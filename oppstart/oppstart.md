@@ -5,7 +5,7 @@
 - Bygge db-scheduler
     - Kjøre tester
 - (Bygge nødvendig kompetanse underveis. Intro til Spring Boot eks.)
-- Lære litt om db-scheduler
+- Lære litt om [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
     - Readme: https://github.com/kagkarlsson/db-scheduler  (det som passer)
     - Se gjennom litt eksempler
         - Enkle [main-eksempler](https://github.com/kagkarlsson/db-scheduler/tree/master/examples/features/src/main/java/com/github/kagkarlsson/examples)
