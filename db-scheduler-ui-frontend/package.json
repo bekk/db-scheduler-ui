@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && cross-env VITE_API_BASE_URL=https://jobjugglerapi-936dd3770db4.herokuapp.com/ vite build",
+    "build": "tsc && cross-env VITE_API_BASE_URL=https://jobjugglerapi-936dd3770db4.herokuapp.com/api vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
