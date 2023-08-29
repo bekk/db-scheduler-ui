@@ -7,10 +7,9 @@ import {
   MenuList,
   Text,
 } from '@chakra-ui/react';
-import { chevronDown } from 'ionicons/icons';
-import { IonIcon } from '@ionic/react';
 import { FilterBy } from 'src/services/getTasks';
 import React from 'react';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 
 export const FilterBox: React.FC<{
   currentFilter: FilterBy;
@@ -23,7 +22,7 @@ export const FilterBox: React.FC<{
     <Menu>
       <MenuButton
         as={Button}
-        rightIcon={<IonIcon icon={chevronDown} />}
+        rightIcon={<ChevronDownIcon />}
         backgroundColor={'#FFFFFF'}
         borderColor={'#E2E8F0'}
         borderWidth={1}
