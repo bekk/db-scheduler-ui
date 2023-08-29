@@ -12,6 +12,8 @@ import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.TaskInstance;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class TaskService {
@@ -37,7 +35,7 @@ public class TaskService {
 
 public void runTaskNow(String taskId, String taskName) {
     Optional<ScheduledExecution<Object>> scheduledExecutionOpt = scheduler.getScheduledExecution(TaskInstanceId.of(taskName, taskId));
-    
+
     if (scheduledExecutionOpt.isPresent()) {
         TaskInstanceId taskInstance = scheduledExecutionOpt.get().getTaskInstance();
         scheduler.reschedule(taskInstance, Instant.now());
@@ -100,17 +98,19 @@ public void runTaskNow(String taskId, String taskName) {
             }
             return true;
         }).collect(Collectors.toList());
-    
+        if (params.getSorting() != null) {
+            tasks.sort(Comparator.comparing(TaskModel::getTaskName));
+        }
         int totalTasks = tasks.size();
         int numberOfPages = (int) Math.ceil((double) totalTasks / params.getSize());
-        
+
         int startIndex = params.getPageNumber() * params.getSize();
         int endIndex = Math.min(startIndex + params.getSize(), totalTasks);
-    
+
         List<TaskModel> pagedTasks = (startIndex < endIndex) ? tasks.subList(startIndex, endIndex) : new ArrayList<>();
-    
+
         return new GetTasksResponse(totalTasks, numberOfPages, pagedTasks);
     }
-    
+
 
 }
