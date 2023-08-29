@@ -44,13 +44,15 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
           <Box textAlign="left" flex="2">
             {taskInstance}
           </Box>
-          <Box flex="1">{new Date(executionTime)?.toLocaleString()}</Box>
+
           <HStack
-            flex="1"
+            flex="2"
             textAlign="left"
             justifyContent={'flex-end'}
             flexDirection={'row'}
           >
+
+            <Box flex="1">{new Date(executionTime)?.toLocaleString()}</Box>
             <TaskRunButton
               taskName={taskName}
               taskInstance={taskInstance}
