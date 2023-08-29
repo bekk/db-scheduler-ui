@@ -3,10 +3,12 @@ import React from 'react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { SortBy } from 'src/services/getTasks';
 
-export const ExecutionSortButton: React.FC<{
+export const SortButton: React.FC<{
+  title: string;
+  name: SortBy;
   currentSort: SortBy;
   setCurrentSort: (sorting: SortBy) => void;
-}> = ({ currentSort, setCurrentSort }) => {
+}> = ({ title, currentSort, setCurrentSort, name }) => {
   return (
     <Text
       as="button"
@@ -14,10 +16,11 @@ export const ExecutionSortButton: React.FC<{
       textAlign="left"
       fontSize={'sm'}
       _active={{ color: '#000000', fontWeight: 'semibold' }}
-      onClick={() => setCurrentSort(SortBy.Default)}
-      fontWeight={currentSort === SortBy.Default ? 'bold' : 'normal'}
+      onClick={() => setCurrentSort(name)}
+      fontWeight={currentSort === name ? 'bold' : 'normal'}
     >
-      Next Execution Time <ChevronDownIcon fontSize={'xl'} />
+      {title}
+      <ChevronDownIcon fontSize={'xl'} />
     </Text>
   );
 };
