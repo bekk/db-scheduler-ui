@@ -29,16 +29,12 @@ export const getTasks = async (
 ): Promise<TasksResponse> => {
   const queryParams = new URLSearchParams();
 
-  if (filter !== FilterBy.All) {
-    queryParams.append('filter', filter.toUpperCase());
-  }
+  queryParams.append('filter', filter.toUpperCase());
   queryParams.append('page', pageNumber.toString());
   queryParams.append('size', limit.toString());
-
-    queryParams.append('sorting', sorting.toUpperCase());
-    queryParams.append('asc', isAsc.toString());
-
-  console.log(queryParams.toString())
+  queryParams.append('sorting', sorting.toUpperCase());
+  queryParams.append('asc', isAsc.toString());
+  
   const response = await fetch(`${API_BASE_URL}/tasks?${queryParams}`, {
     method: 'GET',
     headers: {

@@ -12,7 +12,6 @@ public class TaskRequestParams {
     }
 
     public TaskRequestParams(TaskFilter filter, int pageNumber, int size, TaskSort sorting, boolean asc) {
-        System.out.println(size);
         this.filter = filter;
         this.pageNumber = pageNumber;
         this.size = size;

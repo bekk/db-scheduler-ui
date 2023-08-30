@@ -88,8 +88,6 @@ public void runTaskNow(String taskId, String taskName) {
     }
 
     public GetTasksResponse getAllTasks(TaskRequestParams params) {
-        System.out.println(params.getSorting());
-        System.out.println( params.isAsc());
         List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
             if (params.getFilter() != null) {
                 return switch (params.getFilter()) {
