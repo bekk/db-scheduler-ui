@@ -55,7 +55,7 @@ public class TestController {
     public void deleteTaskNow(@RequestParam String id, @RequestParam String name) {
         taskService.deleteTask(id, name);
     }
-    
+
     @GetMapping("api/run/all")
     public void runAllTasks(){
         taskService.runAllTasks();

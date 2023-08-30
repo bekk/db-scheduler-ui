@@ -1,6 +1,6 @@
 import { TasksResponse } from "src/models/TasksResponse";
 
-const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL as string;
+const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL as string ?? window.location.origin + '/api';
 
 export enum FilterBy {
   All = 'All',
@@ -22,7 +22,7 @@ export enum SortBy {
 export const TASK_QUERY_KEY = `tasks`;
 
 export const getTasks = async (
-  filter = FilterBy.All, 
+  filter = FilterBy.All,
   { pageNumber = 1, limit = 10 }: PaginationParams,
   sorting = SortBy.Default,
   isAsc = true
@@ -34,7 +34,7 @@ export const getTasks = async (
   queryParams.append('size', limit.toString());
   queryParams.append('sorting', sorting.toUpperCase());
   queryParams.append('asc', isAsc.toString());
-  
+
   const response = await fetch(`${API_BASE_URL}/tasks?${queryParams}`, {
     method: 'GET',
     headers: {
