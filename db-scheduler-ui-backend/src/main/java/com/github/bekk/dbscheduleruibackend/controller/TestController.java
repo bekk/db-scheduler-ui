@@ -1,7 +1,6 @@
 package com.github.bekk.dbscheduleruibackend.controller;
 
 import com.github.bekk.dbscheduleruibackend.model.GetTasksResponse;
-import com.github.bekk.dbscheduleruibackend.model.TaskModel;
 import com.github.bekk.dbscheduleruibackend.model.TaskRequestParams;
 import com.github.bekk.dbscheduleruibackend.model.TaskType;
 import com.github.bekk.dbscheduleruibackend.service.TaskService;
@@ -11,8 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin(methods = {RequestMethod.GET, RequestMethod.POST}, origins = "*")
