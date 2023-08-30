@@ -10,7 +10,4 @@ export default defineConfig({
       src: '/src',
     },
   },
-  build: {
-    outDir: '../db-scheduler-ui-backend/src/main/resources/static',
-  }
 });
