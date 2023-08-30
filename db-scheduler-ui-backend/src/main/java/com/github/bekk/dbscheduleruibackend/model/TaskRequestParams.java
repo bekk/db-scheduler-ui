@@ -60,6 +60,7 @@ public class TaskRequestParams {
     }
 
     public enum TaskFilter {
+        ALL,
         FAILED,
         RUNNING,
         SCHEDULED;
