@@ -16,11 +16,11 @@ export const SortButton: React.FC<{
     flex="2"
     textAlign="left"
     fontSize={'sm'}
-    _active={{ color: '#000000', fontWeight: 'semibold' }}
+    //_active={{ color: '#000000', fontWeight: 'semibold' }}
     onClick={() =>
       currentSort === name ? setSortAsc(!sortAsc) : setCurrentSort(name)
     }
-    fontWeight={currentSort === name ? 'bold' : 'normal'}
+    //fontWeight={currentSort === name ? 'bold' : 'normal'}
   >
     {title}
     <ChevronDownIcon
@@ -28,6 +28,7 @@ export const SortButton: React.FC<{
       transform={
         sortAsc || currentSort !== name ? 'rotate(0deg)' : 'rotate(180deg)'
       }
+      color={currentSort === name ? '#000000' : '#ababab'}
       transition="transform 0.3s ease-in-out"
     />
   </Text>
