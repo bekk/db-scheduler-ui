@@ -16,11 +16,9 @@ export const SortButton: React.FC<{
     flex="2"
     textAlign="left"
     fontSize={'sm'}
-    //_active={{ color: '#000000', fontWeight: 'semibold' }}
     onClick={() =>
       currentSort === name ? setSortAsc(!sortAsc) : setCurrentSort(name)
     }
-    //fontWeight={currentSort === name ? 'bold' : 'normal'}
   >
     {title}
     <ChevronDownIcon
