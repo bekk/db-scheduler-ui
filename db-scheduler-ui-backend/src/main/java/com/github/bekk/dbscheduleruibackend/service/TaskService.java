@@ -7,6 +7,7 @@ import com.github.bekk.dbscheduleruibackend.model.TaskRequestParams;
 import com.github.bekk.dbscheduleruibackend.model.GetTasksResponse;
 import com.github.bekk.dbscheduleruibackend.model.TaskData;
 import com.github.bekk.dbscheduleruibackend.model.TaskType;
+import com.github.bekk.dbscheduleruibackend.model.TaskRequestParams.TaskFilter;
 import com.github.bekk.dbscheduleruibackend.util.mapper.TaskMapper;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
@@ -89,11 +90,12 @@ public void runTaskNow(String taskId, String taskName) {
 
     public GetTasksResponse getAllTasks(TaskRequestParams params) {
         List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
-            if (params.getFilter() != null) {
+            if (params.getFilter() != TaskFilter.ALL) {
                 return switch (params.getFilter()) {
                     case FAILED -> task.getConsecutiveFailures() != 0;
                     case RUNNING -> task.isPicked();
                     case SCHEDULED -> !task.isPicked() && task.getConsecutiveFailures() == 0;
+                    default -> throw new IllegalArgumentException("Unexpected value: " + params.getFilter());
                 };
             }
             return true;
