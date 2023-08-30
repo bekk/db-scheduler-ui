@@ -1,4 +1,4 @@
-const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL as string;
+const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL as string ?? window.location.origin + '/api';
 
 const deleteTask = async (id: string, name: string) => {
   const response = await fetch(`${API_BASE_URL}/delete?id=${id}&name=${name}`, {
