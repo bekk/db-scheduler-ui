@@ -8,19 +8,27 @@ export const SortButton: React.FC<{
   name: SortBy;
   currentSort: SortBy;
   setCurrentSort: (sorting: SortBy) => void;
-}> = ({ title, currentSort, setCurrentSort, name }) => {
-  return (
-    <Text
-      as="button"
-      flex="2"
-      textAlign="left"
-      fontSize={'sm'}
-      _active={{ color: '#000000', fontWeight: 'semibold' }}
-      onClick={() => setCurrentSort(name)}
-      fontWeight={currentSort === name ? 'bold' : 'normal'}
-    >
-      {title}
-      <ChevronDownIcon fontSize={'xl'} />
-    </Text>
-  );
-};
+  sortAsc: boolean;
+  setSortAsc: (sortAsc: boolean) => void;
+}> = ({ title, currentSort, setCurrentSort, name, sortAsc, setSortAsc }) => (
+  <Text
+    as="button"
+    flex="2"
+    textAlign="left"
+    fontSize={'sm'}
+    _active={{ color: '#000000', fontWeight: 'semibold' }}
+    onClick={() =>
+      currentSort === name ? setSortAsc(!sortAsc) : setCurrentSort(name)
+    }
+    fontWeight={currentSort === name ? 'bold' : 'normal'}
+  >
+    {title}
+    <ChevronDownIcon
+      fontSize={'xl'}
+      transform={
+        sortAsc || currentSort !== name ? 'rotate(0deg)' : 'rotate(180deg)'
+      }
+      transition="transform 0.3s ease-in-out"
+    />
+  </Text>
+);

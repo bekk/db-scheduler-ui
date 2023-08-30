@@ -13,6 +13,7 @@ export interface PaginationParams {
   pageNumber: number;
   limit: number;
 }
+
 export enum SortBy {
   Default = 'Default',
   Name = 'Name',
@@ -24,18 +25,20 @@ export const getTasks = async (
   filter = FilterBy.All, 
   { pageNumber = 1, limit = 10 }: PaginationParams,
   sorting = SortBy.Default,
+  isAsc = true
 ): Promise<TasksResponse> => {
   const queryParams = new URLSearchParams();
+
   if (filter !== FilterBy.All) {
     queryParams.append('filter', filter.toUpperCase());
   }
   queryParams.append('page', pageNumber.toString());
   queryParams.append('size', limit.toString());
 
-  if (sorting !== SortBy.Default) {
     queryParams.append('sorting', sorting.toUpperCase());
-  }
+    queryParams.append('asc', isAsc.toString());
 
+  console.log(queryParams.toString())
   const response = await fetch(`${API_BASE_URL}/tasks?${queryParams}`, {
     method: 'GET',
     headers: {

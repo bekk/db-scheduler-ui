@@ -22,10 +22,15 @@ const TaskList: React.FC = () => {
     pageNumber: 0,
   });
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
+  const [sortAsc, setSortAsc] = useState<boolean>(true);
   const { data, refetch } = useQuery(
-    [TASK_QUERY_KEY, currentFilter, page, currentSort],
-    () => getTasks(currentFilter, page, currentSort),
+    [TASK_QUERY_KEY, currentFilter, page, currentSort, sortAsc],
+    () => getTasks(currentFilter, page, currentSort, sortAsc),
   );
+
+  useEffect(() => {
+    setSortAsc(true);
+  }, [currentSort]);
 
   useEffect(() => {
     if (data?.numberOfPages && page.pageNumber + 1 > data?.numberOfPages) {
@@ -55,6 +60,8 @@ const TaskList: React.FC = () => {
         <SortButton
           currentSort={currentSort}
           setCurrentSort={setCurrentSort}
+          sortAsc={sortAsc}
+          setSortAsc={setSortAsc}
           title={'Task Name'}
           name={SortBy.Name}
         />
@@ -64,6 +71,8 @@ const TaskList: React.FC = () => {
         <SortButton
           currentSort={currentSort}
           setCurrentSort={setCurrentSort}
+          sortAsc={sortAsc}
+          setSortAsc={setSortAsc}
           title={'Next Execution Time'}
           name={SortBy.Default}
         />

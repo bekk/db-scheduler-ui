@@ -88,6 +88,8 @@ public void runTaskNow(String taskId, String taskName) {
     }
 
     public GetTasksResponse getAllTasks(TaskRequestParams params) {
+        System.out.println(params.getSorting());
+        System.out.println( params.isAsc());
         List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
             if (params.getFilter() != null) {
                 return switch (params.getFilter()) {
@@ -98,19 +100,28 @@ public void runTaskNow(String taskId, String taskName) {
             }
             return true;
         }).collect(Collectors.toList());
-        if (params.getSorting() != null) {
-            tasks.sort(Comparator.comparing(TaskModel::getTaskName));
+    
+        if (params.getSorting() == TaskRequestParams.TaskSort.NAME) {
+            tasks.sort((task1, task2) -> {
+                int comparisonResult = task1.getTaskName().compareTo(task2.getTaskName());
+                return params.isAsc() ? comparisonResult : -comparisonResult;
+            });
+        }else if(params.getSorting() == TaskRequestParams.TaskSort.DEFAULT){
+            tasks.sort((task1, task2) -> {
+                int comparisonResult = task1.getExecutionTime().compareTo(task2.getExecutionTime());
+                return params.isAsc() ? comparisonResult : -comparisonResult;
+            });
         }
+    
         int totalTasks = tasks.size();
         int numberOfPages = (int) Math.ceil((double) totalTasks / params.getSize());
-
+    
         int startIndex = params.getPageNumber() * params.getSize();
         int endIndex = Math.min(startIndex + params.getSize(), totalTasks);
-
+    
         List<TaskModel> pagedTasks = (startIndex < endIndex) ? tasks.subList(startIndex, endIndex) : new ArrayList<>();
-
+    
         return new GetTasksResponse(totalTasks, numberOfPages, pagedTasks);
     }
-
-
+    
 }
