@@ -1,6 +1,4 @@
+import { format } from 'date-fns';
 export function dateFormatText(date: Date) {
-  return new Intl.DateTimeFormat('no-NO', {
-    dateStyle: 'medium',
-    timeStyle: 'medium',
-  }).format(date);
+  return format(date, 'dd. MMM yy, H:mm:ss');
 }
