@@ -53,6 +53,5 @@ jobs:
       - name: Deploy to Heroku
         run: |
           echo "Deploying to Heroku"
-          heroku login -i <<< "${{ secrets.HEROKU_API_KEY }}"
-          heroku git:remote -a jobjugglerapi
+          git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/jobjugglerapi.git
           git push heroku main
