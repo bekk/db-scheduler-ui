@@ -53,7 +53,6 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
             flexDirection={'row'}
           >
             <Box flex={1}>{dateFormatText(new Date(executionTime))}</Box>
-            {/*<DateFormatText executionDate={new Date(executionTime)} />*/}
             <TaskRunButton
               taskName={taskName}
               taskInstance={taskInstance}
