@@ -10,10 +10,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.bekk</groupId>
-    <artifactId>db-scheduler-ui-api</artifactId>
+    <artifactId>db-scheduler-ui</artifactId>
     <version>0.0.1</version>
     <name>db-scheduler-ui-api</name>
-    <description>Demo project for Spring Boot</description>
+    <description>Provides a UI for db-scheduler</description>
     <properties>
         <java.version>17</java.version>
     </properties>

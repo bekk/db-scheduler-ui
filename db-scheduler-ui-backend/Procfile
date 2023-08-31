@@ -1,1 +1,0 @@
-web: java -jar target/db-scheduler-ui-backend-*.jar
