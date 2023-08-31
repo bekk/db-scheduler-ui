@@ -2,11 +2,7 @@ package com.github.bekk.dbscheduleruibackend.service;
 
 import com.github.bekk.dbscheduleruibackend.example.*;
 import com.github.bekk.dbscheduleruibackend.example.OneTimeTaskExample;
-import com.github.bekk.dbscheduleruibackend.model.TaskModel;
-import com.github.bekk.dbscheduleruibackend.model.TaskRequestParams;
-import com.github.bekk.dbscheduleruibackend.model.GetTasksResponse;
-import com.github.bekk.dbscheduleruibackend.model.TaskData;
-import com.github.bekk.dbscheduleruibackend.model.TaskType;
+import com.github.bekk.dbscheduleruibackend.model.*;
 import com.github.bekk.dbscheduleruibackend.util.mapper.TaskMapper;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
@@ -78,7 +74,7 @@ public void runTaskNow(String taskId, String taskName) {
     public void runChainTask() {
         long randomUUID = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
         System.out.println("Chain test");
-        scheduler.schedule(ChainTask.chainTaskStepOne().instance(Long.toString(randomUUID), new TaskData(randomUUID, "test")), Instant.now().plusSeconds(1));
+        scheduler.schedule(ChainTask.chainTaskStepOne().instance(Long.toString(randomUUID), new TestObject("Ole Nordman", 3, "ole.nordman@mail.com")), Instant.now().plusSeconds(100));
     }
 
     public void runAllTasks(){
