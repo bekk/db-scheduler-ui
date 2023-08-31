@@ -48,7 +48,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.bekk</groupId>
-            <artifactId>db-scheduler-ui-api</artifactId>
+            <artifactId>db-scheduler-ui</artifactId>
             <version>0.0.1</version>
         </dependency>
     </dependencies>
