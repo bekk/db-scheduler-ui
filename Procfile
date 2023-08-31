@@ -1,1 +1,1 @@
-web: java -jar db-scheduler-ui-backend/target/*.jar
+web: java -jar *.jar
