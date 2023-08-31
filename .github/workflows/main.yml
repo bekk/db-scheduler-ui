@@ -38,9 +38,9 @@ jobs:
             java-version: '17'
             distribution: 'temurin'
 
-      - name: Build example app with Maven
+      - name: Build all packages with Maven
         run: mvn --batch-mode --update-snapshots package
-        working-directory: example-app
+
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v3
