@@ -3,6 +3,7 @@ import { StatusBox } from 'src/components/StatusBox';
 import { TaskRunButton } from 'src/components/TaskRunButton';
 import React from 'react';
 import { DotButton } from 'src/components/DotButton';
+import { dateFormatText } from 'src/components/dateFormatText';
 
 interface TaskAccordionButtonProps {
   taskName: string;
@@ -51,8 +52,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
             justifyContent={'flex-end'}
             flexDirection={'row'}
           >
-
-            <Box flex="1">{new Date(executionTime)?.toLocaleString()}</Box>
+            <Box flex={1}>{dateFormatText(new Date(executionTime))}</Box>
             <TaskRunButton
               taskName={taskName}
               taskInstance={taskInstance}

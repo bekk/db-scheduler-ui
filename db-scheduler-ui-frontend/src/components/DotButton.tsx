@@ -44,9 +44,10 @@ export const DotButton: React.FC<TaskProps> = ({
           onClick={(event) => event.stopPropagation()}
         />
 
-        <MenuList>
+        <MenuList padding={0}>
           <MenuItem
             rounded={6}
+            minBlockSize={10}
             onClick={(event) => {
               event.stopPropagation();
               setIsOpen(true);
