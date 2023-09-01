@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.github.bekk</groupId>
         <artifactId>db-scheduler-ui-parent</artifactId>
-        <version>0.0.1-snapshot</version>
+        <version>main-SNAPSHOT</version>
     </parent>
 
     <artifactId>db-scheduler-ui-starter</artifactId>
@@ -26,6 +26,14 @@
         </dependencies>
     </dependencyManagement>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/bekk/db-scheduler-ui</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -44,7 +52,7 @@
         <dependency>
             <groupId>com.github.bekk</groupId>
             <artifactId>db-scheduler-ui</artifactId>
-            <version>0.0.1-snapshot</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

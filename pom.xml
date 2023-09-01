@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.bekk</groupId>
     <artifactId>db-scheduler-ui-parent</artifactId>
-    <version>0.0.1-snapshot</version>
+    <version>main-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>db-scheduler-ui: Parent</name>
     <description>Provides a UI for db-scheduler</description>
@@ -20,4 +20,12 @@
         <module>db-scheduler-ui-starter</module>
         <module>example-app</module>
     </modules>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/bekk/db-scheduler-ui</url>
+        </repository>
+    </distributionManagement>
 </project>

@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  release:
+    name: Build and release packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: db-scheduler-ui-frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: db-scheduler-ui-frontend
+
+      - name: Create static folder in backend
+        run: mkdir -p db-scheduler-ui/src/main/resources/static
+
+      - name: Copy static frontend to java package
+        run: cp -r db-scheduler-ui-frontend/dist/. db-scheduler-ui/src/main/resources/static/
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: remove v in tag
+        run: |
+          TAG=${{ github.event.release.tag_name }}
+          echo "VERSION=${TAG#v}" >> $GITHUB_ENV
+
+      - name: Set release version
+        run: |
+          TAG=${{ github.event.release.tag_name }}
+          echo "VERSION=${TAG#v}" >> $GITHUB_ENV
+          mvn --no-transfer-progress --batch-mode versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
+
+      - name: Stage release
+        run: mvn --batch-mode clean deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
