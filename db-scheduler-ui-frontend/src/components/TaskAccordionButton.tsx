@@ -4,13 +4,14 @@ import { TaskRunButton } from 'src/components/TaskRunButton';
 import React from 'react';
 import { DotButton } from 'src/components/DotButton';
 import { dateFormatText } from 'src/components/dateFormatText';
+import { NumberCircle } from 'src/components/NumberCircle';
 
 interface TaskAccordionButtonProps {
   taskName: string;
-  executionTime: Date;
+  executionTime: Date[];
   consecutiveFailures: number;
   picked: boolean;
-  taskInstance: string;
+  taskInstance: string[];
   refetch: () => void;
 }
 
@@ -39,11 +40,25 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
               consecutiveFailures={consecutiveFailures}
             />
           </Box>
-          <Box flex="2" textAlign="left">
+          <Box flex="2" textAlign="left" display={'flex'} alignItems={'center'}>
             {taskName}
+            {taskInstance.length > 1 && (
+              <Box ml={2}>
+                <NumberCircle
+                  number={taskInstance.length}
+                  position={'relative'}
+                  style={{
+                    color: '#000000',
+                  }}
+                />
+              </Box>
+            )}
           </Box>
           <Box textAlign="left" flex="2">
-            {taskInstance}
+            {(taskInstance[0].length > 20 // TODO: grey out ID but not ...more
+              ? taskInstance[0].slice(0, 20) + '...'
+              : taskInstance[0]) +
+              (taskInstance.length > 1 ? ` + ${taskInstance.length} more` : '')}
           </Box>
 
           <HStack
@@ -52,18 +67,18 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
             justifyContent={'flex-end'}
             flexDirection={'row'}
           >
-            <Box flex={1}>{dateFormatText(new Date(executionTime))}</Box>
-            <TaskRunButton
+            <Box flex={1}>{dateFormatText(new Date(executionTime[0]))}</Box>
+            <TaskRunButton // Remove or adjust this button based on number of instances
               taskName={taskName}
-              taskInstance={taskInstance}
+              taskInstance={taskInstance[0]}
               picked={picked}
               consecutiveFailures={consecutiveFailures}
               refetch={refetch}
             />
             {!picked && (
-              <DotButton
+              <DotButton // Remove or adjust this button based on number of instances
                 taskName={taskName}
-                taskInstance={taskInstance}
+                taskInstance={taskInstance[0]}
                 style={{ marginRight: 5 }}
               />
             )}

@@ -58,8 +58,8 @@ public class TaskLogic {
             if (params.getFilter() != TaskRequestParams.TaskFilter.ALL) {
                 return switch (params.getFilter()) {
                     case FAILED -> task.getConsecutiveFailures() != 0;
-                    case RUNNING -> task.isPicked();
-                    case SCHEDULED -> !task.isPicked() && task.getConsecutiveFailures() == 0;
+                    case RUNNING -> task.isPicked().get(0);
+                    case SCHEDULED -> !task.isPicked().get(0) && task.getConsecutiveFailures() == 0;
                     default -> throw new IllegalArgumentException("Unexpected value: " + params.getFilter());
                 };
             }
@@ -72,8 +72,8 @@ public class TaskLogic {
                 return params.isAsc() ? comparisonResult : -comparisonResult;
             });
         }else if(params.getSorting() == TaskRequestParams.TaskSort.DEFAULT){
-            tasks.sort((task1, task2) -> {
-                int comparisonResult = task1.getExecutionTime().compareTo(task2.getExecutionTime());
+            tasks.sort((task1, task2) -> { // TODO: change get(0) to one that gets closest ex time
+                int comparisonResult = task1.getExecutionTime().get(0).compareTo(task2.getExecutionTime().get(0));
                 return params.isAsc() ? comparisonResult : -comparisonResult;
             });
         }

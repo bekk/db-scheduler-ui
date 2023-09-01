@@ -1,19 +1,22 @@
-package com.github.bekk.dbscheduleruiapi.model;
+package com.github.bekk.dbscheduleruibackend.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.common.lang.Nullable;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TaskModel {
     @Nullable private String taskName;
-    @Nullable private String taskInstance;
-    @Nullable private String taskData; // Serialized JSON representation of data
-    @Nullable private Instant executionTime;
-    private boolean picked;
-    @Nullable private String pickedBy;
-    @Nullable private Instant lastSuccess;
+    @Nullable private List<String> taskInstance;
+    @Nullable private List<String> taskData; // Serialized JSON representation of data
+    @Nullable private List<Instant> executionTime;
+    private List<Boolean> picked;
+    @Nullable private List<String> pickedBy;
+    @Nullable private List<Instant> lastSuccess;
     @Nullable private Instant lastFailure;
     private int consecutiveFailures;
     @Nullable private Instant lastHeartbeat;
@@ -22,14 +25,14 @@ public class TaskModel {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public TaskModel(
-            @Nullable String taskName, @Nullable String taskInstance, @Nullable Object taskData,
-            @Nullable Instant executionTime, boolean picked, @Nullable String pickedBy,
-            @Nullable Instant lastSuccess, @Nullable Instant lastFailure, int consecutiveFailures,
+            @Nullable String taskName, @Nullable List<String> taskInstance, @Nullable List<Object> taskData,
+            @Nullable List<Instant> executionTime, List<Boolean> picked, @Nullable List<String> pickedBy,
+            @Nullable List<Instant> lastSuccess, @Nullable Instant lastFailure, int consecutiveFailures,
             @Nullable Instant lastHeartbeat, int version
     ) {
         this.taskName = taskName;
         this.taskInstance = taskInstance;
-        setTaskData(taskData);
+        serializeTaskData(taskData);
         this.executionTime = executionTime;
         this.picked = picked;
         this.pickedBy = pickedBy;
@@ -50,69 +53,68 @@ public class TaskModel {
     }
 
     @Nullable
-    public String getTaskInstance() {
+    public List<String> getTaskInstance() {
         return taskInstance;
     }
 
-    public void setTaskInstance(@Nullable String taskInstance) {
+    public void setTaskInstance(@Nullable List<String> taskInstance) {
         this.taskInstance = taskInstance;
     }
 
     @Nullable
-    public Object getActualTaskData() {
-        try {
-            return objectMapper.readValue(taskData, Object.class);
-        } catch (JsonProcessingException e) {
-            // Handle the error appropriately
-            return null;
-        }
+    public List<String> getActualTaskData() {
+            return taskData;
     }
 
-    public String getTaskData() {
+    public List<String> getTaskData() {
         return this.taskData;
     }
 
-    public void setTaskData(@Nullable Object taskData) {
-        try {
-            this.taskData = objectMapper.writeValueAsString(taskData);
-        } catch (JsonProcessingException e) {
-            // Handle the error appropriately
-            this.taskData = null;
-        }
+    public void serializeTaskData(@Nullable List<Object> taskData) {
+            System.out.println("TaskData: " + taskData);
+            try {
+                this.taskData = Arrays.asList(objectMapper.writeValueAsString(taskData));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            System.out.println(this.taskData);
+    }
+    public void setTaskData(List<String> taskData) {
+        this.taskData = taskData;
     }
 
     @Nullable
-    public Instant getExecutionTime() {
+    public List<Instant> getExecutionTime() {
         return executionTime;
     }
 
-    public void setExecutionTime(@Nullable Instant executionTime) {
+    public void setExecutionTime(@Nullable List<Instant> executionTime) {
         this.executionTime = executionTime;
     }
 
-    public boolean isPicked() {
+    public List<Boolean> isPicked() {
         return picked;
     }
 
-    public void setPicked(boolean picked) {
+    public void setPicked(List<Boolean> picked) {
         this.picked = picked;
     }
 
     @Nullable
-    public String getPickedBy() {
+    public List<String> getPickedBy() {
         return pickedBy;
     }
 
-    public void setPickedBy(@Nullable String pickedBy) {
+    public void setPickedBy(@Nullable List<String> pickedBy) {
         this.pickedBy = pickedBy;
     }
 
     @Nullable
-    public Instant getLastSuccess() {
+    public List<Instant> getLastSuccess() {
         return lastSuccess;
     }
 
-    public void setLastSuccess(@Nullable Instant lastSuccess) {
+    public void setLastSuccess(@Nullable List<Instant> lastSuccess) {
         this.lastSuccess = lastSuccess;
     }
 

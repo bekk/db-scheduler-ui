@@ -1,11 +1,11 @@
 export type Task = {
   taskName: string;
-  taskInstance: string;
+  taskInstance: string[];
   taskData: string | null;
-  executionTime: Date;
+  executionTime: Date[];
   picked: boolean;
-  pickedBy: string | null;
-  lastSuccess: Date | null;
+  pickedBy: string[] | null;
+  lastSuccess: Date[] | null;
   lastFailure: Date | null;
   consecutiveFailures: number;
   lastHeartbeat: Date | null;

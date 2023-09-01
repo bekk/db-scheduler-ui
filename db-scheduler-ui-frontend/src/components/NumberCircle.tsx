@@ -1,13 +1,22 @@
-import { Box } from '@chakra-ui/react';
+import { Box, ResponsiveValue } from '@chakra-ui/react';
+import { Property } from 'csstype';
 
-interface FailureCircleProps {
-  consecutiveFailures: number;
+interface NumberCircleProps {
+  number: number;
+  color?: string;
+  position?: ResponsiveValue<Property.Position>;
+  transform?: ResponsiveValue<Property.Transform>;
+  style?: React.CSSProperties;
 }
 
-export const FailureCircle: React.FC<FailureCircleProps> = ({
-  consecutiveFailures,
+export const NumberCircle: React.FC<NumberCircleProps> = ({
+  number,
+  color,
+  position = 'absolute',
+  transform,
+  style,
 }) => {
-  const powerOfTen = Math.floor(Math.log10(consecutiveFailures));
+  const powerOfTen = Math.floor(Math.log10(number));
   const isExpanded = 1 <= powerOfTen;
 
   const baseSize: number = 22;
@@ -27,21 +36,22 @@ export const FailureCircle: React.FC<FailureCircleProps> = ({
 
   return (
     <Box
-      position="absolute"
+      position={position}
       borderRadius={borderRadius}
       top={0}
       right={`${leftOffset}px`}
       width={`${width}px`}
       height={`${height}px`}
-      backgroundColor="#BB0101"
+      backgroundColor={color ?? '#DAE2F6'}
       display="flex"
       justifyContent="center"
       alignItems={'center'}
       color={'white'}
-      transform="translate(50%, -50%)"
+      transform={transform}
       fontSize={'sm'}
+      style={style}
     >
-      {consecutiveFailures}
+      {number}
     </Box>
   );
 };

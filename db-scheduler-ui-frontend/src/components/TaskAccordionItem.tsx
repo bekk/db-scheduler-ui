@@ -32,7 +32,7 @@ export const TaskAccordionItem: React.FC<TaskAccordionItemProps> = ({
                 : lastFailure && new Date(lastFailure)?.toLocaleString()}
             </Box>
           )}
-          <TaskDataRow taskData={taskData && JSON.parse(taskData)} />
+          <TaskDataRow taskData={taskData} />
         </VStack>
       </Box>
     </AccordionPanel>

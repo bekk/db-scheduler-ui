@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/react';
-import { FailureCircle } from 'src/components/FailureCircle';
+import { NumberCircle } from 'src/components/NumberCircle';
 
 interface StatusBoxProps {
   status: string;
@@ -49,9 +49,11 @@ export const StatusBox: React.FC<StatusBoxProps> = ({
       position="relative"
     >
       {consecutiveFailures > 0 ? (
-        <FailureCircle
-          consecutiveFailures={consecutiveFailures}
-        ></FailureCircle>
+        <NumberCircle
+          number={consecutiveFailures}
+          color="#BB0101"
+          transform={'translate(50%, -50%)'}
+        ></NumberCircle>
       ) : (
         <></>
       )}

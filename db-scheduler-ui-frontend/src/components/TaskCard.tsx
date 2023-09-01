@@ -39,9 +39,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
       />
       <Divider color={'#E0E0E0'} />
       <TaskAccordionItem
-        lastSuccess={lastSuccess}
+        lastSuccess={lastSuccess && lastSuccess[0]}
         lastFailure={lastFailure}
-        taskData={taskData}
+        taskData={taskData && JSON.parse(taskData)}
       />
     </AccordionItem>
   );
