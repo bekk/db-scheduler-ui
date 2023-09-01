@@ -42,10 +42,10 @@ jobs:
         run: mvn --batch-mode --update-snapshots package
 
 
-      - name: Upload production-ready build files
+      - name: Upload example-app build files
         uses: actions/upload-artifact@v3
         with:
-          name: production-files
+          name: example-app
           path: example-app/target/*.jar
 
   deploy:
@@ -60,7 +60,7 @@ jobs:
       - name: Download production-ready build files
         uses: actions/download-artifact@v3
         with:
-          name: production-files
+          name: example-app
 
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.14
