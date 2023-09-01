@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.github.bekk</groupId>
+    <artifactId>db-scheduler-ui-parent</artifactId>
+    <version>0.0.1-snapshot</version>
+    <packaging>pom</packaging>
+    <name>db-scheduler-ui: Parent</name>
+    <description>Provides a UI for db-scheduler</description>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+
+    <modules>
+        <module>db-scheduler-ui</module>
+        <module>db-scheduler-ui-starter</module>
+        <module>example-app</module>
+    </modules>
+</project>

@@ -22,15 +22,15 @@ jobs:
         run: npm install
         working-directory: db-scheduler-ui-frontend
 
-      - name: Build project
+      - name: Build frontend
         run: npm run build
         working-directory: db-scheduler-ui-frontend
 
       - name: Create static folder in backend
-        run: mkdir db-scheduler-ui-backend/src/main/resources/static
+        run: mkdir -p db-scheduler-ui/src/main/resources/static
 
       - name: Copy static frontend to java package
-        run: cp -r db-scheduler-ui-frontend/dist/. db-scheduler-ui-backend/src/main/resources/static/
+        run: cp -r db-scheduler-ui-frontend/dist/. db-scheduler-ui/src/main/resources/static/
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -38,18 +38,15 @@ jobs:
             java-version: '17'
             distribution: 'temurin'
 
-      - name: Build java module with Maven
+      - name: Build all packages with Maven
         run: mvn --batch-mode --update-snapshots package
-        working-directory: db-scheduler-ui-backend
 
-      - name: look for jar file
-        run: ls -R db-scheduler-ui-backend
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v3
         with:
           name: production-files
-          path: db-scheduler-ui-backend/target/*.jar
+          path: example-app/target/*.jar
 
   deploy:
     if: github.ref == 'refs/heads/main'

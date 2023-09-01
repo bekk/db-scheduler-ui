@@ -28,6 +28,7 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
           runTask(taskInstance, taskName).then(() => refetch());
         }}
         iconSpacing={2}
+        width={100}
         bgColor={consecutiveFailures > 0 ? '#5068F6' : '#E9ECFE'}
         textColor={consecutiveFailures > 0 ? '#FFFFFF' : '#002FA7'}
         _hover={{

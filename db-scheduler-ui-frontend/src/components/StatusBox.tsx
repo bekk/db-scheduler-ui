@@ -39,6 +39,7 @@ export const StatusBox: React.FC<StatusBoxProps> = ({
     <Box
       borderRadius={4}
       mr={4}
+      width={115}
       borderColor={borderColor}
       backgroundColor={backgroundColor}
       color={color}
