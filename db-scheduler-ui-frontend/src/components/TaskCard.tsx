@@ -41,7 +41,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       <TaskAccordionItem
         lastSuccess={lastSuccess && lastSuccess[0]}
         lastFailure={lastFailure}
-        taskData={taskData && JSON.parse(taskData)}
+        taskData={taskData}
       />
     </AccordionItem>
   );

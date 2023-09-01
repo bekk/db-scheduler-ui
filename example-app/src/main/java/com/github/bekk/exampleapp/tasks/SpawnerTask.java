@@ -1,5 +1,6 @@
 package com.github.bekk.exampleapp.tasks;
 
+import com.github.bekk.exampleapp.model.TaskData;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
@@ -15,15 +16,15 @@ public class SpawnerTask {
                     final SchedulerClient client = ctx.getSchedulerClient();
                     final long randomUUID = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
 
-                    System.out.println("Scheduling spawned executions.");
                     for(int i = 0; i < 5; i++){
-                        client.schedule(runSpawned().instance("spawned " + randomUUID + " loopnr: " + i), Instant.now().plusSeconds(60));
+                        client.schedule(runSpawned().instance("spawned " + randomUUID + " loopnr: " + i,
+                                new TaskData(123,"{data: MASSIVEDATA}")), Instant.now().plusSeconds(60));
                     }
                 });
     }
 
-    public static Task<?> runSpawned (){
-        return Tasks.oneTime("onetime-spawned-task", Void.class)
+    public static Task<TaskData> runSpawned (){
+        return Tasks.oneTime("onetime-spawned-task", TaskData.class)
                 .execute((inst, ctx) -> {
                     System.out.println("Executed spawned task: " + inst.getTaskName()); 
                     try {

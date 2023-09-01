@@ -31,4 +31,5 @@ export const RepeatIcon = createIcon({
         strokeWidth="32"
       />
     </svg>
+  ),
 });

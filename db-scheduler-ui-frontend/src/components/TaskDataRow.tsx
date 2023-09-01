@@ -4,7 +4,9 @@ import React from 'react';
 export const TaskDataRow: React.FC<{ taskData: string | null }> = ({
   taskData,
 }) => {
-  const parsedData = JSON.parse(taskData || 'null');
+  console.log(taskData);
+  const parsedData = JSON.parse(taskData ? taskData[0] : 'null');
+  console.log(parsedData);
   return (
     <>
       {parsedData !== null && (

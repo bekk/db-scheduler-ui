@@ -1,6 +1,6 @@
-package com.github.bekk.dbscheduleruibackend.util.mapper;
+package com.github.bekk.dbscheduleruiapi.util.mapper;
 
-import com.github.bekk.dbscheduleruibackend.model.TaskModel;
+import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.kagkarlsson.scheduler.CurrentlyExecuting;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 

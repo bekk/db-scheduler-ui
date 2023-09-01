@@ -1,4 +1,4 @@
-package com.github.bekk.dbscheduleruibackend.model;
+package com.github.bekk.dbscheduleruiapi.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,7 +73,8 @@ public class TaskModel {
     public void serializeTaskData(@Nullable List<Object> taskData) {
             System.out.println("TaskData: " + taskData);
             try {
-                this.taskData = Arrays.asList(objectMapper.writeValueAsString(taskData));
+                assert taskData != null;
+                this.taskData = Arrays.asList(objectMapper.writeValueAsString(taskData.get(0)));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
