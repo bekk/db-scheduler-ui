@@ -71,4 +71,10 @@ public class TaskMapper {
         scheduled.addAll(groupTasks(mapCurrentlyExecutingToTaskModel(currentlyExecuting)));
         return scheduled;
     }
+
+    public static List<TaskModel> mapAllExecutionsToTaskModelUngrouped(List<ScheduledExecution<Object>> scheduledExecutions, List<CurrentlyExecuting> currentlyExecuting) {
+        List<TaskModel> scheduled = mapScheduledExecutionsToTaskModel(scheduledExecutions);
+        scheduled.addAll(mapCurrentlyExecutingToTaskModel(currentlyExecuting));
+        return scheduled;
+    }
 }

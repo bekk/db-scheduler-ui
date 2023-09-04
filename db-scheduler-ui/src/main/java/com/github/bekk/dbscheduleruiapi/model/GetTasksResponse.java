@@ -3,15 +3,16 @@ package com.github.bekk.dbscheduleruiapi.model;
 
 import java.util.List;
 
+
 public class GetTasksResponse {
     private int numberOfTasks;
     private int numberOfPages;
     private List<TaskModel> tasks;
 
-    public GetTasksResponse(int numberOfTasks, int numberOfPages, List<TaskModel> tasks) {
-        this.numberOfTasks = numberOfTasks;
-        this.numberOfPages = numberOfPages;
-        this.tasks = tasks;
+    public GetTasksResponse(int totalTasks, List<TaskModel> pagedTasks) {
+        this.numberOfTasks = totalTasks;
+        this.numberOfPages = (int) Math.ceil((double) totalTasks / pagedTasks.size());
+        this.tasks = pagedTasks;
     }
 
     public int getNumberOfTasks() {

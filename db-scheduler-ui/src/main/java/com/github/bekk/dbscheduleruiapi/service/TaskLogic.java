@@ -1,8 +1,10 @@
 package com.github.bekk.dbscheduleruiapi.service;
 
 import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
+import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
+import com.github.bekk.dbscheduleruiapi.util.TaskPagination;
 import com.github.bekk.dbscheduleruiapi.util.mapper.TaskMapper;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
@@ -77,16 +79,27 @@ public class TaskLogic {
                 return params.isAsc() ? comparisonResult : -comparisonResult;
             });
         }
+        List<TaskModel> pagedTasks = TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
 
-        int totalTasks = tasks.size();
-        int numberOfPages = (int) Math.ceil((double) totalTasks / params.getSize());
+        return new GetTasksResponse(tasks.size(), pagedTasks);
 
-        int startIndex = params.getPageNumber() * params.getSize();
-        int endIndex = Math.min(startIndex + params.getSize(), totalTasks);
-
-        List<TaskModel> pagedTasks = (startIndex < endIndex) ? tasks.subList(startIndex, endIndex) : new ArrayList<>();
-
-        return new GetTasksResponse(totalTasks, numberOfPages, pagedTasks);
     }
 
+    public List<TaskModel> getTask(TaskDetailsRequestParams params) {
+        List<TaskModel> tasks = params.taskId.isPresent()
+        ? TaskMapper.mapAllExecutionsToTaskModelUngrouped(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
+            return task.getTaskName().equals(params.taskName) && task.getTaskInstance().get(0).equals(params.taskId.get());
+        }).collect(Collectors.toList())
+        : TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
+            return task.getTaskName().equals(params.taskName);
+        }).collect(Collectors.toList());
+
+        if (tasks.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No ScheduledExecution found for taskName: " + params.taskName + ", taskId: " + params.taskId);
+        }
+
+        List<TaskModel> pagedTasks = TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
+
+        return new GetTasksResponse(tasks.size(), pagedTasks);
+        }
 }

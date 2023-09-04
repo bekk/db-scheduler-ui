@@ -78,7 +78,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
             {!picked && (
               <DotButton // Remove or adjust this button based on number of instances
                 taskName={taskName}
-                taskInstance={taskInstance[0]}
+                taskInstance={taskInstance}
                 style={{ marginRight: 5 }}
               />
             )}

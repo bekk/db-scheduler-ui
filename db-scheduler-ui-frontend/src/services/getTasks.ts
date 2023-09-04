@@ -25,7 +25,9 @@ export const getTasks = async (
   filter = FilterBy.All,
   { pageNumber = 1, limit = 10 }: PaginationParams,
   sorting = SortBy.Default,
-  isAsc = true
+  isAsc = true,
+  taskName?: string,
+  taskId?: string,
 ): Promise<TasksResponse> => {
   const queryParams = new URLSearchParams();
 

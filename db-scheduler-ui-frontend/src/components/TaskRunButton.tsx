@@ -4,7 +4,7 @@ import { PlayIcon, RepeatIcon } from '../assets/icons';
 import React from 'react';
 
 interface TaskRunButtonProps {
-  taskInstance: string;
+  taskInstance: string[];
   taskName: string;
   picked: boolean;
   consecutiveFailures: number;
@@ -25,7 +25,7 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
         style={style}
         onClick={(event) => {
           event.stopPropagation();
-          runTask(taskInstance, taskName).then(() => refetch());
+          runTask(taskInstance[0], taskName).then(() => refetch());
         }}
         iconSpacing={2}
         width={100}
@@ -39,14 +39,20 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
         }}
         fontWeight="normal"
         leftIcon={
-          consecutiveFailures > 0 ? (
+          taskInstance.length > 1 ? (
+            <></>
+          ) : consecutiveFailures > 0 ? (
             <RepeatIcon boxSize={6} />
           ) : (
             <PlayIcon boxSize={4} />
           )
         }
       >
-        {consecutiveFailures > 0 ? 'Rerun' : 'Run'}
+        {taskInstance.length > 1
+          ? 'See all'
+          : consecutiveFailures > 0
+          ? 'Rerun'
+          : 'Run'}
       </Button>
     )}
   </>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Accordion, Box, HStack } from '@chakra-ui/react';
+import { Accordion, Box } from '@chakra-ui/react';
 import TaskCard from './TaskCard';
 import {
   FilterBy,
@@ -13,7 +13,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import PaginationButtons from 'src/components/PaginationButtons';
 import { FilterBox } from 'src/components/FilterBox';
-import { SortButton } from 'src/components/SortButton';
+import TitleRow from 'src/components/TitleRow';
 
 const TaskList: React.FC = () => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
@@ -48,35 +48,12 @@ const TaskList: React.FC = () => {
           setCurrentFilter={setCurrentFilter}
         />
       </Box>
-      <HStack
-        display={'flex'}
-        p="8px 16px"
-        justifyContent={'space-around'}
-        spacing={5}
-      >
-        <Box flex="1" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-          Status
-        </Box>
-        <SortButton
-          currentSort={currentSort}
-          setCurrentSort={setCurrentSort}
-          sortAsc={sortAsc}
-          setSortAsc={setSortAsc}
-          title={'Task Name'}
-          name={SortBy.Name}
-        />
-        <Box flex="2" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-          Task-ID
-        </Box>
-        <SortButton
-          currentSort={currentSort}
-          setCurrentSort={setCurrentSort}
-          sortAsc={sortAsc}
-          setSortAsc={setSortAsc}
-          title={'Next Execution Time'}
-          name={SortBy.Default}
-        />
-      </HStack>
+      <TitleRow
+        currentSort={currentSort}
+        setCurrentSort={setCurrentSort}
+        sortAsc={sortAsc}
+        setSortAsc={setSortAsc}
+      />
       <Accordion allowMultiple>
         {data?.tasks?.map((task) => (
           <TaskCard
