@@ -5,7 +5,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Text,
 } from '@chakra-ui/react';
 import { FilterBy } from 'src/services/getTasks';
 import React from 'react';
@@ -16,9 +15,6 @@ export const FilterBox: React.FC<{
   setCurrentFilter: (filter: FilterBy) => void;
 }> = ({ currentFilter, setCurrentFilter }) => (
   <Box display={'flex'} mb={2} mt={2} alignItems={'center'}>
-    <Text fontSize={'3xl'} fontWeight={'semibold'}>
-      Tasks
-    </Text>
     <Menu>
       <MenuButton
         as={Button}

@@ -5,8 +5,6 @@ import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.service.TaskLogic;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

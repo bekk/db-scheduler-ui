@@ -3,24 +3,25 @@ package com.github.bekk.dbscheduleruiapi.model;
 import java.util.Optional;
 
 public class TaskDetailsRequestParams extends TaskRequestParams {
-    
-    private Optional<String> taskId;
+
+    private String taskId;
     private String taskName;
 
     public TaskDetailsRequestParams() {
     }
 
-    public TaskDetailsRequestParams(TaskFilter filter, int pageNumber, int size, TaskSort sorting, boolean asc, String taskName, Optional<String> taskId) {
+    public TaskDetailsRequestParams(TaskFilter filter, int pageNumber, int size, TaskSort sorting, boolean asc, String taskName, String taskId) {
         super(filter, pageNumber, size, sorting, asc);
         this.taskId = taskId;
         this.taskName = taskName;
+        System.out.println(taskName);
     }
 
-    public Optional<String> getTaskId() {
+    public String getTaskId() {
         return taskId;
     }
 
-    public void setTaskId(Optional<String> taskId) {
+    public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 

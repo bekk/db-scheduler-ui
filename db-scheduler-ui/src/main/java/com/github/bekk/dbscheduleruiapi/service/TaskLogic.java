@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -85,21 +84,21 @@ public class TaskLogic {
 
     }
 
-    public List<TaskModel> getTask(TaskDetailsRequestParams params) {
-        List<TaskModel> tasks = params.taskId.isPresent()
+    public GetTasksResponse getTask(TaskDetailsRequestParams params) {
+        List<TaskModel> tasks = params.getTaskId()!=null
         ? TaskMapper.mapAllExecutionsToTaskModelUngrouped(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
-            return task.getTaskName().equals(params.taskName) && task.getTaskInstance().get(0).equals(params.taskId.get());
+            return task.getTaskName().equals(params.getTaskName()) && task.getTaskInstance().get(0).equals(params.getTaskId());
         }).collect(Collectors.toList())
-        : TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
-            return task.getTaskName().equals(params.taskName);
+        : TaskMapper.mapAllExecutionsToTaskModelUngrouped(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
+            return task.getTaskName().equals(params.getTaskName());
         }).collect(Collectors.toList());
-
         if (tasks.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No ScheduledExecution found for taskName: " + params.taskName + ", taskId: " + params.taskId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No ScheduledExecution found for taskName: "
+                    + params.getTaskName() + ", taskId: " + params.getTaskId());
         }
 
         List<TaskModel> pagedTasks = TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
-
+        System.out.println(tasks);
         return new GetTasksResponse(tasks.size(), pagedTasks);
         }
 }

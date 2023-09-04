@@ -7,7 +7,6 @@ import io.micrometer.common.lang.Nullable;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TaskModel {
     @Nullable private String taskName;
@@ -71,14 +70,12 @@ public class TaskModel {
     }
 
     public void serializeTaskData(@Nullable List<Object> taskData) {
-            System.out.println("TaskData: " + taskData);
             try {
                 assert taskData != null;
                 this.taskData = Arrays.asList(objectMapper.writeValueAsString(taskData.get(0)));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            System.out.println(this.taskData);
     }
     public void setTaskData(List<String> taskData) {
         this.taskData = taskData;

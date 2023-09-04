@@ -1,31 +1,17 @@
 import { TasksResponse } from "src/models/TasksResponse";
+import { FilterBy, PaginationParams, SortBy } from "./getTasks";
 
 const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL as string ?? window.location.origin + '/api';
 
-export enum FilterBy {
-  All = 'All',
-  Failed = 'Failed',
-  Running = 'Running',
-  Scheduled = 'Scheduled',
-}
+export const TASK_DETAILS_QUERY_KEY = `tasks/details`;
 
-export interface PaginationParams {
-  pageNumber: number;
-  limit: number;
-}
-
-export enum SortBy {
-  Default = 'Default',
-  Name = 'Name',
-}
-
-export const TASK_QUERY_KEY = `tasks`;
-
-export const getTasks = async (
+export const getTask = async (
   filter = FilterBy.All,
   { pageNumber = 1, limit = 10 }: PaginationParams,
   sorting = SortBy.Default,
   isAsc = true,
+  taskName?: string,
+  taskId?: string,
 ): Promise<TasksResponse> => {
   const queryParams = new URLSearchParams();
 
@@ -34,8 +20,10 @@ export const getTasks = async (
   queryParams.append('size', limit.toString());
   queryParams.append('sorting', sorting.toUpperCase());
   queryParams.append('asc', isAsc.toString());
+  taskName && queryParams.append('taskName', taskName);
+  taskId && queryParams.append('taskId', taskId);
 
-  const response = await fetch(`${API_BASE_URL}/tasks?${queryParams}`, {
+  const response = await fetch(`${API_BASE_URL}/tasks/details?${queryParams}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

@@ -18,9 +18,7 @@ public class ExampleApp {
         return args -> {
             System.out.println("Running all tasks");
             TaskService taskService = new TaskService(scheduler);
-            System.out.println("TaskService created");
             taskService.runAllTasks();
-            System.out.println("tasks ran");
             };
         }
     }

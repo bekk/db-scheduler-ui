@@ -7,6 +7,7 @@ import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
 
 import java.time.Instant;
+import java.util.Random;
 import java.util.UUID;
 
 public class SpawnerTask {
@@ -26,9 +27,12 @@ public class SpawnerTask {
     public static Task<TaskData> runSpawned (){
         return Tasks.oneTime("onetime-spawned-task", TaskData.class)
                 .execute((inst, ctx) -> {
-                    System.out.println("Executed spawned task: " + inst.getTaskName()); 
+                    
                     try {
                         Thread.sleep(10000);
+                        if (new Random().nextInt(100) < 20) {
+                            throw new RuntimeException("Simulated failure");
+                        }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }});

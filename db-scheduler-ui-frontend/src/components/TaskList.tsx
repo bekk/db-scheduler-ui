@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Accordion, Box } from '@chakra-ui/react';
+import { Accordion, Box, Text, IconButton } from '@chakra-ui/react';
 import TaskCard from './TaskCard';
 import {
   FilterBy,
@@ -14,6 +14,9 @@ import { useQuery } from '@tanstack/react-query';
 import PaginationButtons from 'src/components/PaginationButtons';
 import { FilterBox } from 'src/components/FilterBox';
 import TitleRow from 'src/components/TitleRow';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowBackIcon } from '@chakra-ui/icons';
+import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
 
 const TaskList: React.FC = () => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
@@ -23,11 +26,27 @@ const TaskList: React.FC = () => {
   });
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
   const [sortAsc, setSortAsc] = useState<boolean>(true);
-  const { data, refetch } = useQuery(
-    [TASK_QUERY_KEY, currentFilter, page, currentSort, sortAsc],
-    () => getTasks(currentFilter, page, currentSort, sortAsc),
-  );
 
+  const { taskName } = useParams<{ taskName?: string }>();
+  const isDetailsView = !!taskName;
+  const { data, refetch, status } = useQuery(
+    isDetailsView
+      ? [
+          TASK_DETAILS_QUERY_KEY,
+          currentFilter,
+          page,
+          currentSort,
+          sortAsc,
+          taskName,
+        ]
+      : [TASK_QUERY_KEY, currentFilter, page, currentSort, sortAsc],
+    () =>
+      isDetailsView
+        ? getTask(currentFilter, page, currentSort, sortAsc, taskName)
+        : getTasks(currentFilter, page, currentSort, sortAsc),
+  );
+  const navigate = useNavigate();
+  console.log(status);
   useEffect(() => {
     setSortAsc(true);
   }, [currentSort]);
@@ -42,7 +61,17 @@ const TaskList: React.FC = () => {
 
   return (
     <Box>
-      <Box display={'flex'} mb={14}>
+      <Box display={'flex'} mb={14} alignItems={'center'}>
+        {isDetailsView && (
+          <IconButton
+            icon={<ArrowBackIcon />}
+            onClick={() => navigate('/')}
+            aria-label={'Back button'}
+          />
+        )}
+        <Text ml={5} fontSize={'3xl'} fontWeight={'semibold'}>
+          {isDetailsView ? taskName : 'All Tasks'}
+        </Text>
         <FilterBox
           currentFilter={currentFilter}
           setCurrentFilter={setCurrentFilter}
@@ -53,6 +82,7 @@ const TaskList: React.FC = () => {
         setCurrentSort={setCurrentSort}
         sortAsc={sortAsc}
         setSortAsc={setSortAsc}
+        isDetailsView={isDetailsView}
       />
       <Accordion allowMultiple>
         {data?.tasks?.map((task) => (
