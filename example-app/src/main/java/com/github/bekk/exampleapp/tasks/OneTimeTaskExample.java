@@ -9,7 +9,7 @@ public class OneTimeTaskExample {
         return Tasks.oneTime("example-onetime-task", TaskData.class).
                 execute((inst,ctx) -> {
                     System.out.println("Executed onetime task: " + inst.getTaskName());
-                    System.out.println("With data id: " + inst.getData().id() + " data: " + inst.getData().data());
+                    System.out.println("With data id: " + inst.getData().getId() + " data: " + inst.getData().getData());
                 });
     }
 }
