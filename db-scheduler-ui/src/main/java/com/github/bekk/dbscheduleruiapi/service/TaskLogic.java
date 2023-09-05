@@ -1,17 +1,21 @@
 package com.github.bekk.dbscheduleruiapi.service;
 
 import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
+import com.github.bekk.dbscheduleruiapi.model.LogModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
+import com.github.bekk.dbscheduleruiapi.util.mapper.LogModelRowMapper;
 import com.github.bekk.dbscheduleruiapi.util.mapper.TaskMapper;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.sql.DataSource;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +27,16 @@ public class TaskLogic {
 
     private final Scheduler scheduler;
 
+    private final DataSource dataSource;
+
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    public TaskLogic(Scheduler scheduler) {
+    public TaskLogic(Scheduler scheduler, DataSource dataSource){
         this.scheduler = scheduler;
         this.scheduler.start();
+        this.dataSource = dataSource;
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     public void runTaskNow(String taskId, String taskName) {
@@ -89,4 +99,8 @@ public class TaskLogic {
         return new GetTasksResponse(totalTasks, numberOfPages, pagedTasks);
     }
 
+    public List<LogModel> getLogs() {
+        return jdbcTemplate.query("SELECT * FROM scheduled_execution_logs", new LogModelRowMapper());
+
+    }
 }
