@@ -55,15 +55,16 @@ public class TaskLogic {
 
     public GetTasksResponse getAllTasks(TaskRequestParams params) {
         List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
-            if (params.getFilter() != TaskRequestParams.TaskFilter.ALL) {
-                return switch (params.getFilter()) {
-                    case FAILED -> task.getConsecutiveFailures() != 0;
-                    case RUNNING -> task.isPicked();
-                    case SCHEDULED -> !task.isPicked() && task.getConsecutiveFailures() == 0;
-                    default -> throw new IllegalArgumentException("Unexpected value: " + params.getFilter());
-                };
-            }
-            return true;
+                switch (params.getFilter()){
+                    case FAILED:
+                        return task.getConsecutiveFailures() != 0;
+                    case RUNNING:
+                        return task.isPicked();
+                    case SCHEDULED:
+                        return !task.isPicked() && task.getConsecutiveFailures() == 0;
+                    default:
+                        return true;
+                }
         }).collect(Collectors.toList());
 
         if (params.getSorting() == TaskRequestParams.TaskSort.NAME) {
