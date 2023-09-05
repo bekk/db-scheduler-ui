@@ -43,14 +43,14 @@ jobs:
 
 
       - name: Upload example-app build files
-        if: github.ref == 'refs/heads/main'
+        #if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v3
         with:
           name: example-app
           path: example-app/target/*.jar
 
   deploy:
-    if: github.ref == 'refs/heads/main'
+    #if: github.ref == 'refs/heads/main'
     name: Deploy to Heroku
     runs-on: ubuntu-latest
     needs: build
@@ -61,8 +61,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: example-app
-      - name: ls
-        run: ls -la
 
       - name: Build, Push and Release a Docker container to Heroku
         uses: gonuit/heroku-docker-deploy@v1.3.3
