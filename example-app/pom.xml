@@ -52,7 +52,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>io.rocketbase.extension</groupId>
+            <artifactId>db-scheduler-log-spring-boot-starter</artifactId>
+            <version>0.7.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
