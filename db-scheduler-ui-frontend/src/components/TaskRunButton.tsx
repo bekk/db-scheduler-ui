@@ -36,8 +36,16 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
           }}
           iconSpacing={2}
           width={100}
-          bgColor={consecutiveFailures > 0 ? '#5068F6' : '#E9ECFE'}
-          textColor={consecutiveFailures > 0 ? '#FFFFFF' : '#002FA7'}
+          bgColor={
+            consecutiveFailures > 0 && taskInstance.length === 1
+              ? '#5068F6'
+              : '#E9ECFE'
+          }
+          textColor={
+            consecutiveFailures > 0 && taskInstance.length === 1
+              ? '#FFFFFF'
+              : '#002FA7'
+          }
           _hover={{
             bgColor:
               consecutiveFailures > 0 && taskInstance.length === 1
@@ -45,7 +53,10 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
                 : '#D3D9FE',
           }}
           _active={{
-            bgColor: consecutiveFailures > 0 ? '#8a94c0' : '#eceefa',
+            bgColor:
+              consecutiveFailures > 0 && taskInstance.length === 1
+                ? '#8a94c0'
+                : '#eceefa',
           }}
           fontWeight="normal"
           leftIcon={
