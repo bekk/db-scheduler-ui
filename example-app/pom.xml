@@ -6,25 +6,16 @@
     <parent>
         <groupId>com.github.bekk</groupId>
         <artifactId>db-scheduler-ui-parent</artifactId>
-        <version>0.0.1-snapshot</version>
+        <version>main-SNAPSHOT</version>
     </parent>
-
 
     <artifactId>example-app</artifactId>
     <name>example-app</name>
     <description>Example app using db-scheduler-ui</description>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>3.1.2</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
 
     <dependencies>
@@ -55,7 +46,7 @@
         <dependency>
             <groupId>com.github.bekk</groupId>
             <artifactId>db-scheduler-ui-starter</artifactId>
-            <version>0.0.1-snapshot</version>
+            <version>main-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -65,10 +56,10 @@
     </dependencies>
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.7.15</version>
                 <configuration>
                     <mainClass>com.github.bekk.exampleapp.ExampleApp</mainClass>
                     <layout>JAR</layout>

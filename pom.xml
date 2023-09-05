@@ -5,19 +5,41 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.bekk</groupId>
     <artifactId>db-scheduler-ui-parent</artifactId>
-    <version>0.0.1-snapshot</version>
+    <version>main-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>db-scheduler-ui: Parent</name>
     <description>Provides a UI for db-scheduler</description>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <spring-boot.version>2.7.15</spring-boot.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <modules>
         <module>db-scheduler-ui</module>
         <module>db-scheduler-ui-starter</module>
         <module>example-app</module>
     </modules>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/bekk/db-scheduler-ui</url>
+        </repository>
+    </distributionManagement>
 </project>
