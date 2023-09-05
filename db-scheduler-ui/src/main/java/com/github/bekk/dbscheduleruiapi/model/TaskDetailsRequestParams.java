@@ -14,7 +14,6 @@ public class TaskDetailsRequestParams extends TaskRequestParams {
         super(filter, pageNumber, size, sorting, asc);
         this.taskId = taskId;
         this.taskName = taskName;
-        System.out.println(taskName);
     }
 
     public String getTaskId() {

@@ -19,41 +19,38 @@ const TitleRow: React.FC<TitleRowProps> = ({
   setSortAsc,
   sortAsc,
   isDetailsView,
-}) => {
-  console.log(isDetailsView);
-  return (
-    <HStack
-      display={'flex'}
-      p="8px 16px"
-      justifyContent={'space-around'}
-      spacing={5}
-    >
-      <Box flex="1" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-        Status
-      </Box>
-      {!isDetailsView && (
-        <SortButton
-          currentSort={currentSort}
-          setCurrentSort={setCurrentSort}
-          sortAsc={sortAsc}
-          setSortAsc={setSortAsc}
-          title={'Task Name'}
-          name={SortBy.Name}
-        />
-      )}
-      <Box flex="2" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-        Task-ID
-      </Box>
+}) => (
+  <HStack
+    display={'flex'}
+    p="8px 16px"
+    justifyContent={'space-around'}
+    spacing={5}
+  >
+    <Box flex="1" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
+      Status
+    </Box>
+    {!isDetailsView && (
       <SortButton
         currentSort={currentSort}
         setCurrentSort={setCurrentSort}
         sortAsc={sortAsc}
         setSortAsc={setSortAsc}
-        title={'Next Execution Time'}
-        name={SortBy.Default}
+        title={'Task Name'}
+        name={SortBy.Name}
       />
-    </HStack>
-  );
-};
+    )}
+    <Box flex="2" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
+      Task-ID
+    </Box>
+    <SortButton
+      currentSort={currentSort}
+      setCurrentSort={setCurrentSort}
+      sortAsc={sortAsc}
+      setSortAsc={setSortAsc}
+      title={'Next Execution Time'}
+      name={SortBy.Default}
+    />
+  </HStack>
+);
 
 export default TitleRow;

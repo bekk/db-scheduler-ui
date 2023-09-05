@@ -30,7 +30,7 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
             event.stopPropagation();
             taskInstance.length === 1
               ? runTask(taskInstance[0], taskName).then(() => refetch())
-              : navigate(`tasks/${taskName}`, {
+              : navigate(`/${taskName}`, {
                   state: { taskName: taskName },
                 });
           }}
@@ -39,7 +39,10 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
           bgColor={consecutiveFailures > 0 ? '#5068F6' : '#E9ECFE'}
           textColor={consecutiveFailures > 0 ? '#FFFFFF' : '#002FA7'}
           _hover={{
-            bgColor: consecutiveFailures > 0 ? '#344ACC' : '#D3D9FE',
+            bgColor:
+              consecutiveFailures > 0 && taskInstance.length === 1
+                ? '#344ACC'
+                : '#D3D9FE',
           }}
           _active={{
             bgColor: consecutiveFailures > 0 ? '#8a94c0' : '#eceefa',

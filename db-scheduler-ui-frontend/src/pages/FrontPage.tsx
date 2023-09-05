@@ -8,10 +8,10 @@ export const FrontPage: React.FC = () => {
     <>
       <TopBar title={'JobJuggler'} />
       <Box mx={20} mt={14}>
-        <Router>
+        <Router basename="/db-scheduler-ui">
           <Routes>
             <Route index path="/" element={<TaskList />}></Route>
-            <Route path="/tasks/:taskName" element={<TaskList />}></Route>
+            <Route path="/:taskName" element={<TaskList />}></Route>
           </Routes>
         </Router>
       </Box>

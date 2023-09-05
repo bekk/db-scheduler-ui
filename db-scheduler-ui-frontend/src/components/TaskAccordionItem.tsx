@@ -5,7 +5,7 @@ import React from 'react';
 interface TaskAccordionItemProps {
   lastSuccess: Date | null;
   lastFailure: Date | null;
-  taskData: string | null;
+  taskData: (object | null)[];
 }
 
 export const TaskAccordionItem: React.FC<TaskAccordionItemProps> = ({

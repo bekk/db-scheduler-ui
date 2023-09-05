@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,15 +57,16 @@ public class TaskLogic {
 
     public GetTasksResponse getAllTasks(TaskRequestParams params) {
         List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
-            if (params.getFilter() != TaskRequestParams.TaskFilter.ALL) {
-                return switch (params.getFilter()) {
-                    case FAILED -> task.getConsecutiveFailures() != 0;
-                    case RUNNING -> task.isPicked().get(0);
-                    case SCHEDULED -> !task.isPicked().get(0) && task.getConsecutiveFailures() == 0;
-                    default -> throw new IllegalArgumentException("Unexpected value: " + params.getFilter());
-                };
-            }
-            return true;
+                switch (params.getFilter()){
+                    case FAILED:
+                        return task.getConsecutiveFailures() != 0;
+                    case RUNNING:
+                        return task.isPicked().get(0);
+                    case SCHEDULED:
+                        return !task.isPicked().get(0) && task.getConsecutiveFailures() == 0;
+                    default:
+                        return true;
+                }
         }).collect(Collectors.toList());
 
         if (params.getSorting() == TaskRequestParams.TaskSort.NAME) {
@@ -73,13 +75,14 @@ public class TaskLogic {
                 return params.isAsc() ? comparisonResult : -comparisonResult;
             });
         }else if(params.getSorting() == TaskRequestParams.TaskSort.DEFAULT){
-            tasks.sort((task1, task2) -> { // TODO: change get(0) to one that gets closest ex time
-                int comparisonResult = task1.getExecutionTime().get(0).compareTo(task2.getExecutionTime().get(0));
-                return params.isAsc() ? comparisonResult : -comparisonResult;
-            });
+            Comparator<TaskModel> comparator = Comparator.comparing(
+            task -> task.getExecutionTime().stream()
+                        .min(Instant::compareTo)
+                        .orElse(Instant.MAX),
+            Comparator.nullsLast(Instant::compareTo));
+            tasks.sort(params.isAsc()?comparator:comparator.reversed());
         }
         List<TaskModel> pagedTasks = TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
-
         return new GetTasksResponse(tasks.size(), pagedTasks);
 
     }
@@ -98,7 +101,7 @@ public class TaskLogic {
         }
 
         List<TaskModel> pagedTasks = TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
-        System.out.println(tasks);
+
         return new GetTasksResponse(tasks.size(), pagedTasks);
         }
 }

@@ -19,6 +19,11 @@ public class TaskController {
         this.taskLogic = taskLogic;
     }
 
+    @RequestMapping(value= {"/db-scheduler-ui/**", "/db-scheduler-ui"})
+    public String forwardToIndex() {
+        return "forward:/index.html";
+    }
+
     @GetMapping("/tasks")
     public GetTasksResponse getTasks(TaskRequestParams params) {
         return taskLogic.getAllTasks(params);

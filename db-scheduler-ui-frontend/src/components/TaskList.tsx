@@ -29,7 +29,7 @@ const TaskList: React.FC = () => {
 
   const { taskName } = useParams<{ taskName?: string }>();
   const isDetailsView = !!taskName;
-  const { data, refetch, status } = useQuery(
+  const { data, refetch } = useQuery(
     isDetailsView
       ? [
           TASK_DETAILS_QUERY_KEY,
@@ -46,7 +46,6 @@ const TaskList: React.FC = () => {
         : getTasks(currentFilter, page, currentSort, sortAsc),
   );
   const navigate = useNavigate();
-  console.log(status);
   useEffect(() => {
     setSortAsc(true);
   }, [currentSort]);
@@ -64,9 +63,11 @@ const TaskList: React.FC = () => {
       <Box display={'flex'} mb={14} alignItems={'center'}>
         {isDetailsView && (
           <IconButton
-            icon={<ArrowBackIcon />}
+            icon={<ArrowBackIcon boxSize={8} />}
             onClick={() => navigate('/')}
             aria-label={'Back button'}
+            variant={'ghost'}
+            isRound
           />
         )}
         <Text ml={5} fontSize={'3xl'} fontWeight={'semibold'}>

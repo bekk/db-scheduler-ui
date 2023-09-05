@@ -13,7 +13,7 @@ interface TaskCardProps extends Task {
 const TaskCard: React.FC<TaskCardProps> = ({
   taskName,
   executionTime,
-  taskData,
+  actualTaskData,
   consecutiveFailures,
   picked,
   taskInstance,
@@ -41,7 +41,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       <TaskAccordionItem
         lastSuccess={lastSuccess && lastSuccess[0]}
         lastFailure={lastFailure}
-        taskData={taskData}
+        taskData={actualTaskData}
       />
     </AccordionItem>
   );

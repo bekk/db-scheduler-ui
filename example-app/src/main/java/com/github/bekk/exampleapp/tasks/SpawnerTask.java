@@ -17,7 +17,7 @@ public class SpawnerTask {
                     final SchedulerClient client = ctx.getSchedulerClient();
                     final long randomUUID = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
 
-                    for(int i = 0; i < 5; i++){
+                    for(int i = 0; i < 100; i++){
                         client.schedule(runSpawned().instance("spawned " + randomUUID + " loopnr: " + i,
                                 new TaskData(123,"{data: MASSIVEDATA}")), Instant.now().plusSeconds(60));
                     }

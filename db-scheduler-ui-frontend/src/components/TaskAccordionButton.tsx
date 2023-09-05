@@ -1,4 +1,11 @@
-import { AccordionButton, AccordionIcon, Box, HStack } from '@chakra-ui/react';
+import {
+  AccordionButton,
+  AccordionIcon,
+  Box,
+  Flex,
+  HStack,
+  Text,
+} from '@chakra-ui/react';
 import { StatusBox } from 'src/components/StatusBox';
 import { TaskRunButton } from 'src/components/TaskRunButton';
 import React from 'react';
@@ -63,12 +70,16 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
               )}
             </Box>
           )}
-          <Box textAlign="left" flex="2">
-            {(taskInstance[0].length > 20 // TODO: grey out ID but not ...more
-              ? taskInstance[0].slice(0, 20) + '...'
-              : taskInstance[0]) +
-              (taskInstance.length > 1 ? ` + ${taskInstance.length} more` : '')}
-          </Box>
+          <Flex wrap={'wrap'} textAlign="left" flex="2" display={'flex'}>
+            <Text>{taskInstance[0].slice(0, 20)}</Text>
+            {taskInstance[0].length > 20 && (
+              <Text color={'#555555'}>
+                {taskInstance.length > 1
+                  ? `... + ${taskInstance.length - 1} more`
+                  : ''}
+              </Text>
+            )}
+          </Flex>
 
           <HStack
             flex="2"
@@ -77,21 +88,22 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
             flexDirection={'row'}
           >
             <Box flex={1}>{dateFormatText(new Date(executionTime[0]))}</Box>
-            <TaskRunButton
-              taskName={taskName}
-              taskInstance={taskInstance}
-              picked={picked}
-              consecutiveFailures={consecutiveFailures}
-              refetch={refetch}
-            />
-            {!picked &&
-              taskInstance.length === 1 && ( // TODO: Fix so spacing isn't messed up when it is gone
+            <Box display={'flex'} justifyContent={'space-between'} w={150}>
+              <TaskRunButton
+                taskName={taskName}
+                taskInstance={taskInstance}
+                picked={picked}
+                consecutiveFailures={consecutiveFailures}
+                refetch={refetch}
+              />
+              {!picked && taskInstance.length === 1 && (
                 <DotButton
                   taskName={taskName}
                   taskInstance={taskInstance[0]}
                   style={{ marginRight: 5 }}
                 />
               )}
+            </Box>
             <AccordionIcon />
           </HStack>
         </HStack>
