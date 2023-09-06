@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AccordionItem, Divider } from '@chakra-ui/react';
+import { AccordionItem, AccordionItemProps, Divider } from '@chakra-ui/react';
 import { Task } from '../models/Task';
 
 import { TaskAccordionButton } from 'src/components/TaskAccordionButton';
@@ -8,6 +8,8 @@ import { TaskAccordionItem } from 'src/components/TaskAccordionItem';
 
 interface TaskCardProps extends Task {
   refetch: () => void;
+  accordionProps?: AccordionItemProps;
+  isGrouped?: boolean;
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({
@@ -20,6 +22,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
   lastFailure,
   lastSuccess,
   refetch,
+  accordionProps,
+  isGrouped,
 }) => {
   return (
     <AccordionItem
@@ -28,6 +32,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       m={1}
       borderWidth={1}
       borderColor={'#E0E0E0'}
+      {...accordionProps}
     >
       <TaskAccordionButton
         picked={picked}
@@ -37,12 +42,16 @@ const TaskCard: React.FC<TaskCardProps> = ({
         executionTime={executionTime}
         refetch={refetch}
       />
-      <Divider color={'#E0E0E0'} />
-      <TaskAccordionItem
-        lastSuccess={lastSuccess && lastSuccess[0]}
-        lastFailure={lastFailure}
-        taskData={actualTaskData}
-      />
+      {!isGrouped && (
+        <>
+          <Divider color={'#E0E0E0'} />
+          <TaskAccordionItem
+            lastSuccess={lastSuccess && lastSuccess[0]}
+            lastFailure={lastFailure}
+            taskData={actualTaskData}
+          />
+        </>
+      )}
     </AccordionItem>
   );
 };

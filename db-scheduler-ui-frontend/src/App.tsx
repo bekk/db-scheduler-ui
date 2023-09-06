@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { refetchInterval: 2000 } },
+  defaultOptions: { queries: { refetchInterval: 2000000 } },
 });
 
 function App() {

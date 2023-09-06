@@ -17,6 +17,7 @@ import TitleRow from 'src/components/TitleRow';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
+import TaskGroupCard from './TaskGroupCard';
 
 const TaskList: React.FC = () => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
@@ -86,13 +87,21 @@ const TaskList: React.FC = () => {
         isDetailsView={isDetailsView}
       />
       <Accordion allowMultiple>
-        {data?.tasks?.map((task) => (
-          <TaskCard
-            key={task.taskInstance + task.taskName}
-            {...task}
-            refetch={refetch}
-          />
-        ))}
+        {data?.tasks?.map((task) =>
+          task.taskInstance.length === 1 ? (
+            <TaskCard
+              key={task.taskInstance + task.taskName}
+              {...task}
+              refetch={refetch}
+            />
+          ) : (
+            <TaskGroupCard
+              key={task.taskInstance + task.taskName}
+              {...task}
+              refetch={refetch}
+            />
+          ),
+        )}
       </Accordion>
       <PaginationButtons
         page={page}

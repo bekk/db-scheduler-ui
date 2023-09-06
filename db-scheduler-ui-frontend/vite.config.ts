@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import eslintPlugin from 'vite-plugin-eslint';
 
 export default defineConfig({
-  base: '/db-scheduler-ui',
+  base: '/jobjuggler',
   server: {
     port: 51373,
   },

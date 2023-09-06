@@ -1,6 +1,7 @@
 package com.github.bekk.dbscheduleruistarter.autoconfigure;
 
 import com.github.bekk.dbscheduleruiapi.controller.TaskController;
+import com.github.bekk.dbscheduleruiapi.controller.UIController;
 import com.github.bekk.dbscheduleruiapi.service.TaskLogic;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -27,5 +28,11 @@ public class UiApiAutoConfiguration {
     @ConditionalOnMissingBean
     public TaskController taskController(TaskLogic taskLogic){
         return new TaskController(taskLogic);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public UIController uiController() { // Define the UIController bean
+        return new UIController();
     }
 }
