@@ -7,6 +7,7 @@ import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TaskMapper {
     public static List<TaskModel> mapScheduledExecutionsToTaskModel(List<ScheduledExecution<Object>> scheduledExecutions) {
@@ -20,7 +21,7 @@ public class TaskMapper {
                         Arrays.asList(execution.getPickedBy()),
                         Arrays.asList(execution.getLastSuccess()),
                         execution.getLastFailure(),
-                        execution.getConsecutiveFailures(),
+                        Arrays.asList(execution.getConsecutiveFailures()), // Modified here
                         null,
                         0
                 ))
@@ -38,7 +39,7 @@ public class TaskMapper {
                         Arrays.asList(execution.getExecution().pickedBy),
                         Arrays.asList(execution.getExecution().lastSuccess),
                         execution.getExecution().lastFailure,
-                        execution.getExecution().consecutiveFailures,
+                        Arrays.asList(execution.getExecution().consecutiveFailures), // Modified here
                         null,
                         0
                 ))
@@ -59,22 +60,23 @@ public class TaskMapper {
                     taskModel.setPickedBy(taskModels.stream().map(TaskModel::getPickedBy).flatMap(List::stream).collect(Collectors.toList()));
                     taskModel.setLastSuccess(taskModels.stream().map(TaskModel::getLastSuccess).flatMap(List::stream).collect(Collectors.toList()));
                     taskModel.setLastFailure(taskModels.stream().map(TaskModel::getLastFailure).filter(x -> x != null).findFirst().orElse(null));
-                    taskModel.setConsecutiveFailures(taskModels.stream().map(TaskModel::getConsecutiveFailures).max(Integer::compareTo).orElse(0));
+                    taskModel.setConsecutiveFailures(taskModels.stream().map(TaskModel::getConsecutiveFailures).flatMap(List::stream).collect(Collectors.toList())); // Modified here
                     return taskModel;
                 })
                 .collect(Collectors.toList());
     }
-    
-    
+
+
+
     public static List<TaskModel> mapAllExecutionsToTaskModel(List<ScheduledExecution<Object>> scheduledExecutions, List<CurrentlyExecuting> currentlyExecuting) {
-        List<TaskModel> scheduled = groupTasks(mapScheduledExecutionsToTaskModel(scheduledExecutions));
-        scheduled.addAll(groupTasks(mapCurrentlyExecutingToTaskModel(currentlyExecuting)));
-        return scheduled;
+        return groupTasks(Stream.concat(mapScheduledExecutionsToTaskModel(scheduledExecutions).stream(),
+                mapCurrentlyExecutingToTaskModel(currentlyExecuting).stream()).collect(Collectors.toList()));
     }
 
     public static List<TaskModel> mapAllExecutionsToTaskModelUngrouped(List<ScheduledExecution<Object>> scheduledExecutions, List<CurrentlyExecuting> currentlyExecuting) {
         List<TaskModel> scheduled = mapScheduledExecutionsToTaskModel(scheduledExecutions);
         scheduled.addAll(mapCurrentlyExecutingToTaskModel(currentlyExecuting));
+        scheduled.forEach(s-> System.out.println(s.getTaskInstance()));
         return scheduled;
     }
 }

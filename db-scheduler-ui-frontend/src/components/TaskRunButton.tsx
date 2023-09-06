@@ -3,12 +3,9 @@ import runTask from 'src/services/runTask';
 import { PlayIcon, RepeatIcon } from '../assets/icons';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Task } from 'src/models/Task';
 
-interface TaskRunButtonProps {
-  taskInstance: string[];
-  taskName: string;
-  picked: boolean;
-  consecutiveFailures: number;
+interface TaskRunButtonProps extends Task {
   style?: React.CSSProperties;
   refetch: () => void;
 }
@@ -37,24 +34,24 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
           iconSpacing={2}
           width={100}
           bgColor={
-            consecutiveFailures > 0 && taskInstance.length === 1
+            consecutiveFailures[0] > 0 && taskInstance.length === 1
               ? '#5068F6'
               : '#E9ECFE'
           }
           textColor={
-            consecutiveFailures > 0 && taskInstance.length === 1
+            consecutiveFailures[0] > 0 && taskInstance.length === 1
               ? '#FFFFFF'
               : '#002FA7'
           }
           _hover={{
             bgColor:
-              consecutiveFailures > 0 && taskInstance.length === 1
+              consecutiveFailures[0] > 0 && taskInstance.length === 1
                 ? '#344ACC'
                 : '#D3D9FE',
           }}
           _active={{
             bgColor:
-              consecutiveFailures > 0 && taskInstance.length === 1
+              consecutiveFailures[0] > 0 && taskInstance.length === 1
                 ? '#8a94c0'
                 : '#eceefa',
           }}
@@ -62,7 +59,7 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
           leftIcon={
             taskInstance.length > 1 ? (
               <></>
-            ) : consecutiveFailures > 0 ? (
+            ) : consecutiveFailures[0] > 0 ? (
               <RepeatIcon boxSize={6} />
             ) : (
               <PlayIcon boxSize={4} />
@@ -71,7 +68,7 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
         >
           {taskInstance.length > 1
             ? 'Show all'
-            : consecutiveFailures > 0
+            : consecutiveFailures[0] > 0
             ? 'Rerun'
             : 'Run'}
         </Button>

@@ -17,7 +17,7 @@ public class TaskModel {
     private List<String> pickedBy;
     private List<Instant> lastSuccess;
     private Instant lastFailure;
-    private int consecutiveFailures;
+    private List<Integer> consecutiveFailures;
     private Instant lastHeartbeat;
     private int version;
 
@@ -26,7 +26,7 @@ public class TaskModel {
     public TaskModel(
              String taskName,  List<String> taskInstance,  List<Object> taskData,
              List<Instant> executionTime, List<Boolean> picked,  List<String> pickedBy,
-             List<Instant> lastSuccess,  Instant lastFailure, int consecutiveFailures,
+             List<Instant> lastSuccess,  Instant lastFailure, List<Integer> consecutiveFailures,
              Instant lastHeartbeat, int version
     ) {
         this.taskName = taskName;
@@ -133,11 +133,11 @@ public class TaskModel {
         this.lastFailure = lastFailure;
     }
 
-    public int getConsecutiveFailures() {
+    public List<Integer> getConsecutiveFailures() {
         return consecutiveFailures;
     }
 
-    public void setConsecutiveFailures(int consecutiveFailures) {
+    public void setConsecutiveFailures(List<Integer> consecutiveFailures) {
         this.consecutiveFailures = consecutiveFailures;
     }
 

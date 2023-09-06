@@ -3,7 +3,8 @@ import { Property } from 'csstype';
 
 interface NumberCircleProps {
   number: number;
-  color?: string;
+  bgColor?: string;
+  textColor?: string;
   position?: ResponsiveValue<Property.Position>;
   transform?: ResponsiveValue<Property.Transform>;
   style?: React.CSSProperties;
@@ -11,7 +12,8 @@ interface NumberCircleProps {
 
 export const NumberCircle: React.FC<NumberCircleProps> = ({
   number,
-  color,
+  bgColor,
+  textColor,
   position = 'absolute',
   transform,
   style,
@@ -42,11 +44,11 @@ export const NumberCircle: React.FC<NumberCircleProps> = ({
       right={`${leftOffset}px`}
       width={`${width}px`}
       height={`${height}px`}
-      backgroundColor={color ?? '#DAE2F6'}
+      backgroundColor={bgColor ?? '#DAE2F6'}
       display="flex"
       justifyContent="center"
       alignItems={'center'}
-      color={'white'}
+      color={textColor ?? '#FFFFFF'}
       transform={transform}
       fontSize={'sm'}
       style={style}

@@ -5,10 +5,10 @@ export type Task = {
   actualTaskData: (object|null)[];
   executionTime: Date[];
   picked: boolean;
-  pickedBy: string[] | null;
+  pickedBy: (string|null)[];
   lastSuccess: Date[] | null;
   lastFailure: Date | null;
-  consecutiveFailures: number;
+  consecutiveFailures: number[];
   lastHeartbeat: Date | null;
   version: number;
 };

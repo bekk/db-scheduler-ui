@@ -9,22 +9,17 @@ import { TaskAccordionItem } from 'src/components/TaskAccordionItem';
 interface TaskCardProps extends Task {
   refetch: () => void;
   accordionProps?: AccordionItemProps;
-  isGrouped?: boolean;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({
-  taskName,
-  executionTime,
-  actualTaskData,
-  consecutiveFailures,
-  picked,
-  taskInstance,
-  lastFailure,
-  lastSuccess,
-  refetch,
-  accordionProps,
-  isGrouped,
-}) => {
+const TaskCard: React.FC<TaskCardProps> = (props) => {
+  const {
+    accordionProps,
+    taskInstance,
+    lastSuccess,
+    lastFailure,
+    actualTaskData,
+  } = props;
+
   return (
     <AccordionItem
       backgroundColor={'#FFFFFF'}
@@ -34,15 +29,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
       borderColor={'#E0E0E0'}
       {...accordionProps}
     >
-      <TaskAccordionButton
-        picked={picked}
-        taskInstance={taskInstance}
-        taskName={taskName}
-        consecutiveFailures={consecutiveFailures}
-        executionTime={executionTime}
-        refetch={refetch}
-      />
-      {!isGrouped && (
+      <TaskAccordionButton {...props} />
+      {taskInstance.length === 1 && (
         <>
           <Divider color={'#E0E0E0'} />
           <TaskAccordionItem

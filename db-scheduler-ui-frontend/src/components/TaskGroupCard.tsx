@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Task } from '../models/Task';
 import TaskCard from './TaskCard';
 import { Box } from '@chakra-ui/react';
@@ -7,76 +7,64 @@ interface TaskCardProps extends Task {
   refetch: () => void;
 }
 
-const closedCardAttributes = {
-  middleTransform: 'translateY(-60px)',
-  bottomTransform: 'translateY(-120px)',
-};
-const openCardAttributes = {
-  middleTransform: 'translateY(0px)',
-  bottomTransform: 'translateY(0px)',
-};
-
 const TaskGroupCard: React.FC<TaskCardProps> = (taskProps) => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [marginBottom, setMarginBottom] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const updateRef = () => {
+    if (ref.current) {
+      const el = ref.current;
+      setMarginBottom(-(el.clientHeight * 1.8));
+    }
+  };
+
+  useEffect(() => {
+    updateRef();
+    window.addEventListener('resize', updateRef); // updateRef on resize to avoid overlapping
+    return () => {
+      window.removeEventListener('resize', updateRef);
+    };
+  }, []);
 
   return (
-    <Box position="relative" onClick={() => setOpen(!open)}>
-      {/* Add some shadow later, must be within cards. Also consider removing margin between, as well as borders between */}
+    <Box position="relative" mb={`${marginBottom}px`}>
       <Box zIndex={2} mr={2} pos={'relative'}>
         <TaskCard
           {...taskProps}
-          taskName="Top"
           accordionProps={{
-            shadow: open ? 'none' : 'md',
+            shadow: 'md',
           }}
-          isGrouped
         />
       </Box>
       <Box
-        //top="20px"
         pos={'relative'}
         left="0"
         zIndex={1}
         mx={1}
-        transform={
-          open
-            ? openCardAttributes.middleTransform
-            : closedCardAttributes.middleTransform
-        }
+        transform={'translateY(-90%)'}
       >
         <TaskCard
           {...taskProps}
-          taskName="Middle"
           accordionProps={{
-            shadow: open ? 'none' : 'md',
+            shadow: 'md',
             mt: -1,
-            isFocusable: true,
           }}
-          isGrouped
         />
       </Box>
       <Box
-        //top="10px"
+        ref={ref}
         pos={'relative'}
         left="0"
         zIndex={0}
         ml={2}
-        transform={
-          open
-            ? openCardAttributes.bottomTransform
-            : closedCardAttributes.bottomTransform
-        }
-        mb={open ? '10px' : '-120px'}
+        transform={'translateY(-180%)'}
       >
         <TaskCard
           {...taskProps}
-          taskName="Bottom"
           accordionProps={{
-            shadow: open ? 'none' : 'md',
+            shadow: 'md',
             mt: -1,
-            isFocusable: true,
-          }} // This should probably be moved outside, to TaskList or something
-          isGrouped
+          }}
         />
       </Box>
     </Box>

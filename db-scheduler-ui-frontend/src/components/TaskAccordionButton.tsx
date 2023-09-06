@@ -10,28 +10,27 @@ import { StatusBox } from 'src/components/StatusBox';
 import { TaskRunButton } from 'src/components/TaskRunButton';
 import React from 'react';
 import { DotButton } from 'src/components/DotButton';
-import { dateFormatText } from 'src/components/dateFormatText';
-import { NumberCircle } from 'src/components/NumberCircle';
+import { dateFormatText } from 'src/utils/dateFormatText';
 import { useParams } from 'react-router-dom';
+import { Task } from 'src/models/Task';
+import { NumberCircleGroup } from './NumberCircleGroup';
 
-interface TaskAccordionButtonProps {
-  taskName: string;
-  executionTime: Date[];
-  consecutiveFailures: number;
-  picked: boolean;
-  taskInstance: string[];
+interface TaskAccordionButtonProps extends Task {
   refetch: () => void;
 }
 
-const status = ['Failed', 'Running', 'Scheduled'];
-export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
-  taskName,
-  executionTime,
-  consecutiveFailures,
-  picked,
-  taskInstance,
-  refetch,
-}) => {
+const status = ['Failed', 'Running', 'Scheduled', 'Group'];
+export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
+  props,
+) => {
+  const {
+    taskName,
+    executionTime,
+    consecutiveFailures,
+    picked,
+    taskInstance,
+    refetch,
+  } = props;
   const { taskName: isDetailsView } = useParams<{ taskName?: string }>();
   return (
     <h2>
@@ -40,13 +39,15 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
           <Box flex="1" display="inline-flex">
             <StatusBox
               status={
-                picked
+                taskInstance.length > 1
+                  ? status[3]
+                  : picked
                   ? status[1]
-                  : consecutiveFailures > 0
+                  : consecutiveFailures[0] > 0
                   ? status[0]
                   : status[2]
               }
-              consecutiveFailures={consecutiveFailures}
+              consecutiveFailures={consecutiveFailures[0]}
             />
           </Box>
           {!isDetailsView && (
@@ -59,23 +60,21 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
               {taskName}
               {taskInstance.length > 1 && (
                 <Box ml={2}>
-                  <NumberCircle
-                    number={taskInstance.length}
-                    position={'relative'}
-                    style={{
-                      color: '#000000',
-                    }}
-                  />
+                  <NumberCircleGroup {...props} />
                 </Box>
               )}
             </Box>
           )}
           <Flex wrap={'wrap'} textAlign="left" flex="2" display={'flex'}>
-            <Text>{taskInstance[0].slice(0, 20)}</Text>
-            {taskInstance[0].length > 20 && (
+            <Text>
+              {taskInstance[0].length > 40
+                ? taskInstance[0].slice(0, 40) + '...'
+                : taskInstance[0]}
+            </Text>
+            {taskInstance.length > 1 && (
               <Text color={'#555555'}>
                 {taskInstance.length > 1
-                  ? `... + ${taskInstance.length - 1} more`
+                  ? ` + ${taskInstance.length - 1} more`
                   : ''}
               </Text>
             )}
@@ -88,14 +87,14 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
             flexDirection={'row'}
           >
             <Box flex={1}>{dateFormatText(new Date(executionTime[0]))}</Box>
-            <Box display={'flex'} justifyContent={'space-between'} w={150}>
-              <TaskRunButton
-                taskName={taskName}
-                taskInstance={taskInstance}
-                picked={picked}
-                consecutiveFailures={consecutiveFailures}
-                refetch={refetch}
-              />
+            <Box
+              display={'flex'}
+              justifyContent={
+                taskInstance.length === 1 ? 'space-between' : 'end'
+              }
+              w={150}
+            >
+              <TaskRunButton {...props} refetch={refetch} />
               {!picked && taskInstance.length === 1 && (
                 <DotButton
                   taskName={taskName}
@@ -104,7 +103,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
                 />
               )}
             </Box>
-            <AccordionIcon />
+            {taskInstance.length === 1 && <AccordionIcon />}
           </HStack>
         </HStack>
       </AccordionButton>

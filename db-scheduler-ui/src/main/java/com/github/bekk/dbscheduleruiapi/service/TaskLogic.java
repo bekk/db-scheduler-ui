@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class TaskLogic {
@@ -56,14 +57,16 @@ public class TaskLogic {
     }
 
     public GetTasksResponse getAllTasks(TaskRequestParams params) {
-        List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
+        List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(),
+                scheduler.getCurrentlyExecuting()).stream().filter(task -> {
                 switch (params.getFilter()){
                     case FAILED:
-                        return task.getConsecutiveFailures() != 0;
+                        return task.getConsecutiveFailures().stream().anyMatch(failures -> failures != 0);
                     case RUNNING:
                         return task.isPicked().get(0);
                     case SCHEDULED:
-                        return !task.isPicked().get(0) && task.getConsecutiveFailures() == 0;
+                        return IntStream.range(0, task.isPicked().size())
+                                .anyMatch(i -> !task.isPicked().get(i) && task.getConsecutiveFailures().get(i) == 0);
                     default:
                         return true;
                 }
