@@ -14,7 +14,7 @@ public class LogModelRowMapper implements RowMapper<LogModel> {
         long id = rs.getLong("id");
         String taskName = rs.getString("task_name");
         String taskInstance = rs.getString("task_instance");
-        byte[] taskData = rs.getBytes("task_data");
+        String taskData = rs.getString("task_data");
         Instant timeStarted = rs.getTimestamp("time_started").toInstant();
         Instant timeFinished = rs.getTimestamp("time_finished").toInstant();
         boolean succeeded = rs.getBoolean("succeeded");
@@ -26,7 +26,7 @@ public class LogModelRowMapper implements RowMapper<LogModel> {
                 rs.getLong("id"),
                 rs.getString("task_name"),
                 rs.getString("task_instance"),
-                rs.getBytes("task_data"),
+                rs.getString("task_data"),
                 rs.getTimestamp("time_started").toInstant(),
                 rs.getTimestamp("time_finished").toInstant(),
                 rs.getBoolean("succeeded"),

@@ -14,6 +14,7 @@ import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,13 +29,13 @@ public class TaskLogic {
 
     private final Scheduler scheduler;
 
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Autowired
     public TaskLogic(Scheduler scheduler, DataSource dataSource){
         this.scheduler = scheduler;
         this.scheduler.start();
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     public void runTaskNow(String taskId, String taskName) {
@@ -70,7 +71,7 @@ public class TaskLogic {
         List<TaskModel> pagedTasks = QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
         return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
     }
-    
+
 
     public GetTasksResponse getTask(TaskDetailsRequestParams params) {
         List<TaskModel> tasks = params.getTaskId()!=null
@@ -89,9 +90,11 @@ public class TaskLogic {
         List<TaskModel> pagedTasks = QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
         return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
         }
-        
-    public List<LogModel> getLogs() {
-        return jdbcTemplate.query("SELECT * FROM scheduled_execution_logs", new LogModelRowMapper());
+
+    public List<LogModel> getLogs(String taskName) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("taskName", taskName);
+        return namedParameterJdbcTemplate.query("SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName ", params,new LogModelRowMapper());
 
     }
 }

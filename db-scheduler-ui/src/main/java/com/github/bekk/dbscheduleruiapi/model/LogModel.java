@@ -1,15 +1,12 @@
 package com.github.bekk.dbscheduleruiapi.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.math.BigInteger;
 import java.time.Instant;
 
 public class LogModel {
     private Long id;
     private String taskName;
     private String taskInstance;
-    private byte[] taskData;
+    private String taskData;
     private Instant timeStarted;
     private Instant timeFinished;
 
@@ -21,7 +18,7 @@ public class LogModel {
 
 
     public LogModel(
-            Long id, String taskName, String taskInstance, byte[] taskData,
+            Long id, String taskName, String taskInstance, String taskData,
             Instant timeStarted, Instant timeFinished, boolean succeeded,
             Long durationMs, String exceptionClass, String exceptionMessage, String exceptionStackTrace
     ) {
@@ -62,11 +59,11 @@ public class LogModel {
         this.taskInstance = taskInstance;
     }
 
-    public byte[] getTaskData() {
+    public String getTaskData() {
         return taskData;
     }
 
-    public void setTaskData(byte[] taskData) {
+    public void setTaskData(String taskData) {
         this.taskData = taskData;
     }
 
