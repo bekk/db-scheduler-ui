@@ -14,6 +14,7 @@ import { dateFormatText } from 'src/utils/dateFormatText';
 import { useParams } from 'react-router-dom';
 import { Task } from 'src/models/Task';
 import { NumberCircleGroup } from './NumberCircleGroup';
+import { AttachmentIcon } from '@chakra-ui/icons';
 
 interface TaskAccordionButtonProps extends Task {
   refetch: () => void;
@@ -29,14 +30,18 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
     consecutiveFailures,
     picked,
     taskInstance,
+    actualTaskData,
     refetch,
   } = props;
   const { taskName: isDetailsView } = useParams<{ taskName?: string }>();
   return (
     <h2>
-      <AccordionButton _hover={{ backgroundColor: '#FFFFFF' }}>
+      <AccordionButton
+        _hover={{ backgroundColor: '#FFFFFF' }}
+        cursor={taskInstance.length === 1 ? 'pointer' : 'default'}
+      >
         <HStack w={'100%'} spacing={5}>
-          <Box flex="1" display="inline-flex">
+          <Box flex="1" display="inline-flex" alignItems={'center'}>
             <StatusBox
               status={
                 taskInstance.length > 1
@@ -49,6 +54,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
               }
               consecutiveFailures={consecutiveFailures[0]}
             />
+            {actualTaskData[0] != null && <AttachmentIcon />}
           </Box>
           {!isDetailsView && (
             <Box
@@ -95,15 +101,19 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
               w={150}
             >
               <TaskRunButton {...props} refetch={refetch} />
-              {!picked && taskInstance.length === 1 && (
-                <DotButton
-                  taskName={taskName}
-                  taskInstance={taskInstance[0]}
-                  style={{ marginRight: 5 }}
-                />
-              )}
+              <DotButton
+                taskName={taskName}
+                taskInstance={taskInstance[0]}
+                style={{
+                  marginRight: 5,
+                  visibility:
+                    !picked && taskInstance.length === 1 ? 'visible' : 'hidden',
+                }}
+              />
             </Box>
-            {taskInstance.length === 1 && <AccordionIcon />}
+            <AccordionIcon
+              visibility={taskInstance.length === 1 ? 'visible' : 'hidden'}
+            />
           </HStack>
         </HStack>
       </AccordionButton>

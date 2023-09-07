@@ -28,6 +28,7 @@ const TaskCard: React.FC<TaskCardProps> = (props) => {
       borderWidth={1}
       borderColor={'#E0E0E0'}
       {...accordionProps}
+      pos={'relative'}
     >
       <TaskAccordionButton {...props} />
       {taskInstance.length === 1 && (

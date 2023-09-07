@@ -6,6 +6,7 @@ import com.github.kagkarlsson.scheduler.ScheduledExecution;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,7 +60,7 @@ public class TaskMapper {
                     taskModel.setPicked(taskModels.stream().map(TaskModel::isPicked).flatMap(List::stream).collect(Collectors.toList()));
                     taskModel.setPickedBy(taskModels.stream().map(TaskModel::getPickedBy).flatMap(List::stream).collect(Collectors.toList()));
                     taskModel.setLastSuccess(taskModels.stream().map(TaskModel::getLastSuccess).flatMap(List::stream).collect(Collectors.toList()));
-                    taskModel.setLastFailure(taskModels.stream().map(TaskModel::getLastFailure).filter(x -> x != null).findFirst().orElse(null));
+                    taskModel.setLastFailure(taskModels.stream().map(TaskModel::getLastFailure).filter(Objects::nonNull).findFirst().orElse(null));
                     taskModel.setConsecutiveFailures(taskModels.stream().map(TaskModel::getConsecutiveFailures).flatMap(List::stream).collect(Collectors.toList())); // Modified here
                     return taskModel;
                 })

@@ -27,7 +27,7 @@ const TaskGroupCard: React.FC<TaskCardProps> = (taskProps) => {
   }, []);
 
   return (
-    <Box position="relative" mb={`${marginBottom}px`}>
+    <Box mb={`${marginBottom}px`}>
       <Box zIndex={2} mr={2} pos={'relative'}>
         <TaskCard
           {...taskProps}

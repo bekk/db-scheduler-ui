@@ -27,8 +27,6 @@ const TaskList: React.FC = () => {
   });
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
   const [sortAsc, setSortAsc] = useState<boolean>(true);
-  const [transform, setTransform] = useState<string>('translateY(0px)');
-  const [transitionTask, setTransitionTask] = useState<string>('');
 
   const { taskName } = useParams<{ taskName?: string }>();
   const isDetailsView = !!taskName;
@@ -49,13 +47,6 @@ const TaskList: React.FC = () => {
         : getTasks(currentFilter, page, currentSort, sortAsc),
   );
   const navigate = useNavigate();
-
-  const handleGroupClick = (taskName: string) => {
-    console.log(taskName, transitionTask, setTransitionTask, setTransform);
-    //setTransform('translateY(-200%)');
-    setTransitionTask(taskName);
-    // navigate('/task/' + taskName);
-  };
 
   useEffect(() => {
     setSortAsc(true);
@@ -97,30 +88,17 @@ const TaskList: React.FC = () => {
         isDetailsView={isDetailsView}
       />
       <Accordion allowMultiple>
-        {data?.tasks
-          ?.sort((task) =>
-            transitionTask === '' || transitionTask == task.taskName ? 1 : 0,
-          )
-          .map((task) =>
-            task.taskInstance.length === 1 ? (
-              <TaskCard
-                key={task.taskInstance + task.taskName}
-                {...task}
-                refetch={refetch}
-              />
-            ) : (
-              <Box
-                onClick={() => handleGroupClick(task.taskName)}
-                style={{ transform: transform, transition: 'all 2s' }}
-              >
-                <TaskGroupCard
-                  key={task.taskName}
-                  {...task}
-                  refetch={refetch}
-                />
-              </Box>
-            ),
-          )}
+        {data?.tasks.map((task) =>
+          task.taskInstance.length === 1 ? (
+            <TaskCard
+              key={task.taskInstance + task.taskName}
+              {...task}
+              refetch={refetch}
+            />
+          ) : (
+            <TaskGroupCard key={task.taskName} {...task} refetch={refetch} />
+          ),
+        )}
       </Accordion>
       <PaginationButtons
         page={page}
