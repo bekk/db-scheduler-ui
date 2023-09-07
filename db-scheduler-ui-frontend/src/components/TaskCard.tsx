@@ -35,6 +35,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         taskName={taskName}
         consecutiveFailures={consecutiveFailures}
         executionTime={executionTime}
+        taskData={taskData}
         refetch={refetch}
       />
       <Divider color={'#E0E0E0'} />

@@ -4,6 +4,7 @@ import { TaskRunButton } from 'src/components/TaskRunButton';
 import React from 'react';
 import { DotButton } from 'src/components/DotButton';
 import { dateFormatText } from 'src/components/dateFormatText';
+import { AttachmentIcon } from '@chakra-ui/icons';
 
 interface TaskAccordionButtonProps {
   taskName: string;
@@ -11,6 +12,7 @@ interface TaskAccordionButtonProps {
   consecutiveFailures: number;
   picked: boolean;
   taskInstance: string;
+  taskData: string | null;
   refetch: () => void;
 }
 
@@ -21,6 +23,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
   consecutiveFailures,
   picked,
   taskInstance,
+  taskData,
   refetch,
 }) => {
   return (
@@ -38,6 +41,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = ({
               }
               consecutiveFailures={consecutiveFailures}
             />
+            {taskData != 'null' && <AttachmentIcon />}
           </Box>
           <Box flex="2" textAlign="left">
             {taskName}
