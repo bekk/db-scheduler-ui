@@ -1,4 +1,7 @@
 # DB Scheduler UI / JobJuggler
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/facebook/react/blob/main/LICENSE) 
+
+
 Demo version.\
 A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 
@@ -13,21 +16,20 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * **Delete Tasks** 
 * **Polling** every 2 seconds.
 
-![Screenshot](Screenshot.png)
+<img alt="Screenshot" src="Screenshot.png" width=700/>
 
 ## Table of contents
 
 * [Getting started](#getting-started)
 * [Prerequisites](#prerequisites)
 * [How it works](#how-it-works)
-* [Example](#example)
 * [Configuration](#configuration)
 
 ### Prerequisites
 
 * An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * Minimum Java 11 and SpringBoot 2.7
-* db-scheduler version????
+* db-scheduler version 12
 
 ## Getting started
 
@@ -43,12 +45,14 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 
 ## How it works
 
-Legger til et ???
-Som bruker db-scheduler som 
+Db-scheduler-UI adds a library that have a frontend application to show all Task in db-scheduler. 
+The db-scheduler-ui backend is connected to the schedule-client. The backend fetches all executions, and 
+they are sorted and filtered in the backend before it is displayed in the frontend app. 
+As the backend connects to scheduler-client it is possible to run, re-run and delete task form the database in the application.
 
 Frontend 
 
-URL går til jobjuggler/** (db-scheduler/*)
+The URL connects to jobjuggler/** (db-scheduler/*)
 
 
 ## Configuration
