@@ -57,9 +57,7 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
           }}
           fontWeight="normal"
           leftIcon={
-            taskInstance.length > 1 ? (
-              <></>
-            ) : consecutiveFailures[0] > 0 ? (
+            taskInstance.length > 1 ? undefined : consecutiveFailures[0] > 0 ? (
               <RepeatIcon boxSize={6} />
             ) : (
               <PlayIcon boxSize={4} />
