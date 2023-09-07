@@ -52,7 +52,9 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
                   ? status[0]
                   : status[2]
               }
-              consecutiveFailures={consecutiveFailures[0]}
+              consecutiveFailures={
+                consecutiveFailures.find((val) => val > 0) ?? 0
+              }
             />
             {actualTaskData[0] != null && <AttachmentIcon />}
           </Box>

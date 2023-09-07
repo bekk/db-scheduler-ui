@@ -28,7 +28,7 @@ const TaskList: React.FC = () => {
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
   const [sortAsc, setSortAsc] = useState<boolean>(true);
 
-  const { taskName } = useParams<{ taskName?: string }>();
+  const { taskName } = useParams<{ taskName?: string }>(); // Store page as well in URL so you can refresh? Might fix the other pagination issues as well
   const isDetailsView = !!taskName;
   const { data, refetch } = useQuery(
     isDetailsView
@@ -45,8 +45,10 @@ const TaskList: React.FC = () => {
       isDetailsView
         ? getTask(currentFilter, page, currentSort, sortAsc, taskName)
         : getTasks(currentFilter, page, currentSort, sortAsc),
+    {},
   );
   const navigate = useNavigate();
+  console.log(data?.tasks);
 
   useEffect(() => {
     setSortAsc(true);

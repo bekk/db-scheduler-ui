@@ -21,32 +21,29 @@ export const NumberCircleGroup: React.FC<Task> = ({
   return (
     <Box display={'flex'}>
       {failureCount > 0 && (
-        <Box>
-          <NumberCircle
-            number={failureCount}
-            bgColor="#BB0101"
-            position={'static'}
-          />
-        </Box>
+        <NumberCircle
+          number={failureCount}
+          bgColor="#BB0101"
+          position={'static'}
+          style={{ margin: '0 1px' }}
+        />
       )}
       {runningCount > 0 && (
-        <Box>
-          <NumberCircle
-            number={runningCount}
-            bgColor="#5068F6"
-            position={'static'}
-          />
-        </Box>
+        <NumberCircle
+          number={runningCount}
+          bgColor="#5068F6"
+          position={'static'}
+          style={{ margin: '0 1px' }}
+        />
       )}
       {scheduledCount > 0 && (
-        <Box>
-          <NumberCircle
-            number={scheduledCount}
-            bgColor="#F1F2F5"
-            textColor="#000000"
-            position={'static'}
-          />
-        </Box>
+        <NumberCircle
+          number={scheduledCount}
+          bgColor="#F1F2F5"
+          textColor="#000000"
+          position={'static'}
+          style={{ margin: '0 1px' }}
+        />
       )}
     </Box>
   );
