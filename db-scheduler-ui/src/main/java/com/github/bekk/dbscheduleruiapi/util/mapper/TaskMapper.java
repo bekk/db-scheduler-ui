@@ -77,7 +77,6 @@ public class TaskMapper {
     public static List<TaskModel> mapAllExecutionsToTaskModelUngrouped(List<ScheduledExecution<Object>> scheduledExecutions, List<CurrentlyExecuting> currentlyExecuting) {
         List<TaskModel> scheduled = mapScheduledExecutionsToTaskModel(scheduledExecutions);
         scheduled.addAll(mapCurrentlyExecutingToTaskModel(currentlyExecuting));
-        scheduled.forEach(s-> System.out.println(s.getTaskInstance()));
         return scheduled;
     }
 }

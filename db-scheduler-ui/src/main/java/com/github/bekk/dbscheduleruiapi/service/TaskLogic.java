@@ -104,7 +104,7 @@ public class TaskLogic {
         }
 
         List<TaskModel> pagedTasks = TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
-
+        pagedTasks.forEach((t)->System.out.println(t.getExecutionTime()));
         return new GetTasksResponse(tasks.size(), pagedTasks);
         }
 }
