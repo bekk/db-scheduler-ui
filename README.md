@@ -29,7 +29,7 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 
 * An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * Minimum Java 11 and SpringBoot 2.7
-* db-scheduler version 12
+* Minimum db-scheduler version 12.5
 
 ## Getting started
 
