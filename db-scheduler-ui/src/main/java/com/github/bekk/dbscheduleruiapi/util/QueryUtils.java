@@ -14,9 +14,6 @@ import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskSort;
 public class QueryUtils {
 
     public static <T> List<T> paginate(List<T> allItems, int pageNumber, int pageSize) {
-        System.out.println(allItems.size());
-        System.out.println(pageNumber);
-        System.out.println(pageSize);
         int startIndex = pageNumber * pageSize;
         int endIndex = Math.min(startIndex + pageSize, allItems.size());
 
@@ -24,7 +21,6 @@ public class QueryUtils {
     }
 
     public static List<TaskModel> filterTasks(List<TaskModel> tasks, TaskFilter filter) {
-        System.out.println(filter);
         return tasks.stream()
             .filter(task -> {
                 switch (filter) {

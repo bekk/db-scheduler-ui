@@ -1,7 +1,5 @@
 package com.github.bekk.dbscheduleruiapi.model;
 
-import java.util.Optional;
-
 public class TaskDetailsRequestParams extends TaskRequestParams {
 
     private String taskId;

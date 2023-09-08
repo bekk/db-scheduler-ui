@@ -15,11 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 public class TaskLogic {
@@ -85,10 +83,3 @@ public class TaskLogic {
         return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
         }
 }
-
-
-/**         List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting());
-        tasks = QueryUtils.filterTasks(tasks, params.getFilter());
-        QueryUtils.sortTasks(tasks, params.getSorting(), params.isAsc());
-        return TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
-                     */

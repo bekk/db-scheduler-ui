@@ -34,7 +34,6 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
     refetch,
   } = props;
   const { taskName: isDetailsView } = useParams<{ taskName?: string }>();
-  console.log(!pickedBy[0] && taskInstance.length === 1);
   return (
     <h2>
       <AccordionButton
