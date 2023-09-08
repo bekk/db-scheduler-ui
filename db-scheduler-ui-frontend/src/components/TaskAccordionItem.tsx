@@ -1,6 +1,7 @@
 import { AccordionPanel, Box, VStack } from '@chakra-ui/react';
 import { TaskDataRow } from 'src/components/TaskDataRow';
 import React from 'react';
+import { dateFormatText } from 'src/utils/dateFormatText';
 
 interface TaskAccordionItemProps {
   lastSuccess: Date | null;
@@ -27,8 +28,8 @@ export const TaskAccordionItem: React.FC<TaskAccordionItemProps> = ({
           <Box>
             <strong>Last Execution Time: </strong>
             {lastSuccess
-              ? new Date(lastSuccess)?.toLocaleString()
-              : lastFailure && new Date(lastFailure)?.toLocaleString()}
+              ? dateFormatText(new Date(lastSuccess))
+              : lastFailure && dateFormatText(new Date(lastFailure))}
           </Box>
         )}
         <TaskDataRow taskData={taskData} />
