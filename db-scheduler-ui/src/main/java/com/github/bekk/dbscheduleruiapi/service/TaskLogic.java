@@ -4,7 +4,7 @@ import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
 import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
-import com.github.bekk.dbscheduleruiapi.util.TaskPagination;
+import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
 import com.github.bekk.dbscheduleruiapi.util.mapper.TaskMapper;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
@@ -58,37 +58,14 @@ public class TaskLogic {
 
     public GetTasksResponse getAllTasks(TaskRequestParams params) {
         List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(),
-                scheduler.getCurrentlyExecuting()).stream().filter(task -> {
-                switch (params.getFilter()){
-                    case FAILED:
-                        return task.getConsecutiveFailures().stream().anyMatch(failures -> failures != 0);
-                    case RUNNING:
-                        return task.isPicked().get(0);
-                    case SCHEDULED:
-                        return IntStream.range(0, task.isPicked().size())
-                                .anyMatch(i -> !task.isPicked().get(i) && task.getConsecutiveFailures().get(i) == 0);
-                    default:
-                        return true;
-                }
-        }).collect(Collectors.toList());
+                scheduler.getCurrentlyExecuting());
 
-        if (params.getSorting() == TaskRequestParams.TaskSort.NAME) {
-            tasks.sort((task1, task2) -> {
-                int comparisonResult = task1.getTaskName().compareTo(task2.getTaskName());
-                return params.isAsc() ? comparisonResult : -comparisonResult;
-            });
-        }else if(params.getSorting() == TaskRequestParams.TaskSort.DEFAULT){
-            Comparator<TaskModel> comparator = Comparator.comparing(
-            task -> task.getExecutionTime().stream()
-                        .min(Instant::compareTo)
-                        .orElse(Instant.MAX),
-            Comparator.nullsLast(Instant::compareTo));
-            tasks.sort(params.isAsc()?comparator:comparator.reversed());
-        }
-        List<TaskModel> pagedTasks = TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
+        tasks = QueryUtils.sortTasks(
+                QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
+        List<TaskModel> pagedTasks = QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
         return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
-
     }
+    
 
     public GetTasksResponse getTask(TaskDetailsRequestParams params) {
         List<TaskModel> tasks = params.getTaskId()!=null
@@ -102,7 +79,16 @@ public class TaskLogic {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No tasks found for taskName: "
                     + params.getTaskName() + ", taskId: " + params.getTaskId());
         }
-        List<TaskModel> pagedTasks = TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
+        tasks = QueryUtils.sortTasks(
+                QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
+        List<TaskModel> pagedTasks = QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
         return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
         }
 }
+
+
+/**         List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting());
+        tasks = QueryUtils.filterTasks(tasks, params.getFilter());
+        QueryUtils.sortTasks(tasks, params.getSorting(), params.isAsc());
+        return TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
+                     */

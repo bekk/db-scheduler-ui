@@ -28,12 +28,13 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
     taskName,
     executionTime,
     consecutiveFailures,
-    picked,
+    pickedBy,
     taskInstance,
     actualTaskData,
     refetch,
   } = props;
   const { taskName: isDetailsView } = useParams<{ taskName?: string }>();
+  console.log(!pickedBy[0] && taskInstance.length === 1);
   return (
     <h2>
       <AccordionButton
@@ -46,7 +47,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
               status={
                 taskInstance.length > 1
                   ? status[3]
-                  : picked
+                  : pickedBy[0]
                   ? status[1]
                   : consecutiveFailures[0] > 0
                   ? status[0]
@@ -109,7 +110,9 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
                 style={{
                   marginRight: 5,
                   visibility:
-                    !picked && taskInstance.length === 1 ? 'visible' : 'hidden',
+                    !pickedBy[0] && taskInstance.length === 1
+                      ? 'visible'
+                      : 'hidden',
                 }}
               />
             </Box>

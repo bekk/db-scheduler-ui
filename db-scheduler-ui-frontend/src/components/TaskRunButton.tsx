@@ -12,7 +12,7 @@ interface TaskRunButtonProps extends Task {
 export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
   taskInstance,
   taskName,
-  picked,
+  pickedBy,
   consecutiveFailures,
   style,
   refetch,
@@ -20,7 +20,7 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
   const navigate = useNavigate();
   return (
     <>
-      {!picked && (
+      {!pickedBy[0] && (
         <Button
           style={style}
           onClick={(event) => {

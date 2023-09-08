@@ -36,7 +36,10 @@ export const StatusBox: React.FC<StatusBoxProps> = ({
   status,
   consecutiveFailures,
 }) => {
-  const statusInfo = statusColors[status] || statusColors['Scheduled'];
+  const statusInfo =
+    status === 'Group' && consecutiveFailures > 0
+      ? statusColors['Failed']
+      : statusColors[status] || statusColors['Scheduled'];
   const { borderColor, backgroundColor, color } = statusInfo;
 
   return (
@@ -45,11 +48,7 @@ export const StatusBox: React.FC<StatusBoxProps> = ({
       mr={4}
       width={115}
       borderColor={borderColor}
-      backgroundColor={
-        status === 'Group' && consecutiveFailures > 0
-          ? '#EFC2C2'
-          : backgroundColor
-      } // TODO: ADD red if any of the groups are failed in group
+      backgroundColor={backgroundColor}
       color={color}
       px={4}
       py={1}

@@ -28,7 +28,7 @@ const TaskGroupCard: React.FC<TaskCardProps> = (taskProps) => {
 
   return (
     <Box mb={`${marginBottom}px`}>
-      <Box zIndex={2} mr={2} pos={'relative'}>
+      <Box zIndex={0} mr={2} pos={'relative'}>
         <TaskCard
           {...taskProps}
           accordionProps={{
@@ -39,7 +39,7 @@ const TaskGroupCard: React.FC<TaskCardProps> = (taskProps) => {
       <Box
         pos={'relative'}
         left="0"
-        zIndex={1}
+        zIndex={-3}
         mx={1}
         transform={'translateY(-90%)'}
       >
@@ -55,7 +55,7 @@ const TaskGroupCard: React.FC<TaskCardProps> = (taskProps) => {
         ref={ref}
         pos={'relative'}
         left="0"
-        zIndex={0}
+        zIndex={-4}
         ml={2}
         transform={'translateY(-180%)'}
       >
