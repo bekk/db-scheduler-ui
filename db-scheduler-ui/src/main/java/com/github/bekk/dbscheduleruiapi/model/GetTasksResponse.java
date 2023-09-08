@@ -11,7 +11,7 @@ public class GetTasksResponse {
 
     public GetTasksResponse(int totalTasks, List<TaskModel> pagedTasks, int pageSize) {
         this.numberOfTasks = totalTasks;
-        this.numberOfPages = pagedTasks.isEmpty() ? 0 : (int) Math.ceil((double) totalTasks / pageSize);
+        this.numberOfPages = totalTasks==0 ? 0 : (int) Math.ceil((double) totalTasks / pageSize);
         this.tasks = pagedTasks;
     }
 

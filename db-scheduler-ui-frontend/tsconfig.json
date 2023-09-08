@@ -22,7 +22,7 @@
       "src/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "main.tsx"],
   "references": [
     {
       "path": "./tsconfig.node.json"

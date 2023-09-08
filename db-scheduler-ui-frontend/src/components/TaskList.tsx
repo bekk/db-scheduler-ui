@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { Accordion, Box, Text, IconButton } from '@chakra-ui/react';
 import TaskCard from './TaskCard';
 import {
   FilterBy,
-  PaginationParams,
   SortBy,
   TASK_QUERY_KEY,
   getTasks,
@@ -21,14 +20,16 @@ import TaskGroupCard from './TaskGroupCard';
 
 const TaskList: React.FC = () => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
-  const [page, setPage] = useState<PaginationParams>({
-    limit: 10,
-    pageNumber: 0,
-  });
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
   const [sortAsc, setSortAsc] = useState<boolean>(true);
 
-  const { taskName } = useParams<{ taskName?: string }>(); // Store page as well in URL so you can refresh? Might fix the other pagination issues as well
+  const { taskName, page: rawPage } = useParams<{
+    taskName?: string;
+    page?: string;
+  }>();
+  const page = Number(rawPage) && Number(rawPage) > 0 ? Number(rawPage) : 1;
+
+  const limit = 10;
   const isDetailsView = !!taskName;
   const { data, refetch } = useQuery(
     isDetailsView
@@ -43,23 +44,38 @@ const TaskList: React.FC = () => {
       : [TASK_QUERY_KEY, currentFilter, page, currentSort, sortAsc],
     () =>
       isDetailsView
-        ? getTask(currentFilter, page, currentSort, sortAsc, taskName)
-        : getTasks(currentFilter, page, currentSort, sortAsc),
-    {},
+        ? getTask(
+            currentFilter,
+            { pageNumber: page - 1, limit: limit },
+            currentSort,
+            sortAsc,
+            taskName,
+          )
+        : getTasks(
+            currentFilter,
+            { pageNumber: page - 1, limit: limit },
+            currentSort,
+            sortAsc,
+          ),
   );
   const navigate = useNavigate();
+
+  const setPage = useCallback(
+    (page: number) => {
+      navigate(`/${taskName ? taskName + '/' : ''}/page/${page}`);
+    },
+    [navigate, taskName],
+  );
 
   useEffect(() => {
     setSortAsc(true);
   }, [currentSort]);
 
   useEffect(() => {
-    if (data?.numberOfPages && page.pageNumber + 1 > data?.numberOfPages) {
-      setPage((prev) => {
-        return { ...prev, pageNumber: data?.numberOfPages - 1 };
-      });
+    if (data?.numberOfPages && page > data.numberOfPages) {
+      setPage(data.numberOfPages);
     }
-  }, [data, page]);
+  }, [data, page, setPage]);
 
   return (
     <Box>
@@ -103,6 +119,7 @@ const TaskList: React.FC = () => {
       </Accordion>
       <PaginationButtons
         page={page}
+        limit={10}
         setPage={setPage}
         numberOfPages={data?.numberOfPages}
       />

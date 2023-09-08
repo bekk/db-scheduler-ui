@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @CrossOrigin
-@RequestMapping("/jobjuggler")
+@RequestMapping("/db-scheduler")
 public class UIController {
     @RequestMapping("/**")
     public String forwardToIndex() {
