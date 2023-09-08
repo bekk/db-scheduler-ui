@@ -30,6 +30,7 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * Minimum Java 11 and SpringBoot 2.7
 * db-scheduler version 12
+* db-scheduler-log version 0.7.0
 
 ## Getting started
 
@@ -39,6 +40,13 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
     <groupId>com.github.bekk</groupId>
     <artifactId>db-scheduler-ui-starter</artifactId>
     <version>0.0.1</version>
+</dependency>
+```
+```xml
+<dependency>
+    <groupId>io.rocketbase.extension</groupId>
+    <artifactId>db-scheduler-log-spring-boot-starter</artifactId>
+    <version>0.7.0</version>
 </dependency>
 ```
 
