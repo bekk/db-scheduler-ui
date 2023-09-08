@@ -2,6 +2,8 @@ const API_BASE_URL: string =
   (import.meta.env.VITE_API_BASE_URL as string) ??
   window.location.origin + '/api';
 
+export const LOG_QUERY_KEY = `logs`;
+
 export const getLogs = async (taskName: string) => {
   const queryParams = new URLSearchParams();
 

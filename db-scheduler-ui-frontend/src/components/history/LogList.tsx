@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getLogs } from 'src/services/getLogs';
+import { getLogs, LOG_QUERY_KEY } from 'src/services/getLogs';
 import { Accordion, Box, HStack } from '@chakra-ui/react';
 import React from 'react';
 import { Log } from 'src/models/Log';
@@ -9,8 +9,9 @@ import { LogInfoBox } from 'src/components/history/LogInfoBox';
 
 export const LogList: React.FC = () => {
   const { taskName } = useParams();
-  const { data } = useQuery([], () => getLogs(taskName!));
-
+  const { data } = useQuery([LOG_QUERY_KEY, taskName], () =>
+    getLogs(taskName!),
+  );
   return (
     <Box>
       <Box display={'flex'} mb={14}>

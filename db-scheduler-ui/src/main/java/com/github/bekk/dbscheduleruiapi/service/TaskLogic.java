@@ -94,7 +94,9 @@ public class TaskLogic {
     public List<LogModel> getLogs(String taskName) {
         Map<String, Object> params = new HashMap<>();
         params.put("taskName", taskName);
-        return namedParameterJdbcTemplate.query("SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName ", params,new LogModelRowMapper());
+        List<LogModel> logs = namedParameterJdbcTemplate.query("SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName ", params,new LogModelRowMapper());
+        Collections.reverse(logs);
+        return logs;
 
     }
 }
