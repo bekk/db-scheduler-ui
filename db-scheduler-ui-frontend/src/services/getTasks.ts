@@ -30,7 +30,7 @@ export const getTasks = async (
   const queryParams = new URLSearchParams();
 
   queryParams.append('filter', filter.toUpperCase());
-  queryParams.append('page', pageNumber.toString());
+  queryParams.append('pageNumber', pageNumber.toString());
   queryParams.append('size', limit.toString());
   queryParams.append('sorting', sorting.toUpperCase());
   queryParams.append('asc', isAsc.toString());

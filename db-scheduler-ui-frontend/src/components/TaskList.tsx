@@ -48,7 +48,12 @@ const TaskList: React.FC = () => {
     {},
   );
   const navigate = useNavigate();
-  console.log(data?.tasks);
+  console.log(
+    data?.tasks.map(
+      (t) =>
+        t.taskInstance[0].slice(8, 11) + ' ' + t.taskInstance[0].slice(-4, -1),
+    ),
+  );
 
   useEffect(() => {
     setSortAsc(true);

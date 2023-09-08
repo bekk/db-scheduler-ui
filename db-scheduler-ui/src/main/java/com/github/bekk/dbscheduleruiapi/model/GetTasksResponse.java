@@ -9,9 +9,9 @@ public class GetTasksResponse {
     private int numberOfPages;
     private List<TaskModel> tasks;
 
-    public GetTasksResponse(int totalTasks, List<TaskModel> pagedTasks) {
+    public GetTasksResponse(int totalTasks, List<TaskModel> pagedTasks, int pageSize) {
         this.numberOfTasks = totalTasks;
-        this.numberOfPages = (int) Math.ceil((double) totalTasks / pagedTasks.size());
+        this.numberOfPages = pagedTasks.isEmpty() ? 0 : (int) Math.ceil((double) totalTasks / pageSize);
         this.tasks = pagedTasks;
     }
 

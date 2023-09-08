@@ -86,7 +86,7 @@ public class TaskLogic {
             tasks.sort(params.isAsc()?comparator:comparator.reversed());
         }
         List<TaskModel> pagedTasks = TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
-        return new GetTasksResponse(tasks.size(), pagedTasks);
+        return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
 
     }
 
@@ -99,12 +99,10 @@ public class TaskLogic {
             return task.getTaskName().equals(params.getTaskName());
         }).collect(Collectors.toList());
         if (tasks.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No ScheduledExecution found for taskName: "
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No tasks found for taskName: "
                     + params.getTaskName() + ", taskId: " + params.getTaskId());
         }
-
         List<TaskModel> pagedTasks = TaskPagination.paginate(tasks, params.getPageNumber(), params.getSize());
-        pagedTasks.forEach((t)->System.out.println(t.getExecutionTime()));
-        return new GetTasksResponse(tasks.size(), pagedTasks);
+        return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
         }
 }

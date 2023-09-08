@@ -25,7 +25,9 @@ public class TaskController {
     }
 
     @GetMapping("/tasks/details")
-    public GetTasksResponse getTasks(TaskDetailsRequestParams params) {
+    public GetTasksResponse getTaskDetails(TaskDetailsRequestParams params) {
+        System.out.println("\n\n\n\n\n\nparams");
+        System.out.println(params);
         return taskLogic.getTask(params);
     }
 
