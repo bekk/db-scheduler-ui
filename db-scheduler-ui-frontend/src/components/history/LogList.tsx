@@ -8,9 +8,9 @@ import { useParams } from 'react-router-dom';
 import { LogInfoBox } from 'src/components/history/LogInfoBox';
 
 export const LogList: React.FC = () => {
-  const { taskName } = useParams();
+  const { taskName, taskInstance } = useParams();
   const { data } = useQuery([LOG_QUERY_KEY, taskName], () =>
-    getLogs(taskName!),
+    getLogs(taskName!, taskInstance!),
   );
   return (
     <Box>

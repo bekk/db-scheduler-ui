@@ -62,7 +62,7 @@ export const DotButton: React.FC<TaskProps> = ({
             rounded={6}
             minBlockSize={10}
             onClick={(event) => {
-              navigate(`/${taskName}`);
+              navigate(`/${taskName}/${taskInstance}`);
               event.stopPropagation();
             }}
             icon={<InfoOutlineIcon boxSize={4} />}
