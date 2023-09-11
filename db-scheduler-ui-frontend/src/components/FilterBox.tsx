@@ -59,23 +59,6 @@ export const FilterBox: React.FC<{
           Scheduled
         </MenuItem>
       </MenuList>
-      {/*      <Select
-        backgroundColor={'#FFFFFF'}
-        borderColor={'#E2E8F0'}
-        borderWidth={1}
-        width={200}
-        textAlign={'left'}
-        fontWeight={'normal'}
-        ml={4}
-        defaultValue={FilterBy.All}
-        value={currentFilter}
-        onChange={(e) => setCurrentFilter(e.target.value as FilterBy)}
-      >
-        <option value={FilterBy.All}>All</option>
-        <option value={FilterBy.Failed}>Failed</option>
-        <option value={FilterBy.Running}>Running</option>
-        <option value={FilterBy.Scheduled}>Scheduled</option>
-      </Select>*/}
     </Menu>
   </Box>
 );

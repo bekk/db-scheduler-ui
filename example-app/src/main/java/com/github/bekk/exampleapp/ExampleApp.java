@@ -16,7 +16,7 @@ public class ExampleApp {
     @Bean
     public CommandLineRunner runAllTasks(Scheduler scheduler) {
         return args -> {
-            System.out.println("Running all tasks...");
+            System.out.println("Running all tasks");
             TaskService taskService = new TaskService(scheduler);
             taskService.runAllTasks();
             };
