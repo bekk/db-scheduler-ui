@@ -43,7 +43,7 @@ public class TaskController {
     }
 
     @GetMapping("/logs")
-    public List<LogModel> getLogs(@RequestParam String taskName){
-        return taskLogic.getLogs(taskName);
+    public List<LogModel> getLogs(@RequestParam String taskName, @RequestParam String taskInstance){
+        return taskLogic.getLogs(taskName, taskInstance);
     }
 }

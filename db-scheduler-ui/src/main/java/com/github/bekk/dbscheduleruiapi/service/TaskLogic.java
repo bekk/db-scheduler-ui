@@ -91,10 +91,11 @@ public class TaskLogic {
         return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
         }
 
-    public List<LogModel> getLogs(String taskName) {
+    public List<LogModel> getLogs(String taskName, String taskInstance) {
         Map<String, Object> params = new HashMap<>();
         params.put("taskName", taskName);
-        List<LogModel> logs = namedParameterJdbcTemplate.query("SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName ", params,new LogModelRowMapper());
+        params.put("taskInstance", taskInstance);
+        List<LogModel> logs = namedParameterJdbcTemplate.query("SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName AND task_instance = :taskInstance", params,new LogModelRowMapper());
         Collections.reverse(logs);
         return logs;
 
