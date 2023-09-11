@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
+import javax.sql.DataSource;
+
 @AutoConfiguration
 public class UiApiAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
@@ -19,8 +21,8 @@ public class UiApiAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TaskLogic taskLogic(Scheduler scheduler){
-        return new TaskLogic(scheduler);
+    public TaskLogic taskLogic(Scheduler scheduler, DataSource dataSource){
+        return new TaskLogic(scheduler, dataSource);
     }
 
     @Bean
