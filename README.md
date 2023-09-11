@@ -29,8 +29,8 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 
 * An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * Minimum Java 11 and SpringBoot 2.7
-* db-scheduler version 12
 * db-scheduler-log version 0.7.0
+* Minimum db-scheduler version 12.5
 
 ## Getting started
 
@@ -57,8 +57,6 @@ Db-scheduler-UI adds a library that have a frontend application to show all Task
 The db-scheduler-ui backend is connected to the schedule-client. The backend fetches all executions, and 
 they are sorted and filtered in the backend before it is displayed in the frontend app. 
 As the backend connects to scheduler-client it is possible to run, re-run and delete task form the database in the application.
-
-Frontend 
 
 The URL connects to jobjuggler/** (db-scheduler/*)
 
