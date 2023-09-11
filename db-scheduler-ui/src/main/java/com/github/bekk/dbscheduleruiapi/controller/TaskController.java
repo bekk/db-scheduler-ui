@@ -2,11 +2,14 @@ package com.github.bekk.dbscheduleruiapi.controller;
 
 import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
 import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
+import com.github.bekk.dbscheduleruiapi.model.LogModel;
 import com.github.bekk.dbscheduleruiapi.service.TaskLogic;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -37,5 +40,10 @@ public class TaskController {
     @PostMapping("/delete")
     public void deleteTaskNow(@RequestParam String id, @RequestParam String name) {
         taskLogic.deleteTask(id, name);
+    }
+
+    @GetMapping("/logs")
+    public List<LogModel> getLogs(){
+        return taskLogic.getLogs();
     }
 }

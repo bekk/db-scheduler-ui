@@ -5,15 +5,19 @@ import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
+import com.github.bekk.dbscheduleruiapi.util.mapper.LogModelRowMapper;
 import com.github.bekk.dbscheduleruiapi.util.mapper.TaskMapper;
+import com.github.bekk.dbscheduleruiapi.model.LogModel;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.sql.DataSource;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +28,13 @@ public class TaskLogic {
 
     private final Scheduler scheduler;
 
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    public TaskLogic(Scheduler scheduler) {
+    public TaskLogic(Scheduler scheduler, DataSource dataSource){
         this.scheduler = scheduler;
         this.scheduler.start();
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     public void runTaskNow(String taskId, String taskName) {
@@ -82,4 +89,9 @@ public class TaskLogic {
         List<TaskModel> pagedTasks = QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
         return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
         }
+        
+    public List<LogModel> getLogs() {
+        return jdbcTemplate.query("SELECT * FROM scheduled_execution_logs", new LogModelRowMapper());
+
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.sql.DataSource;
 
 @AutoConfiguration
 public class UiApiAutoConfiguration {
@@ -20,8 +21,8 @@ public class UiApiAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TaskLogic taskLogic(Scheduler scheduler){
-        return new TaskLogic(scheduler);
+    public TaskLogic taskLogic(Scheduler scheduler, DataSource dataSource){
+        return new TaskLogic(scheduler, dataSource);
     }
 
     @Bean
@@ -32,7 +33,7 @@ public class UiApiAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public UIController uiController() { // Define the UIController bean
+    public UIController uiController() {
         return new UIController();
     }
 }
