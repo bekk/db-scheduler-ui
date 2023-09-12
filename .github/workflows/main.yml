@@ -37,6 +37,10 @@ jobs:
       - name: Copy static frontend to java package
         run: cp -r db-scheduler-ui-frontend/dist/. db-scheduler-ui/src/main/resources/static/
 
+      - name: Check index.html contents
+        run: |
+          cat db-scheduler-ui/src/main/resources/static/db-scheduler-ui/index.html
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:

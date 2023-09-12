@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { Accordion, Box, HStack } from '@chakra-ui/react';
+import { Accordion, Box, Text, IconButton } from '@chakra-ui/react';
 import TaskCard from './TaskCard';
 import {
   FilterBy,
-  PaginationParams,
   SortBy,
   TASK_QUERY_KEY,
   getTasks,
@@ -13,19 +12,59 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import PaginationButtons from 'src/components/PaginationButtons';
 import { FilterBox } from 'src/components/FilterBox';
-import { SortButton } from 'src/components/SortButton';
+import TitleRow from 'src/components/TitleRow';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowBackIcon } from '@chakra-ui/icons';
+import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
+import TaskGroupCard from './TaskGroupCard';
 
 const TaskList: React.FC = () => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
-  const [page, setPage] = useState<PaginationParams>({
-    limit: 10,
-    pageNumber: 0,
-  });
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
   const [sortAsc, setSortAsc] = useState<boolean>(true);
+
+  const { taskName, page: rawPage } = useParams<{
+    taskName?: string;
+    page?: string;
+  }>();
+  const page = Number(rawPage) && Number(rawPage) > 0 ? Number(rawPage) : 1;
+
+  const limit = 10;
+  const isDetailsView = !!taskName;
   const { data, refetch } = useQuery(
-    [TASK_QUERY_KEY, currentFilter, page, currentSort, sortAsc],
-    () => getTasks(currentFilter, page, currentSort, sortAsc),
+    isDetailsView
+      ? [
+          TASK_DETAILS_QUERY_KEY,
+          currentFilter,
+          page,
+          currentSort,
+          sortAsc,
+          taskName,
+        ]
+      : [TASK_QUERY_KEY, currentFilter, page, currentSort, sortAsc],
+    () =>
+      isDetailsView
+        ? getTask(
+            currentFilter,
+            { pageNumber: page - 1, limit: limit },
+            currentSort,
+            sortAsc,
+            taskName,
+          )
+        : getTasks(
+            currentFilter,
+            { pageNumber: page - 1, limit: limit },
+            currentSort,
+            sortAsc,
+          ),
+  );
+  const navigate = useNavigate();
+
+  const setPage = useCallback(
+    (page: number) => {
+      navigate(`/${taskName ? taskName + '/' : ''}/page/${page}`);
+    },
+    [navigate, taskName],
   );
 
   useEffect(() => {
@@ -33,61 +72,54 @@ const TaskList: React.FC = () => {
   }, [currentSort]);
 
   useEffect(() => {
-    if (data?.numberOfPages && page.pageNumber + 1 > data?.numberOfPages) {
-      setPage((prev) => {
-        return { ...prev, pageNumber: data?.numberOfPages - 1 };
-      });
+    if (data?.numberOfPages && page > data.numberOfPages) {
+      setPage(data.numberOfPages);
     }
-  }, [data, page]);
+  }, [data, page, setPage]);
 
   return (
     <Box>
-      <Box display={'flex'} mb={14}>
+      <Box display={'flex'} mb={14} alignItems={'center'}>
+        {isDetailsView && (
+          <IconButton
+            icon={<ArrowBackIcon boxSize={8} />}
+            onClick={() => navigate('/')}
+            aria-label={'Back button'}
+            variant={'ghost'}
+            isRound
+          />
+        )}
+        <Text ml={5} fontSize={'3xl'} fontWeight={'semibold'}>
+          {isDetailsView ? taskName : 'All Tasks'}
+        </Text>
         <FilterBox
           currentFilter={currentFilter}
           setCurrentFilter={setCurrentFilter}
         />
       </Box>
-      <HStack
-        display={'flex'}
-        p="8px 16px"
-        justifyContent={'space-around'}
-        spacing={5}
-      >
-        <Box flex="1" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-          Status
-        </Box>
-        <SortButton
-          currentSort={currentSort}
-          setCurrentSort={setCurrentSort}
-          sortAsc={sortAsc}
-          setSortAsc={setSortAsc}
-          title={'Task Name'}
-          name={SortBy.Name}
-        />
-        <Box flex="2" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-          Task-ID
-        </Box>
-        <SortButton
-          currentSort={currentSort}
-          setCurrentSort={setCurrentSort}
-          sortAsc={sortAsc}
-          setSortAsc={setSortAsc}
-          title={'Next Execution Time'}
-          name={SortBy.Default}
-        />
-      </HStack>
+      <TitleRow
+        currentSort={currentSort}
+        setCurrentSort={setCurrentSort}
+        sortAsc={sortAsc}
+        setSortAsc={setSortAsc}
+        isDetailsView={isDetailsView}
+      />
       <Accordion allowMultiple>
-        {data?.tasks?.map((task) => (
-          <TaskCard
-            key={task.taskInstance + task.taskName}
-            {...task}
-            refetch={refetch}
-          />
-        ))}
+        {data?.tasks.map((task) =>
+          task.taskInstance.length === 1 ? (
+            <TaskCard
+              key={task.taskInstance + task.taskName}
+              {...task}
+              refetch={refetch}
+            />
+          ) : (
+            <TaskGroupCard key={task.taskName} {...task} refetch={refetch} />
+          ),
+        )}
       </Accordion>
       <PaginationButtons
         page={page}
+        limit={10}
         setPage={setPage}
         numberOfPages={data?.numberOfPages}
       />

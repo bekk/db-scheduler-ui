@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.github.kagkarlsson</groupId>
             <artifactId>db-scheduler</artifactId>
-            <version>12.4.0</version>
+            <version>12.5.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.bekk</groupId>

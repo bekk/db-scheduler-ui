@@ -1,11 +1,13 @@
 package com.github.bekk.dbscheduleruiapi.service;
 
 import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
-import com.github.bekk.dbscheduleruiapi.model.LogModel;
+import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
+import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
 import com.github.bekk.dbscheduleruiapi.util.mapper.LogModelRowMapper;
 import com.github.bekk.dbscheduleruiapi.util.mapper.TaskMapper;
+import com.github.bekk.dbscheduleruiapi.model.LogModel;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
@@ -17,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.sql.DataSource;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,15 +28,12 @@ public class TaskLogic {
 
     private final Scheduler scheduler;
 
-    private final DataSource dataSource;
-
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public TaskLogic(Scheduler scheduler, DataSource dataSource){
         this.scheduler = scheduler;
         this.scheduler.start();
-        this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
@@ -64,42 +62,34 @@ public class TaskLogic {
     }
 
     public GetTasksResponse getAllTasks(TaskRequestParams params) {
-        List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
-                switch (params.getFilter()){
-                    case FAILED:
-                        return task.getConsecutiveFailures() != 0;
-                    case RUNNING:
-                        return task.isPicked();
-                    case SCHEDULED:
-                        return !task.isPicked() && task.getConsecutiveFailures() == 0;
-                    default:
-                        return true;
-                }
-        }).collect(Collectors.toList());
+        List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(),
+                scheduler.getCurrentlyExecuting());
 
-        if (params.getSorting() == TaskRequestParams.TaskSort.NAME) {
-            tasks.sort((task1, task2) -> {
-                int comparisonResult = task1.getTaskName().compareTo(task2.getTaskName());
-                return params.isAsc() ? comparisonResult : -comparisonResult;
-            });
-        }else if(params.getSorting() == TaskRequestParams.TaskSort.DEFAULT){
-            tasks.sort((task1, task2) -> {
-                int comparisonResult = task1.getExecutionTime().compareTo(task2.getExecutionTime());
-                return params.isAsc() ? comparisonResult : -comparisonResult;
-            });
-        }
-
-        int totalTasks = tasks.size();
-        int numberOfPages = (int) Math.ceil((double) totalTasks / params.getSize());
-
-        int startIndex = params.getPageNumber() * params.getSize();
-        int endIndex = Math.min(startIndex + params.getSize(), totalTasks);
-
-        List<TaskModel> pagedTasks = (startIndex < endIndex) ? tasks.subList(startIndex, endIndex) : new ArrayList<>();
-
-        return new GetTasksResponse(totalTasks, numberOfPages, pagedTasks);
+        tasks = QueryUtils.sortTasks(
+                QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
+        List<TaskModel> pagedTasks = QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
+        return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
     }
+    
 
+    public GetTasksResponse getTask(TaskDetailsRequestParams params) {
+        List<TaskModel> tasks = params.getTaskId()!=null
+        ? TaskMapper.mapAllExecutionsToTaskModelUngrouped(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
+            return task.getTaskName().equals(params.getTaskName()) && task.getTaskInstance().get(0).equals(params.getTaskId());
+        }).collect(Collectors.toList())
+        : TaskMapper.mapAllExecutionsToTaskModelUngrouped(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
+            return task.getTaskName().equals(params.getTaskName());
+        }).collect(Collectors.toList());
+        if (tasks.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No tasks found for taskName: "
+                    + params.getTaskName() + ", taskId: " + params.getTaskId());
+        }
+        tasks = QueryUtils.sortTasks(
+                QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
+        List<TaskModel> pagedTasks = QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
+        return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
+        }
+        
     public List<LogModel> getLogs() {
         return jdbcTemplate.query("SELECT * FROM scheduled_execution_logs", new LogModelRowMapper());
 

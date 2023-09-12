@@ -1,12 +1,12 @@
 import { Box, Button } from '@chakra-ui/react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { DoubleChevronIcon } from 'src/assets/icons/DoubleChevronIcon';
-import { PaginationParams } from 'src/services/getTasks';
 import React from 'react';
 
 interface PaginationButtonsProps {
-  page: PaginationParams;
-  setPage: (value: React.SetStateAction<PaginationParams>) => void;
+  page: number;
+  limit: number;
+  setPage: (value: number) => void;
   numberOfPages: number | undefined;
 }
 
@@ -16,15 +16,11 @@ const PaginationButtons: React.FC<PaginationButtonsProps> = ({
   numberOfPages,
 }) => (
   <Box float={'right'} display={'flex'} alignItems={'center'}>
-    {page.pageNumber > 1 && (
+    {page > 2 && (
       <Button
         variant={'unstyled'}
-        onClick={() =>
-          setPage((prev) => {
-            return { ...prev, pageNumber: 0 };
-          })
-        }
-        visibility={page.pageNumber > 1 ? 'visible' : 'hidden'}
+        onClick={() => setPage(1)}
+        visibility={page > 1 ? 'visible' : 'hidden'}
         p={0}
         m={0}
       >
@@ -36,29 +32,16 @@ const PaginationButtons: React.FC<PaginationButtonsProps> = ({
         />
       </Button>
     )}
-    {page.pageNumber > 0 && (
-      <Button
-        variant={'unstyled'}
-        onClick={() =>
-          setPage((prev) => {
-            return { ...prev, pageNumber: page.pageNumber - 1 };
-          })
-        }
-      >
+    {page > 1 && (
+      <Button variant={'unstyled'} onClick={() => setPage(page - 1)}>
         <ChevronLeftIcon fontSize={24} m={0} />
       </Button>
     )}
-    {'page ' + (page.pageNumber + 1) + ' of ' + (numberOfPages || 1)}
+    {'page ' + page + ' of ' + (numberOfPages || 1)}
     <Button
       variant={'unstyled'}
-      onClick={() =>
-        setPage((prev) => {
-          return { ...prev, pageNumber: page.pageNumber + 1 };
-        })
-      }
-      visibility={
-        page.pageNumber + 1 < (numberOfPages || 0) ? 'visible' : 'hidden'
-      }
+      onClick={() => setPage(page + 1)}
+      visibility={page < (numberOfPages || 1) ? 'visible' : 'hidden'}
       p={0}
       m={0}
     >
@@ -66,14 +49,8 @@ const PaginationButtons: React.FC<PaginationButtonsProps> = ({
     </Button>
     <Button
       variant={'unstyled'}
-      onClick={() =>
-        setPage((prev) => {
-          return { ...prev, pageNumber: numberOfPages ? numberOfPages - 1 : 0 };
-        })
-      }
-      visibility={
-        page.pageNumber + 2 < (numberOfPages || 0) ? 'visible' : 'hidden'
-      }
+      onClick={() => setPage(numberOfPages ? numberOfPages : 1)}
+      visibility={page + 1 < (numberOfPages || 1) ? 'visible' : 'hidden'}
       p={0}
       m={0}
     >

@@ -1,17 +1,19 @@
 package com.github.bekk.dbscheduleruiapi.controller;
 
 import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
+import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.LogModel;
 import com.github.bekk.dbscheduleruiapi.service.TaskLogic;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
 @CrossOrigin
+@RequestMapping("/api")
 public class TaskController {
     private final TaskLogic taskLogic;
 
@@ -23,6 +25,11 @@ public class TaskController {
     @GetMapping("/tasks")
     public GetTasksResponse getTasks(TaskRequestParams params) {
         return taskLogic.getAllTasks(params);
+    }
+
+    @GetMapping("/tasks/details")
+    public GetTasksResponse getTaskDetails(TaskDetailsRequestParams params) {
+        return taskLogic.getTask(params);
     }
 
     @PostMapping("/rerun")
