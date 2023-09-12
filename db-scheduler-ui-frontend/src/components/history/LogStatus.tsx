@@ -4,9 +4,9 @@ interface LogStatusProps {
 }
 
 export const LogStatus: React.FC<LogStatusProps> = ({ succeeded }) => {
-  const borderColor = succeeded ? '#4CAF50' : '#BB0101';
-  const backgroundColor = succeeded ? '#92c298' : '#EFC2C2';
-  const color = succeeded ? '#4CAF50' : '#BB0101';
+  const borderColor = succeeded ? '#08662C' : '#BB0101';
+  const backgroundColor = succeeded ? '#68D391' : '#EFC2C2';
+  const color = succeeded ? '#000000' : '#BB0101';
 
   return (
     <Box

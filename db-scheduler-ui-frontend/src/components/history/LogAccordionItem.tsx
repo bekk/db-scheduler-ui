@@ -5,10 +5,9 @@ interface LogAccordionItemProps {
 }
 
 export const LogAccordionItem: React.FC<LogAccordionItemProps> = ({
-  taskData,
   stackTrace,
 }) => {
-  console.log(taskData);
+  console.log(stackTrace);
   return (
     <AccordionPanel>
       <Box display={'flex'} justifyContent={'space-between'}></Box>
@@ -20,7 +19,18 @@ export const LogAccordionItem: React.FC<LogAccordionItemProps> = ({
         w={'100%'}
         borderRadius={4}
       >
-        <Box>{stackTrace}</Box>
+        <Box>
+          {stackTrace?.split('\n').map((str, index, array) =>
+            index === array.length - 1 ? (
+              str
+            ) : (
+              <>
+                {str}
+                <br />
+              </>
+            ),
+          )}
+        </Box>
       </VStack>
     </AccordionPanel>
   );
