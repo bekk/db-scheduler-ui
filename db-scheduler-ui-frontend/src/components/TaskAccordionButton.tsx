@@ -15,12 +15,12 @@ import { useParams } from 'react-router-dom';
 import { Task } from 'src/models/Task';
 import { NumberCircleGroup } from './NumberCircleGroup';
 import { AttachmentIcon } from '@chakra-ui/icons';
+import { determineStatus, isStatus } from 'src/utils/determineStatus';
 
 interface TaskAccordionButtonProps extends Task {
   refetch: () => void;
 }
 
-const status = ['Failed', 'Running', 'Scheduled', 'Group'];
 export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
   props,
 ) => {
@@ -28,7 +28,6 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
     taskName,
     executionTime,
     consecutiveFailures,
-    pickedBy,
     taskInstance,
     actualTaskData,
     refetch,
@@ -38,20 +37,12 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
     <h2>
       <AccordionButton
         _hover={{ backgroundColor: '#FFFFFF' }}
-        cursor={taskInstance.length === 1 ? 'pointer' : 'default'}
+        cursor={!isStatus('Group', props) ? 'pointer' : 'default'}
       >
         <HStack w={'100%'} spacing={5}>
           <Box flex="1" display="inline-flex" alignItems={'center'}>
             <StatusBox
-              status={
-                taskInstance.length > 1
-                  ? status[3]
-                  : pickedBy[0]
-                  ? status[1]
-                  : consecutiveFailures[0] > 0
-                  ? status[0]
-                  : status[2]
-              }
+              status={determineStatus(props)}
               consecutiveFailures={
                 consecutiveFailures.find((val) => val > 0) ?? 0
               }
@@ -66,7 +57,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
               alignItems={'center'}
             >
               {taskName}
-              {taskInstance.length > 1 && (
+              {isStatus('Group', props) && (
                 <Box ml={2}>
                   <NumberCircleGroup {...props} />
                 </Box>
@@ -79,11 +70,9 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
                 ? taskInstance[0].slice(0, 40) + '...'
                 : taskInstance[0]}
             </Text>
-            {taskInstance.length > 1 && (
+            {isStatus('Group', props) && (
               <Text color={'#555555'}>
-                {taskInstance.length > 1
-                  ? ` + ${taskInstance.length - 1} more`
-                  : ''}
+                {` + ${taskInstance.length - 1} more`}
               </Text>
             )}
           </Flex>
@@ -98,7 +87,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
             <Box
               display={'flex'}
               justifyContent={
-                taskInstance.length === 1 ? 'space-between' : 'end'
+                !isStatus('Group', props) ? 'space-between' : 'end'
               }
               w={150}
             >
@@ -109,14 +98,14 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
                 style={{
                   marginRight: 5,
                   visibility:
-                    !pickedBy[0] && taskInstance.length === 1
+                    !isStatus('Running', props) && !isStatus('Group', props)
                       ? 'visible'
                       : 'hidden',
                 }}
               />
             </Box>
             <AccordionIcon
-              visibility={taskInstance.length === 1 ? 'visible' : 'hidden'}
+              visibility={!isStatus('Group', props) ? 'visible' : 'hidden'}
             />
           </HStack>
         </HStack>

@@ -4,19 +4,14 @@ import { PlayIcon, RepeatIcon } from '../assets/icons';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Task } from 'src/models/Task';
+import { isStatus } from 'src/utils/determineStatus';
 
 interface TaskRunButtonProps extends Task {
   style?: React.CSSProperties;
   refetch: () => void;
 }
-export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
-  taskInstance,
-  taskName,
-  pickedBy,
-  consecutiveFailures,
-  style,
-  refetch,
-}) => {
+export const TaskRunButton: React.FC<TaskRunButtonProps> = (props) => {
+  const { taskInstance, taskName, pickedBy, style, refetch } = props;
   const navigate = useNavigate();
   return (
     <>
@@ -25,7 +20,7 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
           style={style}
           onClick={(event) => {
             event.stopPropagation();
-            taskInstance.length === 1
+            !isStatus('Group', props)
               ? runTask(taskInstance[0], taskName).then(() => refetch())
               : navigate(`/${taskName}`, {
                   state: { taskName: taskName },
@@ -33,40 +28,26 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = ({
           }}
           iconSpacing={2}
           width={100}
-          bgColor={
-            consecutiveFailures[0] > 0 && taskInstance.length === 1
-              ? '#5068F6'
-              : '#E9ECFE'
-          }
-          textColor={
-            consecutiveFailures[0] > 0 && taskInstance.length === 1
-              ? '#FFFFFF'
-              : '#002FA7'
-          }
+          bgColor={isStatus('Failed', props) ? '#5068F6' : '#E9ECFE'}
+          textColor={isStatus('Failed', props) ? '#FFFFFF' : '#002FA7'}
           _hover={{
-            bgColor:
-              consecutiveFailures[0] > 0 && taskInstance.length === 1
-                ? '#344ACC'
-                : '#D3D9FE',
+            bgColor: isStatus('Failed', props) ? '#344ACC' : '#D3D9FE',
           }}
           _active={{
-            bgColor:
-              consecutiveFailures[0] > 0 && taskInstance.length === 1
-                ? '#8a94c0'
-                : '#eceefa',
+            bgColor: isStatus('Failed', props) ? '#8a94c0' : '#eceefa',
           }}
           fontWeight="normal"
           leftIcon={
-            taskInstance.length > 1 ? undefined : consecutiveFailures[0] > 0 ? (
+            isStatus('Group', props) ? undefined : isStatus('Failed', props) ? (
               <RepeatIcon boxSize={6} />
             ) : (
               <PlayIcon boxSize={4} />
             )
           }
         >
-          {taskInstance.length > 1
+          {isStatus('Group', props)
             ? 'Show all'
-            : consecutiveFailures[0] > 0
+            : isStatus('Failed', props)
             ? 'Rerun'
             : 'Run'}
         </Button>
