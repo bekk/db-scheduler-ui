@@ -1,6 +1,6 @@
 import { AccordionButton, Box, HStack } from '@chakra-ui/react';
 import { LogStatus } from 'src/components/history/LogStatus';
-import { dateFormatText } from 'src/components/dateFormatText';
+import { dateFormatText } from 'src/utils/dateFormatText';
 
 interface LogAccordionButtonProps {
   succeeded: boolean;
