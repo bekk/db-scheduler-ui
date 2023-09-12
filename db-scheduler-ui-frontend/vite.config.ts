@@ -2,8 +2,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import eslintPlugin from 'vite-plugin-eslint';
 
+const BASE_URL: string = process.env.NODE_ENV === 'production' ? 'db-scheduler-ui' : '/db-scheduler';
+
+
 export default defineConfig({
-  base: '/db-scheduler-ui',
+  base: BASE_URL,
   server: {
     port: 51373,
   },
