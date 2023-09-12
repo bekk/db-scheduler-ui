@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UIController {
     @RequestMapping("/**")
     public String forwardToIndex() {
-
-        System.out.println("FORWARDING");
         return "forward:/db-scheduler-ui/index.html";
     }
 }
