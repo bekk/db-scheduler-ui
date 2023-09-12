@@ -15,6 +15,8 @@ public class GetTasksResponse {
         this.tasks = pagedTasks;
     }
 
+    public GetTasksResponse(){}
+
     public int getNumberOfTasks() {
         return numberOfTasks;
     }

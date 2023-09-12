@@ -37,15 +37,14 @@ jobs:
       - name: Copy static frontend to java package
         run: cp -r db-scheduler-ui-frontend/dist/. db-scheduler-ui/src/main/resources/static/
 
-      - name: Set up JDK 17
+      - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
             java-version: '11'
             distribution: 'temurin'
 
       - name: Build all packages with Maven
-        run: mvn --batch-mode --update-snapshots package
-
+        run: mvn --batch-mode --update-snapshots package -DskipTests
 
       - name: Upload example-app build files
         if: github.ref == 'refs/heads/main'

@@ -41,7 +41,9 @@ public class TaskModel {
         this.lastHeartbeat = lastHeartbeat;
         this.version = version;
     }
-    
+
+    public TaskModel(){}
+
     public String getTaskName() {
         return taskName;
     }
@@ -50,7 +52,7 @@ public class TaskModel {
         this.taskName = taskName;
     }
 
-    
+
     public List<String> getTaskInstance() {
         return taskInstance;
     }
@@ -58,6 +60,7 @@ public class TaskModel {
     public void setTaskInstance( List<String> taskInstance) {
         this.taskInstance = taskInstance;
     }
+
 
 
     public Object getActualTaskData() {
@@ -89,7 +92,7 @@ public class TaskModel {
         this.taskData = taskData;
     }
 
-    
+
     public List<Instant> getExecutionTime() {
         return executionTime;
     }
@@ -106,7 +109,7 @@ public class TaskModel {
         this.picked = picked;
     }
 
-    
+
     public List<String> getPickedBy() {
         return pickedBy;
     }
@@ -115,7 +118,7 @@ public class TaskModel {
         this.pickedBy = pickedBy;
     }
 
-    
+
     public List<Instant> getLastSuccess() {
         return lastSuccess;
     }
@@ -124,7 +127,7 @@ public class TaskModel {
         this.lastSuccess = lastSuccess;
     }
 
-    
+
     public Instant getLastFailure() {
         return lastFailure;
     }
@@ -141,7 +144,7 @@ public class TaskModel {
         this.consecutiveFailures = consecutiveFailures;
     }
 
-    
+
     public Instant getLastHeartbeat() {
         return lastHeartbeat;
     }
