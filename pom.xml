@@ -14,10 +14,16 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <spring-boot.version>2.7.15</spring-boot.version>
+        <db-scheduler.version>12.5.0</db-scheduler.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.github.kagkarlsson</groupId>
+                <artifactId>db-scheduler</artifactId>
+                <version>${db-scheduler.version}</version>
+            </dependency>
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
