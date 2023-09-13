@@ -15,7 +15,7 @@ public class FailingTask {
             new TaskWithoutDataDescriptor("failing-one-time-task");
 
     public static final TaskWithoutDataDescriptor FAILING_RECURRING_TASK =
-            new TaskWithoutDataDescriptor("failing-one-time-task");
+            new TaskWithoutDataDescriptor("failing-recurring-task");
 
     public static final TaskWithoutDataDescriptor FAILING_ONETIME_TASK_BACKOFF =
             new TaskWithoutDataDescriptor("failing-one-time-with-backoff-task");
