@@ -9,6 +9,7 @@ import com.github.bekk.dbscheduleruiapi.util.mapper.LogModelRowMapper;
 import com.github.bekk.dbscheduleruiapi.util.mapper.TaskMapper;
 import com.github.bekk.dbscheduleruiapi.model.LogModel;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
+import com.github.kagkarlsson.scheduler.ScheduledExecutionsFilter;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +63,7 @@ public class TaskLogic {
     }
 
     public GetTasksResponse getAllTasks(TaskRequestParams params) {
-        List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(),
-                scheduler.getCurrentlyExecuting());
+        List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(ScheduledExecutionsFilter.all().withPicked(true)));
 
         tasks = QueryUtils.sortTasks(
                 QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
@@ -73,11 +73,13 @@ public class TaskLogic {
 
 
     public GetTasksResponse getTask(TaskDetailsRequestParams params) {
+        List<ScheduledExecution<Object>> executions = scheduler.getScheduledExecutions();
+        executions.addAll(scheduler.getScheduledExecutions(ScheduledExecutionsFilter.all().withPicked(true)));
         List<TaskModel> tasks = params.getTaskId()!=null
-        ? TaskMapper.mapAllExecutionsToTaskModelUngrouped(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
+        ? TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions).stream().filter(task -> {
             return task.getTaskName().equals(params.getTaskName()) && task.getTaskInstance().get(0).equals(params.getTaskId());
         }).collect(Collectors.toList())
-        : TaskMapper.mapAllExecutionsToTaskModelUngrouped(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
+        : TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions).stream().filter(task -> {
             return task.getTaskName().equals(params.getTaskName());
         }).collect(Collectors.toList());
         if (tasks.isEmpty()) {
