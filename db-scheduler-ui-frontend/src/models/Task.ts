@@ -1,8 +1,7 @@
 export type Task = {
   taskName: string;
   taskInstance: string[];
-  taskData: (string|null)[];
-  actualTaskData: (object|null)[];
+  taskData: (object|null)[];
   executionTime: Date[];
   picked: boolean;
   pickedBy: (string|null)[];

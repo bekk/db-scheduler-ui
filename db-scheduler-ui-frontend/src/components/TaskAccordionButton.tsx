@@ -30,7 +30,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
     consecutiveFailures,
     pickedBy,
     taskInstance,
-    actualTaskData,
+    taskData,
     refetch,
   } = props;
   const { taskName: isDetailsView } = useParams<{ taskName?: string }>();
@@ -56,7 +56,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
                 consecutiveFailures.find((val) => val > 0) ?? 0
               }
             />
-            {actualTaskData[0] != null && <AttachmentIcon />}
+            {taskData[0] != null && <AttachmentIcon />}
           </Box>
           {!isDetailsView && (
             <Box

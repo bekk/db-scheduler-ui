@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TaskModel {
     private String taskName;
     private List<String> taskInstance;
-    private List<String> taskData; // Serialized JSON representation of data
+    private List<Object> taskData;
     private List<Instant> executionTime;
     private List<Boolean> picked;
     private List<String> pickedBy;
@@ -24,14 +24,14 @@ public class TaskModel {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public TaskModel(
-             String taskName,  List<String> taskInstance,  List<Object> taskData,
-             List<Instant> executionTime, List<Boolean> picked,  List<String> pickedBy,
-             List<Instant> lastSuccess,  Instant lastFailure, List<Integer> consecutiveFailures,
-             Instant lastHeartbeat, int version
+            String taskName, List<String> taskInstance, Object inputTaskData,
+            List<Instant> executionTime, List<Boolean> picked, List<String> pickedBy,
+            List<Instant> lastSuccess, Instant lastFailure, List<Integer> consecutiveFailures,
+            Instant lastHeartbeat, int version
     ) {
         this.taskName = taskName;
         this.taskInstance = taskInstance;
-        serializeTaskData(taskData);
+        this.taskData = serializeTaskData(inputTaskData);
         this.executionTime = executionTime;
         this.picked = picked;
         this.pickedBy = pickedBy;
@@ -42,7 +42,16 @@ public class TaskModel {
         this.version = version;
     }
 
-    public TaskModel(){}
+    public TaskModel() {}
+
+    private List<Object> serializeTaskData(Object inputTaskData) {
+        try {
+            String serializedData = objectMapper.writeValueAsString(inputTaskData);
+            return Collections.singletonList(objectMapper.readValue(serializedData, Object.class));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public String getTaskName() {
         return taskName;
@@ -52,44 +61,20 @@ public class TaskModel {
         this.taskName = taskName;
     }
 
-
     public List<String> getTaskInstance() {
         return taskInstance;
     }
 
-    public void setTaskInstance( List<String> taskInstance) {
+    public void setTaskInstance(List<String> taskInstance) {
         this.taskInstance = taskInstance;
     }
 
-
-
-    public Object getActualTaskData() {
-        return taskData.stream().map(data-> {
-            if(data!=null) {
-                try {
-                    return objectMapper.readValue(data, Object.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            return null;
-        }).collect(Collectors.toList());
+    public List<Object> getTaskData() {
+        return taskData;
     }
 
-    public List<String> getTaskData() {
-        return this.taskData;
-    }
-
-    public void serializeTaskData( List<Object> taskData) {
-            try {
-                assert taskData != null;
-                this.taskData = Arrays.asList(objectMapper.writeValueAsString(taskData.get(0)));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-    }
-    public void setTaskData(List<String> taskData) {
-        this.taskData = taskData;
+    public void setTaskData(Object inputTaskData) {
+        this.taskData = serializeTaskData(inputTaskData);
     }
 
 
@@ -149,15 +134,8 @@ public class TaskModel {
         return lastHeartbeat;
     }
 
-    public void setLastHeartbeat(Instant lastHeartbeat) {
-        this.lastHeartbeat = lastHeartbeat;
-    }
-
     public int getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
-    }
 }
