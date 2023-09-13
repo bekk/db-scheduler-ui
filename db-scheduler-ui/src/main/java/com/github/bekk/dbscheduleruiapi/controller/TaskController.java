@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api")
+@RequestMapping("/db-scheduler-api/tasks")
 public class TaskController {
   private final TaskLogic taskLogic;
 
@@ -18,12 +18,12 @@ public class TaskController {
     this.taskLogic = taskLogic;
   }
 
-  @GetMapping("/tasks")
+  @GetMapping("/all")
   public GetTasksResponse getTasks(TaskRequestParams params) {
     return taskLogic.getAllTasks(params);
   }
 
-  @GetMapping("/tasks/details")
+  @GetMapping("/details")
   public GetTasksResponse getTaskDetails(TaskDetailsRequestParams params) {
     return taskLogic.getTask(params);
   }

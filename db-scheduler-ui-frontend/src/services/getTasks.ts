@@ -1,6 +1,8 @@
-import { TasksResponse } from "src/models/TasksResponse";
+import { TasksResponse } from 'src/models/TasksResponse';
 
-const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL as string ?? window.location.origin + '/api';
+const API_BASE_URL: string =
+  (import.meta.env.VITE_API_BASE_URL as string) ??
+  window.location.origin + '/db-scheduler-api';
 
 export enum FilterBy {
   All = 'All',
@@ -38,11 +40,11 @@ export const getTasks = async (
   queryParams.append('asc', isAsc.toString());
   queryParams.append('searchTerm', searchTerm.trim());
 
-  const response = await fetch(`${API_BASE_URL}/tasks?${queryParams}`, {
+  const response = await fetch(`${API_BASE_URL}/tasks/all?${queryParams}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-    }
+    },
   });
 
   if (!response.ok) {

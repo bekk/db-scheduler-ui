@@ -1,9 +1,14 @@
-const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL as string ?? window.location.origin + '/api';
+const API_BASE_URL: string =
+  (import.meta.env.VITE_API_BASE_URL as string) ??
+  window.location.origin + '/db-scheduler-api';
 
 const runTask = async (id: string, name: string) => {
-  const response = await fetch(`${API_BASE_URL}/rerun?id=${id[0]}&name=${name}`, {
-    method: 'POST',
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/tasks/rerun?id=${id[0]}&name=${name}`,
+    {
+      method: 'POST',
+    },
+  );
 
   if (!response.ok) {
     throw new Error(`Error executing task. Status: ${response.statusText}`);
