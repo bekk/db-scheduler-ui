@@ -2,7 +2,6 @@ package com.github.bekk.dbscheduleruiapi.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 public class GetTasksResponse {
@@ -12,8 +11,8 @@ public class GetTasksResponse {
 
   @JsonCreator
   public GetTasksResponse(
-      @JsonProperty("numberOfTasks") int totalTasks, 
-      @JsonProperty("tasks") List<TaskModel> pagedTasks, 
+      @JsonProperty("numberOfTasks") int totalTasks,
+      @JsonProperty("tasks") List<TaskModel> pagedTasks,
       @JsonProperty("pageSize") int pageSize) {
     this.numberOfTasks = totalTasks;
     this.numberOfPages = totalTasks == 0 ? 0 : (int) Math.ceil((double) totalTasks / pageSize);

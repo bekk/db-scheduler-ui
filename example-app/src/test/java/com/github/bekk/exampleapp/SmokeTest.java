@@ -53,7 +53,7 @@ public class SmokeTest {
             baseUrl + "/api/tasks?filter=ALL&pageNumber=0&size=10&sorting=DEFAULT&asc=true",
             GetTasksResponse.class);
     Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
-    result.getBody().getTasks().forEach(t->System.out.println(t.getTaskName()));
+    result.getBody().getTasks().forEach(t -> System.out.println(t.getTaskName()));
     assertThat(result.getBody().getTasks())
         .anyMatch(taskModel -> taskModel.getTaskName().equals(ONE_TIME_TASK.getTaskName()));
   }
