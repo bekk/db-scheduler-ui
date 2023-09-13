@@ -63,7 +63,9 @@ public class TaskLogic {
     }
 
     public GetTasksResponse getAllTasks(TaskRequestParams params) {
-        List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(scheduler.getScheduledExecutions(ScheduledExecutionsFilter.all().withPicked(true)));
+        List<ScheduledExecution<Object>> executions = scheduler.getScheduledExecutions();
+        executions.addAll(scheduler.getScheduledExecutions(ScheduledExecutionsFilter.all().withPicked(true)));
+        List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(executions);
 
         tasks = QueryUtils.sortTasks(
                 QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
