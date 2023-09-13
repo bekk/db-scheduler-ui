@@ -3,6 +3,7 @@ package com.github.bekk.dbscheduleruiapi.controller;
 import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
 import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.LogModel;
+import com.github.bekk.dbscheduleruiapi.service.LogLogic;
 import com.github.bekk.dbscheduleruiapi.service.TaskLogic;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 
@@ -42,8 +43,4 @@ public class TaskController {
         taskLogic.deleteTask(id, name);
     }
 
-    @GetMapping("/logs")
-    public List<LogModel> getLogs(@RequestParam String taskName, @RequestParam String taskInstance){
-        return taskLogic.getLogs(taskName, taskInstance);
-    }
 }
