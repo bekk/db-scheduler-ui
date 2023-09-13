@@ -7,6 +7,8 @@ import com.github.bekk.exampleapp.model.TestObject;
 
 import java.util.List;
 
+import static com.github.bekk.exampleapp.tasks.ChainTask.CHAINED_STEP_1_TASK;
+
 public class TaskDefinitions {
 
     public static List<Task<?>> getAllKnownTaskDefinitions() {
@@ -29,7 +31,7 @@ public class TaskDefinitions {
         return List.of(
                 OneTimeTaskExample.getExample().instance("1", new TaskData(1, "test data")),
                 RecurringTaskExample.getExample().instance("2"),
-                ChainTask.chainTaskStepOne().instance("3", new TestObject("Ole Nordman", 3, "ole.nordman@mail.com")),
+                CHAINED_STEP_1_TASK.instance("3", new TestObject("Ole Nordman", 1, "ole.nordman@mail.com")),
                 LongRunningTask.runLongRunningTask().instance("5"),
                 FailingTask.runOneTimeFailing().instance("6"),
                 FailingTask.runRecurringFailing().instance("7"),
