@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.ONE_TIME_TASK;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -48,7 +49,7 @@ public class SmokeTest {
     public void testGetTasksReturnsExampleOneTimeTask() throws Exception {
         ResponseEntity<GetTasksResponse> result = this.restTemplate.getForEntity(baseUrl + "/api/tasks?filter=ALL&page=0&size=10&sorting=DEFAULT&asc=true", GetTasksResponse.class);
         Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
-        assertThat(result.getBody().getTasks()).anyMatch(taskModel -> taskModel.getTaskName().equals("example-onetime-task"));
+        assertThat(result.getBody().getTasks()).anyMatch(taskModel -> taskModel.getTaskName().equals(ONE_TIME_TASK.getTaskName()));
     }
 
     @BeforeEach
