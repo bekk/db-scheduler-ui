@@ -7,7 +7,6 @@ interface LogAccordionItemProps {
 export const LogAccordionItem: React.FC<LogAccordionItemProps> = ({
   stackTrace,
 }) => {
-  console.log(stackTrace);
   return (
     <AccordionPanel>
       <Box display={'flex'} justifyContent={'space-between'}></Box>
