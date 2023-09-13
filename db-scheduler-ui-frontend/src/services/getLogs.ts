@@ -9,7 +9,7 @@ export const getLogs = async (taskName: string, taskInstance: string) => {
 
   queryParams.append('taskName', taskName);
   queryParams.append('taskInstance', taskInstance);
-  const response = await fetch(`${API_BASE_URL}/logs?${queryParams}`, {
+  const response = await fetch(`${API_BASE_URL}/logs/id?${queryParams}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
