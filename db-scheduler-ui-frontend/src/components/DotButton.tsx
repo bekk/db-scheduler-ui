@@ -15,8 +15,9 @@ import {
 } from '@chakra-ui/react';
 import deleteTask from 'src/services/deleteTask';
 import React from 'react';
-import { DeleteIcon } from '@chakra-ui/icons';
+import { DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { IoEllipsisVerticalIcon } from '../assets/icons';
+import { useNavigate } from 'react-router-dom';
 
 interface TaskProps {
   taskName: string;
@@ -30,6 +31,7 @@ export const DotButton: React.FC<TaskProps> = ({
   style,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const navigate = useNavigate();
   const onClose = () => setIsOpen(false);
   const cancelRef = React.useRef(null);
   return (
@@ -55,6 +57,17 @@ export const DotButton: React.FC<TaskProps> = ({
             icon={<DeleteIcon boxSize={4} />}
           >
             Delete task
+          </MenuItem>
+          <MenuItem
+            rounded={6}
+            minBlockSize={10}
+            onClick={(event) => {
+              navigate(`/${taskName}/${taskInstance}`);
+              event.stopPropagation();
+            }}
+            icon={<InfoOutlineIcon boxSize={4} />}
+          >
+            See logs
           </MenuItem>
         </MenuList>
       </Menu>

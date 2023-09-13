@@ -13,6 +13,7 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * **Re-run or Run** your task directly from the User Interface
 * **Sort task** on Task Name or Execution Time
 * **View only Tasks that are Scheduled, Running or Failed.**
+* **View the history of all Tasks**
 * **Delete Tasks** 
 * **Polling** every 2 seconds.
 
