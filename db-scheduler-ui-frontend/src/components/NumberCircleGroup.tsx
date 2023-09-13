@@ -2,6 +2,7 @@ import React from 'react';
 import { Task } from 'src/models/Task';
 import { NumberCircle } from './NumberCircle';
 import { Box } from '@chakra-ui/react';
+import colors from 'src/styles/colors';
 
 export const NumberCircleGroup: React.FC<Task> = ({
   pickedBy,
@@ -23,7 +24,7 @@ export const NumberCircleGroup: React.FC<Task> = ({
       {failureCount > 0 && (
         <NumberCircle
           number={failureCount}
-          bgColor="#BB0101"
+          bgColor={colors.failed['200']}
           position={'static'}
           style={{ margin: '0 1px' }}
         />
@@ -31,7 +32,7 @@ export const NumberCircleGroup: React.FC<Task> = ({
       {runningCount > 0 && (
         <NumberCircle
           number={runningCount}
-          bgColor="#5068F6"
+          bgColor={colors.running['300']}
           position={'static'}
           style={{ margin: '0 1px' }}
         />
@@ -39,8 +40,8 @@ export const NumberCircleGroup: React.FC<Task> = ({
       {scheduledCount > 0 && (
         <NumberCircle
           number={scheduledCount}
-          bgColor="#F1F2F5"
-          textColor="#000000"
+          bgColor={colors.primary['200']}
+          textColor={colors.primary['900']}
           position={'static'}
           style={{ margin: '0 1px' }}
         />

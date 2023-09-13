@@ -4,6 +4,7 @@ import { Box, HStack } from '@chakra-ui/react';
 import { SortBy } from 'src/services/getTasks';
 
 import { SortButton } from 'src/components/SortButton';
+import colors from 'src/styles/colors';
 
 interface TitleRowProps {
   currentSort: SortBy;
@@ -26,7 +27,12 @@ const TitleRow: React.FC<TitleRowProps> = ({
     justifyContent={'space-around'}
     spacing={5}
   >
-    <Box flex="1" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
+    <Box
+      flex="1"
+      textAlign="left"
+      textColor={colors.primary['600']}
+      fontSize={'sm'}
+    >
       Status
     </Box>
     {!isDetailsView && (
@@ -39,7 +45,12 @@ const TitleRow: React.FC<TitleRowProps> = ({
         name={SortBy.Name}
       />
     )}
-    <Box flex="2" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
+    <Box
+      flex="2"
+      textAlign="left"
+      textColor={colors.primary['600']}
+      fontSize={'sm'}
+    >
       Task-ID
     </Box>
     <SortButton

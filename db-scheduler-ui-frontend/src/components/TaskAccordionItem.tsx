@@ -2,6 +2,7 @@ import { AccordionPanel, Box, VStack } from '@chakra-ui/react';
 import { TaskDataRow } from 'src/components/TaskDataRow';
 import React from 'react';
 import { dateFormatText } from 'src/utils/dateFormatText';
+import colors from 'src/styles/colors';
 
 interface TaskAccordionItemProps {
   lastSuccess: Date | null;
@@ -19,7 +20,7 @@ export const TaskAccordionItem: React.FC<TaskAccordionItemProps> = ({
       <VStack
         align="start"
         spacing={2}
-        bgColor={'#FFFFFF'}
+        bgColor={colors.primary['100']}
         p={2}
         w={'100%'}
         borderRadius={4}

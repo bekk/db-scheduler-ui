@@ -1,6 +1,7 @@
 import { AccordionButton, Box, HStack } from '@chakra-ui/react';
 import { LogStatus } from 'src/components/history/LogStatus';
 import { dateFormatText } from 'src/utils/dateFormatText';
+import colors from 'src/styles/colors';
 
 interface LogAccordionButtonProps {
   succeeded: boolean;
@@ -17,7 +18,7 @@ export const LogAccordionButton: React.FC<LogAccordionButtonProps> = (
 ) => {
   return (
     <h2>
-      <AccordionButton _hover={{ backgroundColor: '#FFFFFF' }}>
+      <AccordionButton _hover={{ backgroundColor: colors.primary['100'] }}>
         <HStack w={'100%'} spacing={5}>
           <Box flex="1" display="inline-flex">
             <LogStatus succeeded={props.succeeded} />
