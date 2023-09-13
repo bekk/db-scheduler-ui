@@ -17,6 +17,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
 import TaskGroupCard from './TaskGroupCard';
+import { isStatus } from 'src/utils/determineStatus';
 
 const TaskList: React.FC = () => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
@@ -104,9 +105,9 @@ const TaskList: React.FC = () => {
         setSortAsc={setSortAsc}
         isDetailsView={isDetailsView}
       />
-      <Accordion allowMultiple>
+      <Accordion allowMultiple key={taskName || 'all'}>
         {data?.tasks.map((task) =>
-          task.taskInstance.length === 1 ? (
+          !isStatus('Group', task) ? (
             <TaskCard
               key={task.taskInstance + task.taskName}
               {...task}
