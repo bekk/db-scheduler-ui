@@ -5,17 +5,18 @@ import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.OneTimeTask;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 
-
 public class OneTimeTaskExample {
 
-    public static final TaskWithDataDescriptor<TaskData> ONE_TIME_TASK =
-            new TaskWithDataDescriptor<>("onetime-task", TaskData.class);
+  public static final TaskWithDataDescriptor<TaskData> ONE_TIME_TASK =
+      new TaskWithDataDescriptor<>("onetime-task", TaskData.class);
 
-    public static OneTimeTask<TaskData> getExample() {
-        return Tasks.oneTime(ONE_TIME_TASK).
-                execute((inst,ctx) -> {
-                    System.out.println("Executed onetime task: " + inst.getTaskName());
-                    System.out.println("With data id: " + inst.getData().getId() + " data: " + inst.getData().getData());
-                });
-    }
+  public static OneTimeTask<TaskData> getExample() {
+    return Tasks.oneTime(ONE_TIME_TASK)
+        .execute(
+            (inst, ctx) -> {
+              System.out.println("Executed onetime task: " + inst.getTaskName());
+              System.out.println(
+                  "With data id: " + inst.getData().getId() + " data: " + inst.getData().getData());
+            });
+  }
 }
