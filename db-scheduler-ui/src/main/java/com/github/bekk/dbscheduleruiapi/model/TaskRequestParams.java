@@ -2,11 +2,11 @@ package com.github.bekk.dbscheduleruiapi.model;
 
 public class TaskRequestParams {
 
-    private final TaskFilter filter;
-    private final int pageNumber;
-    private final int size;
-    private final TaskSort sorting;
-    private final boolean asc;
+  private final TaskFilter filter;
+  private final int pageNumber;
+  private final int size;
+  private final TaskSort sorting;
+  private final boolean asc;
 
   public TaskRequestParams(
       TaskFilter filter, int pageNumber, int size, TaskSort sorting, boolean asc) {
@@ -21,31 +21,31 @@ public class TaskRequestParams {
     return filter;
   }
 
-    public int getPageNumber() {
-        return pageNumber;
-    }
+  public int getPageNumber() {
+    return pageNumber;
+  }
 
-    public int getSize() {
-        return size;
-    }
+  public int getSize() {
+    return size;
+  }
 
-    public TaskSort getSorting() {
-        return sorting;
-    }
+  public TaskSort getSorting() {
+    return sorting;
+  }
 
-    public boolean isAsc() {
-        return asc;
-    }
+  public boolean isAsc() {
+    return asc;
+  }
 
-    public enum TaskFilter {
-        ALL,
-        FAILED,
-        RUNNING,
-        SCHEDULED;
-    }
+  public enum TaskFilter {
+    ALL,
+    FAILED,
+    RUNNING,
+    SCHEDULED;
+  }
 
-    public enum TaskSort {
-        DEFAULT,
-        NAME;
-    }
+  public enum TaskSort {
+    DEFAULT,
+    NAME;
+  }
 }

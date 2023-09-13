@@ -19,20 +19,23 @@ public class QueryUtils {
     return (startIndex < endIndex) ? allItems.subList(startIndex, endIndex) : new ArrayList<>();
   }
 
-    public static List<TaskModel> filterTasks(List<TaskModel> tasks, TaskFilter filter) {
-        return tasks.stream()
-            .filter(task -> {
-                switch (filter) {
-                    case FAILED:
-                        return task.getConsecutiveFailures().stream().anyMatch(failures -> failures != 0);
-                    case RUNNING:
-                        return task.isPicked().stream().anyMatch(Boolean::booleanValue);
-                    case SCHEDULED:
-                        return IntStream.range(0, task.isPicked().size())
-                                .anyMatch(i -> !task.isPicked().get(i) && task.getConsecutiveFailures().get(i) == 0);
-                    default:
-                        return true;
-                }
+  public static List<TaskModel> filterTasks(List<TaskModel> tasks, TaskFilter filter) {
+    return tasks.stream()
+        .filter(
+            task -> {
+              switch (filter) {
+                case FAILED:
+                  return task.getConsecutiveFailures().stream().anyMatch(failures -> failures != 0);
+                case RUNNING:
+                  return task.isPicked().stream().anyMatch(Boolean::booleanValue);
+                case SCHEDULED:
+                  return IntStream.range(0, task.isPicked().size())
+                      .anyMatch(
+                          i ->
+                              !task.isPicked().get(i) && task.getConsecutiveFailures().get(i) == 0);
+                default:
+                  return true;
+              }
             })
         .collect(Collectors.toList());
   }

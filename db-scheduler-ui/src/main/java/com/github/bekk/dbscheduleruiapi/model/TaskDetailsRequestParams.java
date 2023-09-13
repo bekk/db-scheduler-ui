@@ -2,8 +2,8 @@ package com.github.bekk.dbscheduleruiapi.model;
 
 public class TaskDetailsRequestParams extends TaskRequestParams {
 
-    private final String taskId;
-    private final String taskName;
+  private final String taskId;
+  private final String taskName;
 
   public TaskDetailsRequestParams(
       TaskFilter filter,
@@ -22,7 +22,7 @@ public class TaskDetailsRequestParams extends TaskRequestParams {
     return taskId;
   }
 
-    public String getTaskName() {
-        return taskName;
-    }
+  public String getTaskName() {
+    return taskName;
+  }
 }

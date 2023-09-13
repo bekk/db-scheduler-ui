@@ -3,82 +3,89 @@ package com.github.bekk.dbscheduleruiapi.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TaskModel {
-    private String taskName;
-    private List<String> taskInstance;
-    private List<Object> taskData;
-    private List<Instant> executionTime;
-    private List<Boolean> picked;
-    private List<String> pickedBy;
-    private List<Instant> lastSuccess;
-    private Instant lastFailure;
-    private List<Integer> consecutiveFailures;
-    private Instant lastHeartbeat;
-    private int version;
+  private String taskName;
+  private List<String> taskInstance;
+  private List<Object> taskData;
+  private List<Instant> executionTime;
+  private List<Boolean> picked;
+  private List<String> pickedBy;
+  private List<Instant> lastSuccess;
+  private Instant lastFailure;
+  private List<Integer> consecutiveFailures;
+  private Instant lastHeartbeat;
+  private int version;
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public TaskModel(
-            String taskName, List<String> taskInstance, List<Object> inputTaskData,
-            List<Instant> executionTime, List<Boolean> picked, List<String> pickedBy,
-            List<Instant> lastSuccess, Instant lastFailure, List<Integer> consecutiveFailures,
-            Instant lastHeartbeat, int version
-    ) {
-        this.taskName = taskName;
-        this.taskInstance = taskInstance;
-        this.taskData = serializeTaskData(inputTaskData);
-        this.executionTime = executionTime;
-        this.picked = picked;
-        this.pickedBy = pickedBy;
-        this.lastSuccess = lastSuccess;
-        this.lastFailure = lastFailure;
-        this.consecutiveFailures = consecutiveFailures;
-        this.lastHeartbeat = lastHeartbeat;
-        this.version = version;
-    }
+  public TaskModel(
+      String taskName,
+      List<String> taskInstance,
+      List<Object> inputTaskData,
+      List<Instant> executionTime,
+      List<Boolean> picked,
+      List<String> pickedBy,
+      List<Instant> lastSuccess,
+      Instant lastFailure,
+      List<Integer> consecutiveFailures,
+      Instant lastHeartbeat,
+      int version) {
+    this.taskName = taskName;
+    this.taskInstance = taskInstance;
+    this.taskData = serializeTaskData(inputTaskData);
+    this.executionTime = executionTime;
+    this.picked = picked;
+    this.pickedBy = pickedBy;
+    this.lastSuccess = lastSuccess;
+    this.lastFailure = lastFailure;
+    this.consecutiveFailures = consecutiveFailures;
+    this.lastHeartbeat = lastHeartbeat;
+    this.version = version;
+  }
 
-    public TaskModel() {}
+  public TaskModel() {}
 
-    private List<Object> serializeTaskData(List<Object> inputTaskDataList) {
-        return inputTaskDataList.stream().map(data -> {
-            try {
+  private List<Object> serializeTaskData(List<Object> inputTaskDataList) {
+    return inputTaskDataList.stream()
+        .map(
+            data -> {
+              try {
                 String serializedData = objectMapper.writeValueAsString(data);
                 return objectMapper.readValue(serializedData, Object.class);
-            } catch (JsonProcessingException e) {
+              } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
-            }
-        }).collect(Collectors.toList());
-    }
-
+              }
+            })
+        .collect(Collectors.toList());
+  }
 
   public String getTaskName() {
     return taskName;
   }
 
-    public List<String> getTaskInstance() {
-        return taskInstance;
-    }
+  public List<String> getTaskInstance() {
+    return taskInstance;
+  }
 
-    public void setTaskInstance(List<String> taskInstance) {
-        this.taskInstance = taskInstance;
-    }
+  public void setTaskInstance(List<String> taskInstance) {
+    this.taskInstance = taskInstance;
+  }
 
-    public List<Object> getTaskData() {
-        return taskData;
-    }
+  public List<Object> getTaskData() {
+    return taskData;
+  }
 
-    public void setTaskData(List<Object> inputTaskData) {
-        this.taskData = serializeTaskData(inputTaskData);
-    }
+  public void setTaskData(List<Object> inputTaskData) {
+    this.taskData = serializeTaskData(inputTaskData);
+  }
 
   public void setExecutionTime(List<Instant> executionTime) {
     this.executionTime = executionTime;
   }
+
   public List<Instant> getExecutionTime() {
     return executionTime;
   }
@@ -130,8 +137,8 @@ public class TaskModel {
   public int getVersion() {
     return version;
   }
-    public void setConsecutiveFailures(List<Integer> consecutiveFailures) {
-        this.consecutiveFailures = consecutiveFailures;
-    }
 
+  public void setConsecutiveFailures(List<Integer> consecutiveFailures) {
+    this.consecutiveFailures = consecutiveFailures;
+  }
 }

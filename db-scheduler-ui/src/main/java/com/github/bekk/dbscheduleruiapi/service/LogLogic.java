@@ -3,7 +3,6 @@ package com.github.bekk.dbscheduleruiapi.service;
 import com.github.bekk.dbscheduleruiapi.model.LogModel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,7 @@ public class LogLogic {
     return namedParameterJdbcTemplate.query(
         "SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName AND task_instance = :taskInstance ORDER BY time_started DESC",
         params,
-            new LogModelRowMapper());
+        new LogModelRowMapper());
   }
 
   public List<LogModel> getAllLogs() {
@@ -46,18 +45,17 @@ public class LogLogic {
     @Override
     public LogModel mapRow(ResultSet rs, int rowNum) throws SQLException {
       return new LogModel(
-              rs.getLong("id"),
-              rs.getString("task_name"),
-              rs.getString("task_instance"),
-              rs.getString("task_data"),
-              rs.getTimestamp("time_started").toInstant(),
-              rs.getTimestamp("time_finished").toInstant(),
-              rs.getBoolean("succeeded"),
-              rs.getLong("duration_ms"),
-              rs.getString("exception_class"),
-              rs.getString("exception_message"),
-              rs.getString("exception_stacktrace")
-      );
+          rs.getLong("id"),
+          rs.getString("task_name"),
+          rs.getString("task_instance"),
+          rs.getString("task_data"),
+          rs.getTimestamp("time_started").toInstant(),
+          rs.getTimestamp("time_finished").toInstant(),
+          rs.getBoolean("succeeded"),
+          rs.getLong("duration_ms"),
+          rs.getString("exception_class"),
+          rs.getString("exception_message"),
+          rs.getString("exception_stacktrace"));
     }
   }
 }
