@@ -18,20 +18,6 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
         <LogoIcon mr={2} />
         {title}
       </Text>
-      <Box
-        borderRadius={'50%'}
-        backgroundColor={'#E9ECFE'}
-        width={'32px'}
-        height={'32px'}
-        justifyContent={'center'}
-        alignItems={'center'}
-        display={'flex'}
-        mr={4}
-      >
-        <Text color={'#002FA7'} fontSize={'sm'}>
-          ET
-        </Text>
-      </Box>
     </Box>
   );
 };
