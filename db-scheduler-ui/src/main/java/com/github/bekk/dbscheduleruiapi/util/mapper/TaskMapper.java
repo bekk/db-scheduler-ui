@@ -5,6 +5,7 @@ import com.github.kagkarlsson.scheduler.CurrentlyExecuting;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -15,14 +16,14 @@ public class TaskMapper {
         return scheduledExecutions.stream()
                 .map(execution -> new TaskModel(
                         execution.getTaskInstance().getTaskName(),
-                        Arrays.asList(execution.getTaskInstance().getId()),
-                        Arrays.asList(execution.getData()),
-                        Arrays.asList(execution.getExecutionTime()),
-                        Arrays.asList(execution.isPicked()),
-                        Arrays.asList(execution.getPickedBy()),
-                        Arrays.asList(execution.getLastSuccess()),
+                        Collections.singletonList(execution.getTaskInstance().getId()),
+                        Collections.singletonList(execution.getData()),
+                        Collections.singletonList(execution.getExecutionTime()),
+                        List.of(execution.isPicked()),
+                        Collections.singletonList(execution.getPickedBy()),
+                        Collections.singletonList(execution.getLastSuccess()),
                         execution.getLastFailure(),
-                        Arrays.asList(execution.getConsecutiveFailures()), // Modified here
+                        List.of(execution.getConsecutiveFailures()),
                         null,
                         0
                 ))
@@ -33,14 +34,14 @@ public class TaskMapper {
         return currentlyExecuting.stream()
                 .map(execution -> new TaskModel(
                         execution.getTaskInstance().getTaskName(),
-                        Arrays.asList(execution.getTaskInstance().getId()),
-                        Arrays.asList(execution.getTaskInstance().getData()),
-                        Arrays.asList(execution.getExecution().executionTime),
-                        Arrays.asList(execution.getExecution().picked),
-                        Arrays.asList(execution.getExecution().pickedBy),
-                        Arrays.asList(execution.getExecution().lastSuccess),
+                        Collections.singletonList(execution.getTaskInstance().getId()),
+                        Collections.singletonList(execution.getTaskInstance().getData()),
+                        Collections.singletonList(execution.getExecution().executionTime),
+                        List.of(execution.getExecution().picked),
+                        Collections.singletonList(execution.getExecution().pickedBy),
+                        Collections.singletonList(execution.getExecution().lastSuccess),
                         execution.getExecution().lastFailure,
-                        Arrays.asList(execution.getExecution().consecutiveFailures), // Modified here
+                        List.of(execution.getExecution().consecutiveFailures),
                         null,
                         0
                 ))

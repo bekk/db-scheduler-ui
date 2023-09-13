@@ -68,34 +68,34 @@ public class TaskLogic {
         tasks = QueryUtils.sortTasks(
                 QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
         List<TaskModel> pagedTasks = QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
+
         return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
     }
 
 
     public GetTasksResponse getTask(TaskDetailsRequestParams params) {
-        List<TaskModel> tasks = params.getTaskId()!=null
-        ? TaskMapper.mapAllExecutionsToTaskModelUngrouped(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
-            return task.getTaskName().equals(params.getTaskName()) && task.getTaskInstance().get(0).equals(params.getTaskId());
-        }).collect(Collectors.toList())
-        : TaskMapper.mapAllExecutionsToTaskModelUngrouped(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting()).stream().filter(task -> {
-            return task.getTaskName().equals(params.getTaskName());
-        }).collect(Collectors.toList());
+        List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModelUngrouped(scheduler.getScheduledExecutions(), scheduler.getCurrentlyExecuting())
+                .stream()
+                .filter(task -> task.getTaskName().equals(params.getTaskName()) &&
+                        (params.getTaskId() == null || task.getTaskInstance().get(0).equals(params.getTaskId())))
+                .collect(Collectors.toList());
+
         if (tasks.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No tasks found for taskName: "
                     + params.getTaskName() + ", taskId: " + params.getTaskId());
         }
+
         tasks = QueryUtils.sortTasks(
                 QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
         List<TaskModel> pagedTasks = QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
+
         return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
-        }
+    }
 
     public List<LogModel> getLogs(String taskName, String taskInstance) {
         Map<String, Object> params = new HashMap<>();
         params.put("taskName", taskName);
         params.put("taskInstance", taskInstance);
         return namedParameterJdbcTemplate.query("SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName AND task_instance = :taskInstance ORDER BY time_started DESC", params,new LogModelRowMapper());
-
-
     }
 }

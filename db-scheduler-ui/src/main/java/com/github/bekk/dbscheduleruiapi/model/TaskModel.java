@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TaskModel {
     private String taskName;
@@ -24,7 +25,7 @@ public class TaskModel {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public TaskModel(
-            String taskName, List<String> taskInstance, Object inputTaskData,
+            String taskName, List<String> taskInstance, List<Object> inputTaskData,
             List<Instant> executionTime, List<Boolean> picked, List<String> pickedBy,
             List<Instant> lastSuccess, Instant lastFailure, List<Integer> consecutiveFailures,
             Instant lastHeartbeat, int version
@@ -44,21 +45,20 @@ public class TaskModel {
 
     public TaskModel() {}
 
-    private List<Object> serializeTaskData(Object inputTaskData) {
-        try {
-            String serializedData = objectMapper.writeValueAsString(inputTaskData);
-            return Collections.singletonList(objectMapper.readValue(serializedData, Object.class));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    private List<Object> serializeTaskData(List<Object> inputTaskDataList) {
+        return inputTaskDataList.stream().map(data -> {
+            try {
+                String serializedData = objectMapper.writeValueAsString(data);
+                return objectMapper.readValue(serializedData, Object.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
     }
+
 
     public String getTaskName() {
         return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
     }
 
     public List<String> getTaskInstance() {
@@ -73,7 +73,7 @@ public class TaskModel {
         return taskData;
     }
 
-    public void setTaskData(Object inputTaskData) {
+    public void setTaskData(List<Object> inputTaskData) {
         this.taskData = serializeTaskData(inputTaskData);
     }
 
