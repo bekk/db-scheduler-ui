@@ -9,16 +9,16 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class ExampleApp {
-    public static void main(String[] args) {
-        SpringApplication.run(ExampleApp.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(ExampleApp.class, args);
+  }
 
-    @Bean
-    public CommandLineRunner runAllTasks(Scheduler scheduler) {
-        return args -> {
-            System.out.println("Running all tasks");
-            TaskService taskService = new TaskService(scheduler);
-            taskService.runAllTasks();
-            };
-        }
-    }
+  @Bean
+  public CommandLineRunner runAllTasks(Scheduler scheduler) {
+    return args -> {
+      System.out.println("Running all tasks");
+      TaskService taskService = new TaskService(scheduler);
+      taskService.runAllTasks();
+    };
+  }
+}

@@ -5,6 +5,7 @@ import { Task } from '../models/Task';
 
 import { TaskAccordionButton } from 'src/components/TaskAccordionButton';
 import { TaskAccordionItem } from 'src/components/TaskAccordionItem';
+import { isStatus } from 'src/utils/determineStatus';
 
 interface TaskCardProps extends Task {
   refetch: () => void;
@@ -12,8 +13,7 @@ interface TaskCardProps extends Task {
 }
 
 const TaskCard: React.FC<TaskCardProps> = (props) => {
-  const { accordionProps, taskInstance, lastSuccess, lastFailure, taskData } =
-    props;
+  const { accordionProps, lastSuccess, lastFailure, taskData } = props;
 
   return (
     <AccordionItem
@@ -26,7 +26,7 @@ const TaskCard: React.FC<TaskCardProps> = (props) => {
       pos={'relative'}
     >
       <TaskAccordionButton {...props} />
-      {taskInstance.length === 1 && (
+      {!isStatus('Group', props) && (
         <>
           <Divider color={'#E0E0E0'} />
           <TaskAccordionItem

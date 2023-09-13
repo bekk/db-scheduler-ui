@@ -2,7 +2,6 @@ package com.github.bekk.dbscheduleruiapi.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,7 +21,7 @@ public class TaskModel {
     private Instant lastHeartbeat;
     private int version;
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public TaskModel(
             String taskName, List<String> taskInstance, List<Object> inputTaskData,
@@ -57,9 +56,9 @@ public class TaskModel {
     }
 
 
-    public String getTaskName() {
-        return taskName;
-    }
+  public String getTaskName() {
+    return taskName;
+  }
 
     public List<String> getTaskInstance() {
         return taskInstance;
@@ -77,65 +76,62 @@ public class TaskModel {
         this.taskData = serializeTaskData(inputTaskData);
     }
 
+  public void setExecutionTime(List<Instant> executionTime) {
+    this.executionTime = executionTime;
+  }
+  public List<Instant> getExecutionTime() {
+    return executionTime;
+  }
 
-    public List<Instant> getExecutionTime() {
-        return executionTime;
-    }
+  public List<Boolean> isPicked() {
+    return picked;
+  }
 
-    public void setExecutionTime( List<Instant> executionTime) {
-        this.executionTime = executionTime;
-    }
+  public void setPicked(List<Boolean> picked) {
+    this.picked = picked;
+  }
 
-    public List<Boolean> isPicked() {
-        return picked;
-    }
+  public List<String> getPickedBy() {
+    return pickedBy;
+  }
 
-    public void setPicked(List<Boolean> picked) {
-        this.picked = picked;
-    }
+  public void setPickedBy(List<String> pickedBy) {
+    this.pickedBy = pickedBy;
+  }
 
+  public List<Instant> getLastSuccess() {
+    return lastSuccess;
+  }
 
-    public List<String> getPickedBy() {
-        return pickedBy;
-    }
+  public void setLastSuccess(List<Instant> lastSuccess) {
+    this.lastSuccess = lastSuccess;
+  }
 
-    public void setPickedBy( List<String> pickedBy) {
-        this.pickedBy = pickedBy;
-    }
+  public Instant getLastFailure() {
+    return lastFailure;
+  }
 
+  public void setLastFailure(Instant lastFailure) {
+    this.lastFailure = lastFailure;
+  }
 
-    public List<Instant> getLastSuccess() {
-        return lastSuccess;
-    }
+  public List<Integer> getConsecutiveFailures() {
+    return consecutiveFailures;
+  }
 
-    public void setLastSuccess( List<Instant> lastSuccess) {
-        this.lastSuccess = lastSuccess;
-    }
+  public Instant getLastHeartbeat() {
+    return lastHeartbeat;
+  }
 
+  public void setLastHeartbeat(Instant lastHeartbeat) {
+    this.lastHeartbeat = lastHeartbeat;
+  }
 
-    public Instant getLastFailure() {
-        return lastFailure;
-    }
-
-    public void setLastFailure(Instant lastFailure) {
-        this.lastFailure = lastFailure;
-    }
-
-    public List<Integer> getConsecutiveFailures() {
-        return consecutiveFailures;
-    }
-
+  public int getVersion() {
+    return version;
+  }
     public void setConsecutiveFailures(List<Integer> consecutiveFailures) {
         this.consecutiveFailures = consecutiveFailures;
-    }
-
-
-    public Instant getLastHeartbeat() {
-        return lastHeartbeat;
-    }
-
-    public int getVersion() {
-        return version;
     }
 
 }

@@ -8,17 +8,18 @@ public class TaskRequestParams {
     private final TaskSort sorting;
     private final boolean asc;
 
-    public TaskRequestParams(TaskFilter filter, int pageNumber, int size, TaskSort sorting, boolean asc) {
-        this.filter = filter;
-        this.pageNumber = pageNumber;
-        this.size = size;
-        this.sorting = sorting;
-        this.asc = asc;
-    }
+  public TaskRequestParams(
+      TaskFilter filter, int pageNumber, int size, TaskSort sorting, boolean asc) {
+    this.filter = filter;
+    this.pageNumber = pageNumber;
+    this.size = size;
+    this.sorting = sorting;
+    this.asc = asc;
+  }
 
-    public TaskFilter getFilter() {
-        return filter;
-    }
+  public TaskFilter getFilter() {
+    return filter;
+  }
 
     public int getPageNumber() {
         return pageNumber;

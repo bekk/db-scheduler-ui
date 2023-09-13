@@ -1,15 +1,12 @@
 package com.github.bekk.dbscheduleruiapi.util.mapper;
 
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
-import com.github.kagkarlsson.scheduler.CurrentlyExecuting;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TaskMapper {
     public static List<TaskModel> mapScheduledExecutionsToTaskModel(List<ScheduledExecution<Object>> scheduledExecutions) {
@@ -23,25 +20,7 @@ public class TaskMapper {
                         Collections.singletonList(execution.getPickedBy()),
                         Collections.singletonList(execution.getLastSuccess()),
                         execution.getLastFailure(),
-                        List.of(execution.getConsecutiveFailures()),
-                        null,
-                        0
-                ))
-                .collect(Collectors.toList());
-    }
-
-    public static List<TaskModel> mapCurrentlyExecutingToTaskModel(List<CurrentlyExecuting> currentlyExecuting) {
-        return currentlyExecuting.stream()
-                .map(execution -> new TaskModel(
-                        execution.getTaskInstance().getTaskName(),
-                        Collections.singletonList(execution.getTaskInstance().getId()),
-                        Collections.singletonList(execution.getTaskInstance().getData()),
-                        Collections.singletonList(execution.getExecution().executionTime),
-                        List.of(execution.getExecution().picked),
-                        Collections.singletonList(execution.getExecution().pickedBy),
-                        Collections.singletonList(execution.getExecution().lastSuccess),
-                        execution.getExecution().lastFailure,
-                        List.of(execution.getExecution().consecutiveFailures),
+                        List.of(execution.getConsecutiveFailures()), // Modified here
                         null,
                         0
                 ))
@@ -70,14 +49,11 @@ public class TaskMapper {
 
 
 
-    public static List<TaskModel> mapAllExecutionsToTaskModel(List<ScheduledExecution<Object>> scheduledExecutions, List<CurrentlyExecuting> currentlyExecuting) {
-        return groupTasks(Stream.concat(mapScheduledExecutionsToTaskModel(scheduledExecutions).stream(),
-                mapCurrentlyExecutingToTaskModel(currentlyExecuting).stream()).collect(Collectors.toList()));
+    public static List<TaskModel> mapAllExecutionsToTaskModel(List<ScheduledExecution<Object>> scheduledExecutions) {
+        return groupTasks(mapScheduledExecutionsToTaskModel(scheduledExecutions));
     }
 
-    public static List<TaskModel> mapAllExecutionsToTaskModelUngrouped(List<ScheduledExecution<Object>> scheduledExecutions, List<CurrentlyExecuting> currentlyExecuting) {
-        List<TaskModel> scheduled = mapScheduledExecutionsToTaskModel(scheduledExecutions);
-        scheduled.addAll(mapCurrentlyExecutingToTaskModel(currentlyExecuting));
-        return scheduled;
+    public static List<TaskModel> mapAllExecutionsToTaskModelUngrouped(List<ScheduledExecution<Object>> scheduledExecutions) {
+        return mapScheduledExecutionsToTaskModel(scheduledExecutions);
     }
 }
