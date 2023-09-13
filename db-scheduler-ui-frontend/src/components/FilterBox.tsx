@@ -14,7 +14,7 @@ export const FilterBox: React.FC<{
   currentFilter: FilterBy;
   setCurrentFilter: (filter: FilterBy) => void;
 }> = ({ currentFilter, setCurrentFilter }) => (
-  <Box display={'flex'} mb={2} mt={2} alignItems={'center'}>
+  <Box display={'flex'} mb={2} mt={2} flex={1} justifyContent={'end'}>
     <Menu>
       <MenuButton
         as={Button}

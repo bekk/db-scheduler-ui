@@ -56,4 +56,28 @@ public class QueryUtils {
     }
     return tasks;
   }
+
+  public static List<TaskModel> search(List<TaskModel> tasks, String searchTerm) {
+    if (searchTerm == null || searchTerm.trim().isEmpty()) {
+      return tasks;
+    }
+
+    String lowerCaseTerm = searchTerm.toLowerCase();
+
+    return tasks.stream()
+        .filter(
+            task ->
+                task.getTaskName().toLowerCase().contains(lowerCaseTerm)
+                    || task.getTaskInstance().stream()
+                        .anyMatch(
+                            instance ->
+                                instance != null && instance.toLowerCase().contains(lowerCaseTerm))
+                    || (task.getPickedBy() != null
+                        && task.getPickedBy().stream()
+                            .anyMatch(
+                                picked ->
+                                    picked != null
+                                        && picked.toLowerCase().contains(lowerCaseTerm))))
+        .collect(Collectors.toList());
+  }
 }
