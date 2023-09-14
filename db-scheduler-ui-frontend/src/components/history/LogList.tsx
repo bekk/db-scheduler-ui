@@ -6,6 +6,7 @@ import { Log } from 'src/models/Log';
 import { LogCard } from 'src/components/history/LogCard';
 import { useParams } from 'react-router-dom';
 import { LogInfoBox } from 'src/components/history/LogInfoBox';
+import colors from 'src/styles/colors';
 
 export const LogList: React.FC = () => {
   const { taskName, taskInstance } = useParams();
@@ -22,25 +23,16 @@ export const LogList: React.FC = () => {
         p="8px 16px"
         justifyContent={'space-around'}
         spacing={5}
+        textColor={colors.primary['500']}
+        fontSize={'sm'}
+        textAlign="left"
       >
-        <Box flex="1" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-          Status
-        </Box>
-        <Box flex="2" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-          Execution-ID
-        </Box>
-        <Box flex="2" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-          Task-ID
-        </Box>
-        <Box flex="2" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-          Last Execution
-        </Box>
-        <Box flex="2" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-          Exception Class
-        </Box>
-        <Box flex="2" textAlign="left" textColor={'#484848'} fontSize={'sm'}>
-          Exception Message
-        </Box>
+        <Box flex="1">Status</Box>
+        <Box flex="2">Execution-ID</Box>
+        <Box flex="2">Task-ID</Box>
+        <Box flex="2">Last Execution</Box>
+        <Box flex="2">Exception Class</Box>
+        <Box flex="2">Exception Message</Box>
       </HStack>
       <Accordion allowMultiple>
         {data?.map((log: Log) => (

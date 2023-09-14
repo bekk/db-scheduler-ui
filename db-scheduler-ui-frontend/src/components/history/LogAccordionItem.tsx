@@ -1,4 +1,5 @@
 import { AccordionPanel, Box, VStack } from '@chakra-ui/react';
+import colors from 'src/styles/colors';
 interface LogAccordionItemProps {
   taskData: string | null;
   stackTrace: string | null;
@@ -13,7 +14,7 @@ export const LogAccordionItem: React.FC<LogAccordionItemProps> = ({
       <VStack
         align="start"
         spacing={2}
-        bgColor={'#FFFFFF'}
+        bgColor={colors.primary['100']}
         p={2}
         w={'100%'}
         borderRadius={4}
