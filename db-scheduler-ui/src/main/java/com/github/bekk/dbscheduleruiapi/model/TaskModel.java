@@ -3,14 +3,13 @@ package com.github.bekk.dbscheduleruiapi.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TaskModel {
   private String taskName;
   private List<String> taskInstance;
-  private List<String> taskData; // Serialized JSON representation of data
+  private List<Object> taskData;
   private List<Instant> executionTime;
   private List<Boolean> picked;
   private List<String> pickedBy;
@@ -25,7 +24,7 @@ public class TaskModel {
   public TaskModel(
       String taskName,
       List<String> taskInstance,
-      List<Object> taskData,
+      List<Object> inputTaskData,
       List<Instant> executionTime,
       List<Boolean> picked,
       List<String> pickedBy,
@@ -36,7 +35,7 @@ public class TaskModel {
       int version) {
     this.taskName = taskName;
     this.taskInstance = taskInstance;
-    serializeTaskData(taskData);
+    this.taskData = serializeTaskData(inputTaskData);
     this.executionTime = executionTime;
     this.picked = picked;
     this.pickedBy = pickedBy;
@@ -49,12 +48,22 @@ public class TaskModel {
 
   public TaskModel() {}
 
-  public String getTaskName() {
-    return taskName;
+  private List<Object> serializeTaskData(List<Object> inputTaskDataList) {
+    return inputTaskDataList.stream()
+        .map(
+            data -> {
+              try {
+                String serializedData = objectMapper.writeValueAsString(data);
+                return objectMapper.readValue(serializedData, Object.class);
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .collect(Collectors.toList());
   }
 
-  public void setTaskName(String taskName) {
-    this.taskName = taskName;
+  public String getTaskName() {
+    return taskName;
   }
 
   public List<String> getTaskInstance() {
@@ -65,45 +74,20 @@ public class TaskModel {
     this.taskInstance = taskInstance;
   }
 
-  public Object getActualTaskData() {
-    return taskData.stream()
-        .map(
-            data -> {
-              if (data != null) {
-                try {
-                  return objectMapper.readValue(data, Object.class);
-                } catch (JsonProcessingException e) {
-                  throw new RuntimeException(e);
-                }
-              }
-              return null;
-            })
-        .collect(Collectors.toList());
+  public List<Object> getTaskData() {
+    return taskData;
   }
 
-  public List<String> getTaskData() {
-    return this.taskData;
-  }
-
-  public void serializeTaskData(List<Object> taskData) {
-    try {
-      assert taskData != null;
-      this.taskData = Arrays.asList(objectMapper.writeValueAsString(taskData.get(0)));
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public void setTaskData(List<String> taskData) {
-    this.taskData = taskData;
-  }
-
-  public List<Instant> getExecutionTime() {
-    return executionTime;
+  public void setTaskData(List<Object> inputTaskData) {
+    this.taskData = serializeTaskData(inputTaskData);
   }
 
   public void setExecutionTime(List<Instant> executionTime) {
     this.executionTime = executionTime;
+  }
+
+  public List<Instant> getExecutionTime() {
+    return executionTime;
   }
 
   public List<Boolean> isPicked() {
@@ -142,10 +126,6 @@ public class TaskModel {
     return consecutiveFailures;
   }
 
-  public void setConsecutiveFailures(List<Integer> consecutiveFailures) {
-    this.consecutiveFailures = consecutiveFailures;
-  }
-
   public Instant getLastHeartbeat() {
     return lastHeartbeat;
   }
@@ -158,7 +138,7 @@ public class TaskModel {
     return version;
   }
 
-  public void setVersion(int version) {
-    this.version = version;
+  public void setConsecutiveFailures(List<Integer> consecutiveFailures) {
+    this.consecutiveFailures = consecutiveFailures;
   }
 }

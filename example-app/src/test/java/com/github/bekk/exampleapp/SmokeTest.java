@@ -41,7 +41,7 @@ public class SmokeTest {
     ResponseEntity<GetTasksResponse> result =
         this.restTemplate.getForEntity(
             baseUrl
-                + "/db-scheduler-api/tasks/all?filter=ALL&page=0&size=10&sorting=DEFAULT&asc=true",
+                + "/db-scheduler-api/tasks/all?filter=ALL&pageNumber=0&size=10&sorting=DEFAULT&asc=true",
             GetTasksResponse.class);
     Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
     assertThat(result.getBody().getTasks()).hasSizeGreaterThan(0);
@@ -52,9 +52,10 @@ public class SmokeTest {
     ResponseEntity<GetTasksResponse> result =
         this.restTemplate.getForEntity(
             baseUrl
-                + "/db-scheduler-api/tasks/all?filter=ALL&page=0&size=10&sorting=DEFAULT&asc=true",
+                + "/db-scheduler-api/tasks/all?filter=ALL&pageNumber=0&size=10&sorting=DEFAULT&asc=true",
             GetTasksResponse.class);
     Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
+    result.getBody().getTasks().forEach(t -> System.out.println(t.getTaskName()));
     assertThat(result.getBody().getTasks())
         .anyMatch(taskModel -> taskModel.getTaskName().equals(ONE_TIME_TASK.getTaskName()));
   }
