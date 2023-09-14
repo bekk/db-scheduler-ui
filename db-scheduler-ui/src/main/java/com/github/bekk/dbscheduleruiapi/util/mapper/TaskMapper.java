@@ -2,7 +2,7 @@ package com.github.bekk.dbscheduleruiapi.util.mapper;
 
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -15,14 +15,14 @@ public class TaskMapper {
             execution ->
                 new TaskModel(
                     execution.getTaskInstance().getTaskName(),
-                    Arrays.asList(execution.getTaskInstance().getId()),
-                    Arrays.asList(execution.getData()),
-                    Arrays.asList(execution.getExecutionTime()),
-                    Arrays.asList(execution.isPicked()),
-                    Arrays.asList(execution.getPickedBy()),
-                    Arrays.asList(execution.getLastSuccess()),
+                    Collections.singletonList(execution.getTaskInstance().getId()),
+                    Collections.singletonList(execution.getData()),
+                    Collections.singletonList(execution.getExecutionTime()),
+                    List.of(execution.isPicked()),
+                    Collections.singletonList(execution.getPickedBy()),
+                    Collections.singletonList(execution.getLastSuccess()),
                     execution.getLastFailure(),
-                    Arrays.asList(execution.getConsecutiveFailures()), // Modified here
+                    List.of(execution.getConsecutiveFailures()), // Modified here
                     null,
                     0))
         .collect(Collectors.toList());

@@ -14,7 +14,7 @@ interface TaskCardProps extends Task {
 }
 
 const TaskCard: React.FC<TaskCardProps> = (props) => {
-  const { accordionProps, lastSuccess, lastFailure, actualTaskData } = props;
+  const { accordionProps, lastSuccess, lastFailure, taskData } = props;
 
   return (
     <AccordionItem
@@ -33,7 +33,7 @@ const TaskCard: React.FC<TaskCardProps> = (props) => {
           <TaskAccordionItem
             lastSuccess={lastSuccess && lastSuccess[0]}
             lastFailure={lastFailure}
-            taskData={actualTaskData}
+            taskData={taskData}
           />
         </>
       )}

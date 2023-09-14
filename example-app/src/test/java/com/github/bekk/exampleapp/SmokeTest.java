@@ -57,6 +57,7 @@ public class SmokeTest {
                 + ONE_TIME_TASK.getTaskName(),
             GetTasksResponse.class);
     Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
+    result.getBody().getTasks().forEach(t -> System.out.println(t.getTaskName()));
     assertThat(result.getBody().getTasks())
         .anyMatch(taskModel -> taskModel.getTaskName().equals(ONE_TIME_TASK.getTaskName()));
   }
