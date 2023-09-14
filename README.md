@@ -1,4 +1,4 @@
-# DB Scheduler UI / JobJuggler
+# DB Scheduler UI
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/facebook/react/blob/main/LICENSE) 
 
 
@@ -59,7 +59,7 @@ The db-scheduler-ui backend is connected to the schedule-client. The backend fet
 they are sorted and filtered in the backend before it is displayed in the frontend app. 
 As the backend connects to scheduler-client it is possible to run, re-run and delete task form the database in the application.
 
-The URL connects to jobjuggler/** (db-scheduler/*)
+The URL connects to db-scheduler/**
 
 
 ## Configuration
