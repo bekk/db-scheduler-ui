@@ -10,6 +10,7 @@ interface HeaderBarProps {
   setCurrentFilter: (filter: FilterBy) => void;
   setSearchTerm: (searchTerm: string) => void;
   title: string;
+  history?: boolean;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
@@ -18,6 +19,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   setCurrentFilter,
   setSearchTerm,
   title,
+  history,
 }) => (
   <Box
     display={'flex'}
@@ -45,6 +47,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
     <FilterBox
       currentFilter={currentFilter}
       setCurrentFilter={setCurrentFilter}
+      history={history}
     />
   </Box>
 );

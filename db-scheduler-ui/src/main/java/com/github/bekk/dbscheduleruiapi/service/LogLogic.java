@@ -1,14 +1,16 @@
 package com.github.bekk.dbscheduleruiapi.service;
 
 import com.github.bekk.dbscheduleruiapi.model.LogModel;
+import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
+import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -17,43 +19,68 @@ import org.springframework.stereotype.Service;
 public class LogLogic {
 
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-  private final JdbcTemplate jdbcTemplate;
 
   @Autowired
   public LogLogic(DataSource dataSource) {
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    this.jdbcTemplate = new JdbcTemplate(dataSource);
   }
 
-  public List<LogModel> getLogsById(String taskName, String taskInstance, String searchTerm) {
+  public List<LogModel> getLogsById(TaskDetailsRequestParams requestParams) {
+    System.out.println("specific history");
     Map<String, Object> params = new HashMap<>();
-    params.put("taskName", taskName);
-    params.put("taskInstance", taskInstance);
-    String baseQuery =
-        "SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName AND task_instance = :taskInstance";
+    params.put("taskName", requestParams.getTaskName());
+    params.put("taskInstance", requestParams.getTaskId());
+    StringBuilder baseQuery =
+        new StringBuilder(
+            "SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName AND task_instance = :taskInstance");
 
-    if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-      baseQuery +=
-          " AND (LOWER(id) LIKE LOWER(:searchTerm) OR LOWER(task_name) LIKE LOWER(:searchTerm) OR LOWER(task_instance) LIKE LOWER(:searchTerm))";
-      params.put("searchTerm", "%" + searchTerm + "%");
+    if (requestParams.getSearchTerm() != null && !requestParams.getSearchTerm().trim().isEmpty()) {
+      baseQuery.append(
+          " AND (LOWER(id) LIKE LOWER(:searchTerm) OR LOWER(task_name) LIKE LOWER(:searchTerm) OR LOWER(task_instance) LIKE LOWER(:searchTerm))");
+      params.put("searchTerm", "%" + requestParams.getSearchTerm() + "%");
     }
+    if (requestParams.getFilter() != null
+        && requestParams.getFilter() != TaskRequestParams.TaskFilter.ALL) {
+      String filterCondition =
+          requestParams.getFilter() == TaskRequestParams.TaskFilter.SUCCEEDED
+              ? " = TRUE"
+              : " = FALSE";
+      baseQuery.append(" AND succeeded").append(filterCondition);
+    }
+    System.out.println(baseQuery);
 
-    baseQuery += " ORDER BY time_started DESC";
-    return namedParameterJdbcTemplate.query(baseQuery, params, new LogModelRowMapper());
+    baseQuery.append(" ORDER BY time_started DESC");
+    return namedParameterJdbcTemplate.query(baseQuery.toString(), params, new LogModelRowMapper());
   }
 
-  public List<LogModel> getAllLogs(String searchTerm) {
-    String baseQuery = "SELECT * FROM scheduled_execution_logs";
+  public List<LogModel> getAllLogs(TaskDetailsRequestParams requestParams) {
+    System.out.println("All history");
+    System.out.println(requestParams.getFilter());
+    StringBuilder baseQuery = new StringBuilder("SELECT * FROM scheduled_execution_logs");
     Map<String, Object> params = new HashMap<>();
+    List<String> conditions = new ArrayList<>();
 
-    if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-      baseQuery +=
-          " WHERE LOWER(id) LIKE LOWER(:searchTerm) OR LOWER(task_name) LIKE LOWER(:searchTerm) OR LOWER(task_instance) LIKE LOWER(:searchTerm)";
-      params.put("searchTerm", "%" + searchTerm + "%");
+    if (requestParams.getSearchTerm() != null && !requestParams.getSearchTerm().trim().isEmpty()) {
+      conditions.add(
+          "(LOWER(id) LIKE LOWER(:searchTerm) OR LOWER(task_name) LIKE LOWER(:searchTerm) OR LOWER(task_instance) LIKE LOWER(:searchTerm))");
+      params.put("searchTerm", "%" + requestParams.getSearchTerm() + "%");
+    }
+    if (requestParams.getFilter() != null
+        && requestParams.getFilter() != TaskRequestParams.TaskFilter.ALL) {
+      String filterCondition =
+          requestParams.getFilter() == TaskRequestParams.TaskFilter.SUCCEEDED
+              ? "succeeded = TRUE"
+              : "succeeded = FALSE";
+      conditions.add(filterCondition);
     }
 
-    baseQuery += " LIMIT 500";
-    return namedParameterJdbcTemplate.query(baseQuery, params, new LogModelRowMapper());
+    if (!conditions.isEmpty()) {
+      baseQuery.append(" WHERE ").append(String.join(" AND ", conditions));
+    }
+
+    baseQuery.append(" LIMIT 500");
+    System.out.println(baseQuery);
+    return namedParameterJdbcTemplate.query(baseQuery.toString(), params, new LogModelRowMapper());
   }
 
   public static class LogModelRowMapper implements RowMapper<LogModel> {

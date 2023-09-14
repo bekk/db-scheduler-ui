@@ -11,16 +11,16 @@ public class TaskRequestParams {
 
   public TaskRequestParams(
       TaskFilter filter,
-      int pageNumber,
-      int size,
+      Integer pageNumber,
+      Integer size,
       TaskSort sorting,
-      boolean asc,
+      Boolean asc,
       String searchTerm) {
     this.filter = filter;
-    this.pageNumber = pageNumber;
-    this.size = size;
+    this.pageNumber = pageNumber != null ? pageNumber : 0;
+    this.size = size != null ? size : 10;
     this.sorting = sorting;
-    this.asc = asc;
+    this.asc = asc != null ? asc : true;
     this.searchTerm = searchTerm;
   }
 
@@ -52,7 +52,8 @@ public class TaskRequestParams {
     ALL,
     FAILED,
     RUNNING,
-    SCHEDULED;
+    SCHEDULED,
+    SUCCEEDED;
   }
 
   public enum TaskSort {

@@ -1,6 +1,7 @@
 package com.github.bekk.dbscheduleruiapi.controller;
 
 import com.github.bekk.dbscheduleruiapi.model.LogModel;
+import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.service.LogLogic;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +20,12 @@ public class LogController {
   }
 
   @GetMapping("/id")
-  public List<LogModel> getLogsById(
-      @RequestParam String taskName,
-      @RequestParam String taskInstance,
-      @RequestParam String searchTerm) {
-    return logLogic.getLogsById(taskName, taskInstance, searchTerm);
+  public List<LogModel> getLogsById(TaskDetailsRequestParams params) {
+    return logLogic.getLogsById(params);
   }
 
   @GetMapping("/all")
-  public List<LogModel> getAllLogs(@RequestParam String searchTerm) {
-    return logLogic.getAllLogs(searchTerm);
+  public List<LogModel> getAllLogs(TaskDetailsRequestParams params) {
+    return logLogic.getAllLogs(params);
   }
 }

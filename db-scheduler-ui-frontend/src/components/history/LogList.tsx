@@ -12,16 +12,17 @@ import { ALL_LOG_QUERY_KEY, getAllLogs } from 'src/services/getAllLogs';
 
 export const LogList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
 
   const { taskName, taskInstance } = useParams();
   const { data } = useQuery(
     !taskName
-      ? [LOG_QUERY_KEY, taskName, searchTerm]
-      : [ALL_LOG_QUERY_KEY, searchTerm],
+      ? [LOG_QUERY_KEY, taskName, currentFilter, searchTerm]
+      : [ALL_LOG_QUERY_KEY, currentFilter, searchTerm],
     () =>
       !taskName
-        ? getAllLogs(searchTerm)
-        : getLogs(taskName!, taskInstance!, searchTerm),
+        ? getAllLogs(currentFilter, searchTerm)
+        : getLogs(taskName!, taskInstance!, currentFilter, searchTerm),
   );
   return (
     <Box>
@@ -31,9 +32,10 @@ export const LogList: React.FC = () => {
           taskName ? '' : 'name, '
         }task id or execution id`}
         taskName={taskName || ''}
-        currentFilter={FilterBy.All}
-        setCurrentFilter={() => {}}
+        currentFilter={currentFilter}
+        setCurrentFilter={setCurrentFilter}
         setSearchTerm={setSearchTerm}
+        history
       />
       <HStack
         display={'flex'}

@@ -9,6 +9,7 @@ export enum FilterBy {
   Failed = 'Failed',
   Running = 'Running',
   Scheduled = 'Scheduled',
+  Succeeded = 'Succeeded',
 }
 
 export interface PaginationParams {
