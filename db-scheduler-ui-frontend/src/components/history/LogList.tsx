@@ -8,13 +8,20 @@ import { useParams } from 'react-router-dom';
 import colors from 'src/styles/colors';
 import { HeaderBar } from '../HeaderBar';
 import { FilterBy } from 'src/services/getTasks';
+import { ALL_LOG_QUERY_KEY, getAllLogs } from 'src/services/getAllLogs';
 
 export const LogList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const { taskName, taskInstance } = useParams();
-  const { data } = useQuery([LOG_QUERY_KEY, taskName], () =>
-    getLogs(taskName!, taskInstance!, searchTerm),
+  const { data } = useQuery(
+    !taskName
+      ? [LOG_QUERY_KEY, taskName, searchTerm]
+      : [ALL_LOG_QUERY_KEY, searchTerm],
+    () =>
+      !taskName
+        ? getAllLogs(searchTerm)
+        : getLogs(taskName!, taskInstance!, searchTerm),
   );
   return (
     <Box>
