@@ -1,4 +1,4 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Button, Text } from '@chakra-ui/react';
 import React from 'react';
 import { LogoIcon } from 'src/assets/icons/Logo';
 import colors from 'src/styles/colors';
@@ -30,21 +30,55 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
         {title}
       </Text>
       <Box>
-        <Text
-          as={'button'}
+        <Button
+          _hover={{
+            bgColor: colors.primary['100'],
+            borderColor: colors.dbBlue,
+            color: colors.primary['400'],
+          }}
+          _active={{
+            borderColor: colors.primary['200'],
+            color: colors.primary['300'],
+          }}
+          bgColor={colors.primary['100']}
+          color={colors.dbBlue}
+          borderBottom="2px"
+          borderRadius={'0'}
+          borderColor={
+            !window.location.toString().includes('db-scheduler/history/')
+              ? colors.dbBlue
+              : colors.primary['300']
+          }
           onClick={() => navigate('/')}
           aria-label={'Home button'}
           marginRight={12}
         >
           Scheduled
-        </Text>
-        <Text
-          as={'button'}
-          onClick={() => navigate(`/all`)}
+        </Button>
+        <Button
+          _hover={{
+            bgColor: colors.primary['100'],
+            borderColor: colors.dbBlue,
+            color: colors.primary['400'],
+          }}
+          _active={{
+            borderColor: colors.running['200'],
+            color: colors.primary['300'],
+          }}
+          bgColor={colors.primary['100']}
+          color={colors.dbBlue}
+          borderBottom="2px"
+          borderRadius={'0'}
+          borderColor={
+            window.location.toString().includes('history')
+              ? colors.dbBlue
+              : colors.primary['300']
+          }
+          onClick={() => navigate(`/history/all`)}
           aria-label={'History button'}
         >
           History
-        </Text>
+        </Button>
       </Box>
     </Box>
   );
