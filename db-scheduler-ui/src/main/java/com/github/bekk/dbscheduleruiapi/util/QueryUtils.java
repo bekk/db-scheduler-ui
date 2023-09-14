@@ -42,8 +42,7 @@ public class QueryUtils {
 
   public static List<TaskModel> sortTasks(List<TaskModel> tasks, TaskSort sortType, boolean isAsc) {
     if (sortType == TaskSort.NAME) {
-      Comparator<TaskModel> compareTasks =
-          Comparator.comparing(TaskModel::getTaskName);
+      Comparator<TaskModel> compareTasks = Comparator.comparing(TaskModel::getTaskName);
       tasks.sort(isAsc ? compareTasks : compareTasks.reversed());
     } else if (sortType == TaskSort.DEFAULT) {
       Comparator<TaskModel> comparator =
