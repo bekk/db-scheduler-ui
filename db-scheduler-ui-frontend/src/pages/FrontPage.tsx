@@ -13,7 +13,7 @@ export const FrontPage: React.FC = () => {
           <Route index element={<TaskList />}></Route>
           <Route path="/:taskName" element={<TaskList />}></Route>
           <Route path="/:taskName/page/:page" element={<TaskList />}></Route>
-            <Route path="/:taskName/:taskInstance" element={<LogList/>}></Route>
+          <Route path="/:taskName/:taskInstance" element={<LogList />}></Route>
         </Routes>
       </Box>
     </>

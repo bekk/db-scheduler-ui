@@ -45,17 +45,6 @@ public class LogLogic {
 
     @Override
     public LogModel mapRow(ResultSet rs, int rowNum) throws SQLException {
-      long id = rs.getLong("id");
-      String taskName = rs.getString("task_name");
-      String taskInstance = rs.getString("task_instance");
-      String taskData = rs.getString("task_data");
-      Instant timeStarted = rs.getTimestamp("time_started").toInstant();
-      Instant timeFinished = rs.getTimestamp("time_finished").toInstant();
-      boolean succeeded = rs.getBoolean("succeeded");
-      Long durationMs = rs.getLong("duration_ms");
-      String exceptionClass = rs.getString("exception_class");
-      String exceptionMessage = rs.getString("exception_message");
-      String exceptionStackTrace = rs.getString("exception_stacktrace");
       return new LogModel(
           rs.getLong("id"),
           rs.getString("task_name"),
