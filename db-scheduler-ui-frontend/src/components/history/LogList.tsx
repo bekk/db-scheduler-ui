@@ -12,7 +12,7 @@ import { ALL_LOG_QUERY_KEY, getAllLogs } from 'src/services/getAllLogs';
 export const LogList: React.FC = () => {
   const { taskName, taskInstance } = useParams();
   const { data } = useQuery(
-    !taskName ? [LOG_QUERY_KEY, taskName] : [ALL_LOG_QUERY_KEY],
+    !taskName ? [ALL_LOG_QUERY_KEY] : [LOG_QUERY_KEY, taskName],
     () => (!taskName ? getAllLogs() : getLogs(taskName!, taskInstance!)),
   );
   return (
@@ -23,18 +23,20 @@ export const LogList: React.FC = () => {
       <HStack
         display={'flex'}
         p="8px 16px"
-        justifyContent={'space-around'}
+        justifyContent={'space-between'}
         spacing={5}
         textColor={colors.primary['500']}
         fontSize={'sm'}
         textAlign="left"
       >
         <Box flex="1">Status</Box>
-        <Box flex="2">Execution-ID</Box>
+        <Box flex="2" hidden={!!taskName}>
+          Task Name
+        </Box>
         <Box flex="2">Task-ID</Box>
-        <Box flex="2">Last Execution</Box>
-        <Box flex="2">Exception Class</Box>
+        <Box flex="2">Time Finished</Box>
         <Box flex="2">Exception Message</Box>
+        <Box flex="0.2" />
       </HStack>
       <Accordion allowMultiple>
         {data?.map((log: Log) => (
