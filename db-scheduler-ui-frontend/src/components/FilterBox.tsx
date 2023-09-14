@@ -9,6 +9,7 @@ import {
 import { FilterBy } from 'src/services/getTasks';
 import React from 'react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
+import colors from 'src/styles/colors';
 
 export const FilterBox: React.FC<{
   currentFilter: FilterBy;
@@ -26,8 +27,8 @@ export const FilterBox: React.FC<{
       <MenuButton
         as={Button}
         rightIcon={<ChevronDownIcon />}
-        backgroundColor={'#FFFFFF'}
-        borderColor={'#E2E8F0'}
+        backgroundColor={colors.primary['100']}
+        borderColor={colors.primary['300']}
         borderWidth={1}
         width={200}
         textAlign={'left'}
