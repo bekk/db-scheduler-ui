@@ -1,12 +1,13 @@
 import { Box } from '@chakra-ui/react';
+import colors from 'src/styles/colors';
 interface LogStatusProps {
   succeeded: boolean;
 }
 
 export const LogStatus: React.FC<LogStatusProps> = ({ succeeded }) => {
-  const borderColor = succeeded ? '#08662C' : '#BB0101';
-  const backgroundColor = succeeded ? '#68D391' : '#EFC2C2';
-  const color = succeeded ? '#000000' : '#BB0101';
+  const borderColor = succeeded ? colors.success[200] : colors.failed[200];
+  const backgroundColor = succeeded ? colors.success[100] : colors.failed[100];
+  const color = succeeded ? colors.success[200] : colors.failed[200];
 
   return (
     <Box

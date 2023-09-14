@@ -5,11 +5,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Task } from 'src/models/Task';
 import { isStatus } from 'src/utils/determineStatus';
+import colors from 'src/styles/colors';
 
 interface TaskRunButtonProps extends Task {
   style?: React.CSSProperties;
   refetch: () => void;
 }
+
 export const TaskRunButton: React.FC<TaskRunButtonProps> = (props) => {
   const { taskInstance, taskName, pickedBy, style, refetch } = props;
   const navigate = useNavigate();
@@ -28,13 +30,25 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = (props) => {
           }}
           iconSpacing={2}
           width={100}
-          bgColor={isStatus('Failed', props) ? '#5068F6' : '#E9ECFE'}
-          textColor={isStatus('Failed', props) ? '#FFFFFF' : '#002FA7'}
+          bgColor={
+            isStatus('Failed', props)
+              ? colors.running['300']
+              : colors.running['100']
+          }
+          textColor={
+            isStatus('Failed', props)
+              ? colors.primary['100']
+              : colors.running['500']
+          }
           _hover={{
-            bgColor: isStatus('Failed', props) ? '#344ACC' : '#D3D9FE',
+            bgColor: isStatus('Failed', props)
+              ? colors.running['400']
+              : colors.running['200'],
           }}
           _active={{
-            bgColor: isStatus('Failed', props) ? '#8a94c0' : '#eceefa',
+            bgColor: isStatus('Failed', props)
+              ? colors.running['300']
+              : colors.running['100'],
           }}
           fontWeight="normal"
           leftIcon={

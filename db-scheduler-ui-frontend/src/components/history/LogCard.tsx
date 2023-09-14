@@ -2,6 +2,7 @@ import { Log } from 'src/models/Log';
 import { AccordionItem, Divider } from '@chakra-ui/react';
 import { LogAccordionButton } from 'src/components/history/LogAccordionButton';
 import { LogAccordionItem } from 'src/components/history/LogAccordionItem';
+import colors from 'src/styles/colors';
 
 interface LogCardProps {
   log: Log;
@@ -11,11 +12,11 @@ export const LogCard: React.FC<LogCardProps> = ({ log }) => {
   console.log(log.timeFinished);
   return (
     <AccordionItem
-      backgroundColor={'#FFFFFF'}
+      backgroundColor={colors.primary['100']}
       borderRadius={4}
       m={1}
       borderWidth={1}
-      borderColor={'#E0E0E0'}
+      borderColor={colors.primary['300']}
     >
       <LogAccordionButton
         succeeded={log.succeeded}
@@ -26,7 +27,7 @@ export const LogCard: React.FC<LogCardProps> = ({ log }) => {
         exceptionMessage={log.exceptionMessage}
         timeFinished={log.timeFinished}
       />
-      <Divider color={'#E0E0E0'} />
+      <Divider color={colors.primary['300']} />
       <LogAccordionItem
         taskData={log.taskData}
         stackTrace={log.exceptionStackTrace}

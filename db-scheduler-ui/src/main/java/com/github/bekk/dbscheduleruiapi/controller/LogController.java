@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/logs")
+@RequestMapping("/db-scheduler-api/logs")
 public class LogController {
 
   private final LogLogic logLogic;

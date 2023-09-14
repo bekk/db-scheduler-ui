@@ -16,6 +16,7 @@ import { Task } from 'src/models/Task';
 import { NumberCircleGroup } from './NumberCircleGroup';
 import { AttachmentIcon } from '@chakra-ui/icons';
 import { determineStatus, isStatus } from 'src/utils/determineStatus';
+import colors from 'src/styles/colors';
 
 interface TaskAccordionButtonProps extends Task {
   refetch: () => void;
@@ -36,7 +37,8 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
   return (
     <h2>
       <AccordionButton
-        _hover={{ backgroundColor: '#FFFFFF' }}
+        background={colors.primary['100']}
+        _hover={{ backgroundColor: colors.primary['100'] }}
         cursor={!isStatus('Group', props) ? 'pointer' : 'default'}
       >
         <HStack w={'100%'} spacing={5}>
@@ -71,7 +73,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
                 : taskInstance[0]}
             </Text>
             {isStatus('Group', props) && (
-              <Text color={'#555555'}>
+              <Text color={colors.primary['500']}>
                 {` + ${taskInstance.length - 1} more`}
               </Text>
             )}

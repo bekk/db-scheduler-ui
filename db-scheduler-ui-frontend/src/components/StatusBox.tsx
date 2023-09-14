@@ -1,5 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import { NumberCircle } from 'src/components/NumberCircle';
+import colors from 'src/styles/colors';
 
 interface StatusBoxProps {
   status: string;
@@ -11,24 +12,24 @@ const statusColors: Record<
   { borderColor: string; backgroundColor: string; color: string }
 > = {
   Failed: {
-    borderColor: '#BB0101',
-    backgroundColor: '#EFC2C2',
-    color: '#BB0101',
+    borderColor: colors.failed['200'],
+    backgroundColor: colors.failed['100'],
+    color: colors.failed['200'],
   },
   Running: {
-    borderColor: '#DAE2F6',
-    backgroundColor: '#DAE2F6',
-    color: '#000000',
+    borderColor: colors.running['100'],
+    backgroundColor: colors.running['100'],
+    color: colors.primary['900'],
   },
   Scheduled: {
-    borderColor: '#F1F2F5',
-    backgroundColor: '#F1F2F5',
-    color: '#000000',
+    borderColor: colors.primary['300'],
+    backgroundColor: colors.primary['200'],
+    color: colors.primary['900'],
   },
   Group: {
-    borderColor: '#121212',
-    backgroundColor: '#FFFFFF',
-    color: '#000000',
+    borderColor: colors.primary['600'],
+    backgroundColor: colors.primary['100'],
+    color: colors.primary['900'],
   },
 };
 
@@ -59,7 +60,7 @@ export const StatusBox: React.FC<StatusBoxProps> = ({
       {consecutiveFailures > 0 && status !== 'Group' ? (
         <NumberCircle
           number={consecutiveFailures}
-          bgColor={'#BB0101'}
+          bgColor={colors.failed['200']}
           transform={'translate(50%, -50%)'}
         ></NumberCircle>
       ) : (
