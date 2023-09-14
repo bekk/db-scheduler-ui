@@ -86,7 +86,7 @@ const TaskList: React.FC = () => {
     <Box>
       <Box
         display={'flex'}
-        mb={14}
+        mb={7}
         alignItems={'center'}
         justifyContent={'space-between'}
         w={'100%'}
@@ -101,19 +101,21 @@ const TaskList: React.FC = () => {
               isRound
             />
           )}
-          <Text ml={5} fontSize={'3xl'} fontWeight={'semibold'}>
-            {isDetailsView ? taskName : 'All Tasks'}
-          </Text>
+          <Box>
+            <Text ml={5} fontSize={'3xl'} fontWeight={'semibold'}>
+              {isDetailsView ? taskName : 'All Tasks'}
+            </Text>
+            <Input
+              placeholder={`search for ${
+                isDetailsView ? '' : 'name, '
+              }task id or server id (if picked by)`}
+              onChange={(e) => setSearchTerm(e.currentTarget.value)}
+              bgColor={'white'}
+              w={'30vmax'}
+              mt={7}
+            />
+          </Box>
         </Box>
-
-        <Input
-          placeholder={`search for ${
-            isDetailsView ? '' : 'name, '
-          }task id or server id (if picked by)`}
-          onChange={(e) => setSearchTerm(e.currentTarget.value)}
-          bgColor={'white'}
-          flex={1.5}
-        />
 
         <FilterBox
           currentFilter={currentFilter}
