@@ -45,7 +45,7 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
           borderBottom="2px"
           borderRadius={'0'}
           borderColor={
-            !window.location.toString().includes('history/')
+            !window.location.toString().includes('db-scheduler/history/')
               ? colors.dbBlue
               : colors.primary['300']
           }
