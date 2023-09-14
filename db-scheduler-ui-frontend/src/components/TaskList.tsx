@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Accordion, Box, Text, IconButton, Input } from '@chakra-ui/react';
+import { Accordion, Box } from '@chakra-ui/react';
 import TaskCard from './TaskCard';
 import {
   FilterBy,
@@ -11,13 +11,12 @@ import {
 
 import { useQuery } from '@tanstack/react-query';
 import PaginationButtons from 'src/components/PaginationButtons';
-import { FilterBox } from 'src/components/FilterBox';
 import TitleRow from 'src/components/TitleRow';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBackIcon } from '@chakra-ui/icons';
 import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
 import TaskGroupCard from './TaskGroupCard';
 import { isStatus } from 'src/utils/determineStatus';
+import { HeaderBar } from './HeaderBar';
 
 const TaskList: React.FC = () => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
@@ -84,44 +83,16 @@ const TaskList: React.FC = () => {
 
   return (
     <Box>
-      <Box
-        display={'flex'}
-        mb={7}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-        w={'100%'}
-      >
-        <Box display={'flex'} alignItems={'center'} flex={1}>
-          {isDetailsView && (
-            <IconButton
-              icon={<ArrowBackIcon boxSize={8} />}
-              onClick={() => navigate('/')}
-              aria-label={'Back button'}
-              variant={'ghost'}
-              isRound
-            />
-          )}
-          <Box>
-            <Text ml={5} fontSize={'3xl'} fontWeight={'semibold'}>
-              {isDetailsView ? taskName : 'All Tasks'}
-            </Text>
-            <Input
-              placeholder={`search for ${
-                isDetailsView ? '' : 'name, '
-              }task id or server id (if picked by)`}
-              onChange={(e) => setSearchTerm(e.currentTarget.value)}
-              bgColor={'white'}
-              w={'30vmax'}
-              mt={7}
-            />
-          </Box>
-        </Box>
-
-        <FilterBox
-          currentFilter={currentFilter}
-          setCurrentFilter={setCurrentFilter}
-        />
-      </Box>
+      <HeaderBar
+        title={isDetailsView ? taskName : 'All Tasks'}
+        inputPlaceholder={`search for ${
+          isDetailsView ? '' : 'name, '
+        }task id or server id (if picked by)`}
+        taskName={taskName || ''}
+        currentFilter={currentFilter}
+        setCurrentFilter={setCurrentFilter}
+        setSearchTerm={setSearchTerm}
+      />
 
       <TitleRow
         currentSort={currentSort}
