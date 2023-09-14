@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.kagkarlsson</groupId>
-            <artifactId>db-scheduler</artifactId>
+            <artifactId>db-scheduler-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.bekk</groupId>
