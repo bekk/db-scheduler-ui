@@ -4,11 +4,12 @@ const API_BASE_URL: string =
 
 export const LOG_QUERY_KEY = `logs`;
 
-export const getLogs = async (taskName: string, taskInstance: string) => {
+export const getLogs = async (taskName: string, taskInstance: string, searchTerm:string) => {
   const queryParams = new URLSearchParams();
 
   queryParams.append('taskName', taskName);
   queryParams.append('taskInstance', taskInstance);
+  queryParams.append('searchTerm', searchTerm);
   const response = await fetch(`${API_BASE_URL}/logs/id?${queryParams}`, {
     method: 'GET',
     headers: {

@@ -20,12 +20,14 @@ public class LogController {
 
   @GetMapping("/id")
   public List<LogModel> getLogsById(
-      @RequestParam String taskName, @RequestParam String taskInstance) {
-    return logLogic.getLogsById(taskName, taskInstance);
+      @RequestParam String taskName,
+      @RequestParam String taskInstance,
+      @RequestParam String searchTerm) {
+    return logLogic.getLogsById(taskName, taskInstance, searchTerm);
   }
 
   @GetMapping("/all")
-  public List<LogModel> getAllLogs() {
-    return logLogic.getAllLogs();
+  public List<LogModel> getAllLogs(@RequestParam String searchTerm) {
+    return logLogic.getAllLogs(searchTerm);
   }
 }
