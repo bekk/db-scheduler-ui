@@ -12,7 +12,10 @@ import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
 import java.time.Instant;
 import java.util.Random;
 import java.util.UUID;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class SpawnerTask {
 
   public static final TaskWithoutDataDescriptor RECURRING_SPAWNER_TASK =
@@ -21,7 +24,8 @@ public class SpawnerTask {
   public static final TaskWithDataDescriptor<TaskData> ONE_TIME_SPAWNER_TASK =
       new TaskWithDataDescriptor<>("onetime-spawned-task", TaskData.class);
 
-  public static Task<?> runSpawner() {
+  @Bean
+  public Task<?> runSpawner() {
     return Tasks.recurring(RECURRING_SPAWNER_TASK, FixedDelay.ofSeconds(180))
         .execute(
             (inst, ctx) -> {
@@ -38,7 +42,8 @@ public class SpawnerTask {
             });
   }
 
-  public static Task<TaskData> runOneTimeSpawned() {
+  @Bean
+  public Task<TaskData> runOneTimeSpawned() {
     return Tasks.oneTime(ONE_TIME_SPAWNER_TASK)
         .execute(
             (inst, ctx) -> {

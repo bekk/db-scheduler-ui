@@ -14,11 +14,11 @@ public class ExampleApp {
   }
 
   @Bean
-  public CommandLineRunner runAllTasks(Scheduler scheduler) {
+  public CommandLineRunner runAllManuallyTriggeredTasks(Scheduler scheduler) {
     return args -> {
-      System.out.println("Running all tasks");
+      System.out.println("Running all manually triggered tasks");
       TaskService taskService = new TaskService(scheduler);
-      taskService.runAllTasks();
+      taskService.runManuallyTriggeredTasks();
     };
   }
 }

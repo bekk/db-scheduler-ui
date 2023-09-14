@@ -25,6 +25,11 @@
                 <version>${db-scheduler.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.github.kagkarlsson</groupId>
+                <artifactId>db-scheduler-spring-boot-starter</artifactId>
+                <version>${db-scheduler.version}</version>
+            </dependency>
+            <dependency>
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
