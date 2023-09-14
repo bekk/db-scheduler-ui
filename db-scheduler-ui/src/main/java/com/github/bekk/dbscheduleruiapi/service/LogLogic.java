@@ -26,7 +26,6 @@ public class LogLogic {
   }
 
   public List<LogModel> getLogsById(TaskDetailsRequestParams requestParams) {
-    System.out.println("specific history");
     Map<String, Object> params = new HashMap<>();
     params.put("taskName", requestParams.getTaskName());
     params.put("taskInstance", requestParams.getTaskId());
@@ -47,15 +46,12 @@ public class LogLogic {
               : " = FALSE";
       baseQuery.append(" AND succeeded").append(filterCondition);
     }
-    System.out.println(baseQuery);
 
     baseQuery.append(" ORDER BY time_started DESC");
     return namedParameterJdbcTemplate.query(baseQuery.toString(), params, new LogModelRowMapper());
   }
 
   public List<LogModel> getAllLogs(TaskDetailsRequestParams requestParams) {
-    System.out.println("All history");
-    System.out.println(requestParams.getFilter());
     StringBuilder baseQuery = new StringBuilder("SELECT * FROM scheduled_execution_logs");
     Map<String, Object> params = new HashMap<>();
     List<String> conditions = new ArrayList<>();
@@ -79,7 +75,6 @@ public class LogLogic {
     }
 
     baseQuery.append(" LIMIT 500");
-    System.out.println(baseQuery);
     return namedParameterJdbcTemplate.query(baseQuery.toString(), params, new LogModelRowMapper());
   }
 

@@ -64,7 +64,6 @@ public class TaskLogic {
     executions.addAll(
         scheduler.getScheduledExecutions(ScheduledExecutionsFilter.all().withPicked(true)));
     List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(executions);
-    System.out.println(params.getSearchTerm());
     tasks = QueryUtils.search(tasks, params.getSearchTerm());
     tasks =
         QueryUtils.sortTasks(
