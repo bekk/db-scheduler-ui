@@ -48,7 +48,9 @@ public class LogModel {
     return taskName;
   }
 
-  public String getTaskData() {return taskData;}
+  public String getTaskData() {
+    return taskData;
+  }
 
   public Long getId() {
     return id;
