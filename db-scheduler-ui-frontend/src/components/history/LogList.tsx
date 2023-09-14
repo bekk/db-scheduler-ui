@@ -7,11 +7,12 @@ import { LogCard } from 'src/components/history/LogCard';
 import { useParams } from 'react-router-dom';
 import { LogInfoBox } from 'src/components/history/LogInfoBox';
 import colors from 'src/styles/colors';
+import { getAllLogs } from 'src/services/getAllLogs';
 
 export const LogList: React.FC = () => {
   const { taskName, taskInstance } = useParams();
   const { data } = useQuery([LOG_QUERY_KEY, taskName], () =>
-    getLogs(taskName!, taskInstance!),
+    !taskName ? getAllLogs() : getLogs(taskName!, taskInstance!),
   );
   return (
     <Box>
