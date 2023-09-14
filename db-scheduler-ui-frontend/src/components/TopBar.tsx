@@ -44,7 +44,11 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
           color={colors.dbBlue}
           borderBottom="2px"
           borderRadius={'0'}
-          borderColor={colors.primary['300']}
+          borderColor={
+            !window.location.toString().includes('history/')
+              ? colors.dbBlue
+              : colors.primary['300']
+          }
           onClick={() => navigate('/')}
           aria-label={'Home button'}
           marginRight={12}
@@ -65,7 +69,11 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
           color={colors.dbBlue}
           borderBottom="2px"
           borderRadius={'0'}
-          borderColor={colors.primary['300']}
+          borderColor={
+            window.location.toString().includes('history')
+              ? colors.dbBlue
+              : colors.primary['300']
+          }
           onClick={() => navigate(`/history/all`)}
           aria-label={'History button'}
         >
