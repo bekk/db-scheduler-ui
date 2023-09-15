@@ -35,7 +35,7 @@ public class LogLogic {
 
     if (requestParams.getSearchTerm() != null && !requestParams.getSearchTerm().trim().isEmpty()) {
       baseQuery.append(
-          " AND (LOWER(id) LIKE LOWER(:searchTerm) OR LOWER(task_name) LIKE LOWER(:searchTerm) OR LOWER(task_instance) LIKE LOWER(:searchTerm))");
+          " AND (LOWER(task_name) LIKE LOWER(:searchTerm) OR LOWER(task_instance) LIKE LOWER(:searchTerm))");
       params.put("searchTerm", "%" + requestParams.getSearchTerm() + "%");
     }
     if (requestParams.getFilter() != null
@@ -58,7 +58,7 @@ public class LogLogic {
 
     if (requestParams.getSearchTerm() != null && !requestParams.getSearchTerm().trim().isEmpty()) {
       conditions.add(
-          "(LOWER(id) LIKE LOWER(:searchTerm) OR LOWER(task_name) LIKE LOWER(:searchTerm) OR LOWER(task_instance) LIKE LOWER(:searchTerm))");
+          "(LOWER(task_name) LIKE LOWER(:searchTerm) OR LOWER(task_instance) LIKE LOWER(:searchTerm))");
       params.put("searchTerm", "%" + requestParams.getSearchTerm() + "%");
     }
     if (requestParams.getFilter() != null
