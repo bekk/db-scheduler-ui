@@ -5,6 +5,7 @@ import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
+import com.github.bekk.dbscheduleruiapi.util.Caching;
 import com.github.bekk.dbscheduleruiapi.util.mapper.TaskMapper;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.ScheduledExecutionsFilter;
@@ -22,11 +23,13 @@ import org.springframework.web.server.ResponseStatusException;
 public class TaskLogic {
 
   private final Scheduler scheduler;
+  private final Caching caching;
 
   @Autowired
-  public TaskLogic(Scheduler scheduler) {
+  public TaskLogic(Scheduler scheduler, Caching caching) {
     this.scheduler = scheduler;
     this.scheduler.start();
+    this.caching = caching;
   }
 
   public void runTaskNow(String taskId, String taskName) {
@@ -60,10 +63,8 @@ public class TaskLogic {
   }
 
   public GetTasksResponse getAllTasks(TaskRequestParams params) {
-    List<ScheduledExecution<Object>> executions = scheduler.getScheduledExecutions();
-    executions.addAll(
-        scheduler.getScheduledExecutions(ScheduledExecutionsFilter.all().withPicked(true)));
-    List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(executions);
+    List<TaskModel> tasks = TaskMapper
+            .mapAllExecutionsToTaskModel(caching.getExecutionsFromCacheOrDB(false, scheduler));
 
     tasks =
         QueryUtils.sortTasks(
