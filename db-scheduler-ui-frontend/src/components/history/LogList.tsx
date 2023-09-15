@@ -24,13 +24,14 @@ export const LogList: React.FC = () => {
         ? getAllLogs(currentFilter, searchTerm)
         : getLogs(taskName!, taskInstance!, currentFilter, searchTerm),
   );
+
   return (
     <Box>
       <HeaderBar
         title={'History' + (taskName ? ' for ' + taskName : '')}
         inputPlaceholder={`search for ${
-          taskName ? '' : 'name, '
-        }task id or execution id`}
+          taskName ? '' : 'task name or '
+        }task id`}
         taskName={taskName || ''}
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}
@@ -55,7 +56,7 @@ export const LogList: React.FC = () => {
       </HStack>
       <Accordion allowMultiple>
         {data?.map((log: Log) => (
-          <LogCard key={log.taskName + log.taskInstance} log={log} />
+          <LogCard key={log.taskName + log.taskInstance + log.id} log={log} />
         ))}
       </Accordion>
     </Box>

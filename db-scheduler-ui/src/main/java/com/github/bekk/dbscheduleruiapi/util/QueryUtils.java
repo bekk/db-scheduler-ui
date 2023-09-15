@@ -1,12 +1,16 @@
 package com.github.bekk.dbscheduleruiapi.util;
 
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
+import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskFilter;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskSort;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -76,5 +80,51 @@ public class QueryUtils {
                                     picked != null
                                         && picked.toLowerCase().contains(lowerCaseTerm))))
         .collect(Collectors.toList());
+  }
+
+  public static void logSearchCondition(
+      Map<String, Object> params, String searchTerm, List<String> conditions) {
+    List<String> terms = splitSearchTerm(searchTerm);
+    if (terms.size() > 0) {
+      List<String> termConditions = new ArrayList<>();
+      for (int i = 0; i < terms.size(); i++) {
+        String termKey = "searchTerm" + i;
+        termConditions.add(
+            "(LOWER(task_name) LIKE LOWER(:"
+                + termKey
+                + ") OR LOWER(task_instance) LIKE LOWER(:"
+                + termKey
+                + "))");
+        params.put(termKey, "%" + terms.get(i) + "%");
+      }
+      conditions.add(String.join(" AND ", termConditions));
+    }
+  }
+
+  public static void logFilterCondition(
+      TaskRequestParams.TaskFilter filter, List<String> conditions) {
+    if (filter != null && filter != TaskRequestParams.TaskFilter.ALL) {
+      String filterCondition =
+          filter == TaskRequestParams.TaskFilter.SUCCEEDED
+              ? "succeeded = TRUE"
+              : "succeeded = FALSE";
+      conditions.add(filterCondition);
+    }
+  }
+
+  private static List<String> splitSearchTerm(String searchTerm) {
+    List<String> terms = new ArrayList<>();
+    Pattern pattern = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+    Matcher matcher = pattern.matcher(searchTerm);
+
+    while (matcher.find()) {
+      if (matcher.group(1) != null) {
+        terms.add(matcher.group(1));
+      } else {
+        terms.add(matcher.group());
+      }
+    }
+
+    return terms;
   }
 }

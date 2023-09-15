@@ -2,7 +2,7 @@ package com.github.bekk.dbscheduleruiapi.service;
 
 import com.github.bekk.dbscheduleruiapi.model.LogModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
-import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
+import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,18 +33,12 @@ public class LogLogic {
         new StringBuilder(
             "SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName AND task_instance = :taskInstance");
 
-    if (requestParams.getSearchTerm() != null && !requestParams.getSearchTerm().trim().isEmpty()) {
-      baseQuery.append(
-          " AND (LOWER(task_name) LIKE LOWER(:searchTerm) OR LOWER(task_instance) LIKE LOWER(:searchTerm))");
-      params.put("searchTerm", "%" + requestParams.getSearchTerm() + "%");
-    }
-    if (requestParams.getFilter() != null
-        && requestParams.getFilter() != TaskRequestParams.TaskFilter.ALL) {
-      String filterCondition =
-          requestParams.getFilter() == TaskRequestParams.TaskFilter.SUCCEEDED
-              ? " = TRUE"
-              : " = FALSE";
-      baseQuery.append(" AND succeeded").append(filterCondition);
+    List<String> conditions = new ArrayList<>();
+    QueryUtils.logSearchCondition(params, requestParams.getSearchTerm(), conditions);
+    QueryUtils.logFilterCondition(requestParams.getFilter(), conditions);
+
+    if (!conditions.isEmpty()) {
+      baseQuery.append(" AND ").append(String.join(" AND ", conditions));
     }
 
     baseQuery.append(" ORDER BY time_started DESC");
@@ -56,25 +50,14 @@ public class LogLogic {
     Map<String, Object> params = new HashMap<>();
     List<String> conditions = new ArrayList<>();
 
-    if (requestParams.getSearchTerm() != null && !requestParams.getSearchTerm().trim().isEmpty()) {
-      conditions.add(
-          "(LOWER(task_name) LIKE LOWER(:searchTerm) OR LOWER(task_instance) LIKE LOWER(:searchTerm))");
-      params.put("searchTerm", "%" + requestParams.getSearchTerm() + "%");
-    }
-    if (requestParams.getFilter() != null
-        && requestParams.getFilter() != TaskRequestParams.TaskFilter.ALL) {
-      String filterCondition =
-          requestParams.getFilter() == TaskRequestParams.TaskFilter.SUCCEEDED
-              ? "succeeded = TRUE"
-              : "succeeded = FALSE";
-      conditions.add(filterCondition);
-    }
+    QueryUtils.logSearchCondition(params, requestParams.getSearchTerm(), conditions);
+    QueryUtils.logFilterCondition(requestParams.getFilter(), conditions);
 
     if (!conditions.isEmpty()) {
       baseQuery.append(" WHERE ").append(String.join(" AND ", conditions));
     }
 
-    baseQuery.append(" LIMIT 500");
+    baseQuery.append(" LIMIT 20");
     return namedParameterJdbcTemplate.query(baseQuery.toString(), params, new LogModelRowMapper());
   }
 

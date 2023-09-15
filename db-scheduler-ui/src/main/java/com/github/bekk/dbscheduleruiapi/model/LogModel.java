@@ -40,6 +40,14 @@ public class LogModel {
     this.exceptionStackTrace = exceptionStackTrace;
   }
 
+  public Long getId() {
+    return id;
+  }
+
+  public String getTaskName() {
+    return taskName;
+  }
+
   public String getTaskInstance() {
     return taskInstance;
   }
