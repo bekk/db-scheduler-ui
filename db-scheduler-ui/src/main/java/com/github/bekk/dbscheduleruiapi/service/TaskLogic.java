@@ -4,11 +4,10 @@ import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
 import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
-import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
 import com.github.bekk.dbscheduleruiapi.util.Caching;
+import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
 import com.github.bekk.dbscheduleruiapi.util.mapper.TaskMapper;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
-import com.github.kagkarlsson.scheduler.ScheduledExecutionsFilter;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import java.time.Instant;
@@ -63,8 +62,9 @@ public class TaskLogic {
   }
 
   public GetTasksResponse getAllTasks(TaskRequestParams params) {
-    List<TaskModel> tasks = TaskMapper
-            .mapAllExecutionsToTaskModel(caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler));
+    List<TaskModel> tasks =
+        TaskMapper.mapAllExecutionsToTaskModel(
+            caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler));
 
     tasks =
         QueryUtils.sortTasks(
@@ -75,7 +75,8 @@ public class TaskLogic {
   }
 
   public GetTasksResponse getTask(TaskDetailsRequestParams params) {
-    List<ScheduledExecution<Object>> executions = caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler);
+    List<ScheduledExecution<Object>> executions =
+        caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler);
 
     List<TaskModel> tasks =
         params.getTaskId() != null

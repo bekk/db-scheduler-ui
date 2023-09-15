@@ -13,8 +13,7 @@ public class TaskDetailsRequestParams extends TaskRequestParams {
       boolean asc,
       boolean refresh,
       String taskName,
-      String taskId
-  ) {
+      String taskId) {
     super(filter, pageNumber, size, sorting, asc, refresh);
     this.taskId = taskId;
     this.taskName = taskName;

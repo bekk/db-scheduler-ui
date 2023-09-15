@@ -38,6 +38,7 @@ public class TaskRequestParams {
   public boolean isAsc() {
     return asc;
   }
+
   public boolean isRefresh() {
     return refresh;
   }
