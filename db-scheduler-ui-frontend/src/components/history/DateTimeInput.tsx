@@ -1,24 +1,33 @@
 import DatePicker from 'react-datepicker';
 import { Box } from '@chakra-ui/react';
-import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
+import colors from 'src/styles/colors';
 
 interface DateTimeInputProps {
-  defaultDate: Date | null;
+  selectedDate: Date | null;
+  onChange: (date: Date | null) => void;
 }
 
 export const DateTimeInput: React.FC<DateTimeInputProps> = ({
-  defaultDate,
+  selectedDate,
+  onChange,
 }) => {
-  const [startDate, setStartDate] = useState(defaultDate);
-  console.log(startDate);
   return (
-    <Box>
+    <Box
+      p={1}
+      borderRadius={4}
+      borderColor={colors.primary[300]}
+      borderWidth={1}
+      backgroundColor={colors.primary[100]}
+    >
       <DatePicker
-        selected={startDate}
-        onChange={(date) => setStartDate(date!)}
+        selected={selectedDate}
+        onChange={onChange}
         showTimeSelect
         timeFormat={'HH:mm'}
+        dateFormat={'yyyy-MM-dd HH:mm'}
+        placeholderText={'YYYY-MM-DD HH:mm'}
+        useWeekdaysShort={true}
       ></DatePicker>
     </Box>
   );

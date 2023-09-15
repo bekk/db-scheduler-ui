@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getLogs, LOG_QUERY_KEY } from 'src/services/getLogs';
-import { Accordion, Box, HStack } from '@chakra-ui/react';
+import { Accordion, Box, Flex, HStack, Text } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { Log } from 'src/models/Log';
 import { LogCard } from 'src/components/history/LogCard';
@@ -9,19 +9,22 @@ import colors from 'src/styles/colors';
 import { HeaderBar } from '../HeaderBar';
 import { FilterBy } from 'src/services/getTasks';
 import { ALL_LOG_QUERY_KEY, getAllLogs } from 'src/services/getAllLogs';
+import { DateTimeInput } from 'src/components/history/DateTimeInput';
 
 export const LogList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
 
   const { taskName, taskInstance } = useParams();
+  const [startDate, setStartDate] = React.useState<Date | null>(null);
+  const [endDate, setEndDate] = React.useState<Date | null>(null);
   const { data } = useQuery(
     !taskName
       ? [LOG_QUERY_KEY, taskName, currentFilter, searchTerm]
-      : [ALL_LOG_QUERY_KEY, currentFilter, searchTerm],
+      : [ALL_LOG_QUERY_KEY, currentFilter, searchTerm, startDate, endDate],
     () =>
       !taskName
-        ? getAllLogs(currentFilter, searchTerm)
+        ? getAllLogs(currentFilter, searchTerm, startDate, endDate)
         : getLogs(taskName!, taskInstance!, currentFilter, searchTerm),
   );
 
@@ -38,6 +41,21 @@ export const LogList: React.FC = () => {
         setSearchTerm={setSearchTerm}
         history
       />
+      <Box mb={14}>
+        <Flex alignItems={'center'}>
+          <DateTimeInput
+            selectedDate={startDate}
+            onChange={(date) => {
+              setStartDate(date);
+            }}
+          />
+          <Text mx={3}>-</Text>
+          <DateTimeInput
+            selectedDate={endDate}
+            onChange={(date) => setEndDate(date)}
+          />
+        </Flex>
+      </Box>
       <HStack
         display={'flex'}
         p="8px 16px"
@@ -58,7 +76,7 @@ export const LogList: React.FC = () => {
       </HStack>
       <Accordion allowMultiple>
         {data?.map((log: Log) => (
-          <LogCard key={log.taskName + log.taskInstance + log.id} log={log} />
+          <LogCard key={log.id + log.taskName + log.taskInstance + log.id} log={log} />
         ))}
       </Accordion>
     </Box>
