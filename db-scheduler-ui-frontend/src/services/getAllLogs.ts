@@ -2,7 +2,7 @@ import { FilterBy } from "./getTasks";
 
 const API_BASE_URL: string =
   (import.meta.env.VITE_API_BASE_URL as string) ??
-  window.location.origin + '/api';
+  window.location.origin + '/db-scheduler-api';
 
 export const ALL_LOG_QUERY_KEY = `logs/all`;
 

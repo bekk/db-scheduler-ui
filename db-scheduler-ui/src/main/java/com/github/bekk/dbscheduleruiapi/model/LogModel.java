@@ -40,20 +40,20 @@ public class LogModel {
     this.exceptionStackTrace = exceptionStackTrace;
   }
 
-  public Long getId() {
-    return id;
+  public String getTaskInstance() {
+    return taskInstance;
   }
 
   public String getTaskName() {
     return taskName;
   }
 
-  public String getTaskInstance() {
-    return taskInstance;
-  }
-
   public String getTaskData() {
     return taskData;
+  }
+
+  public Long getId() {
+    return id;
   }
 
   public Instant getTimeStarted() {

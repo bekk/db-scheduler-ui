@@ -39,10 +39,6 @@
             <artifactId>flyway-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.kagkarlsson</groupId>
-            <artifactId>db-scheduler</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.github.bekk</groupId>
             <artifactId>db-scheduler-ui-starter</artifactId>
             <version>main-SNAPSHOT</version>

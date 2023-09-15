@@ -4,7 +4,7 @@ const API_BASE_URL: string =
 
 const runTask = async (id: string, name: string) => {
   const response = await fetch(
-    `${API_BASE_URL}/tasks/rerun?id=${id[0]}&name=${name}`,
+    `${API_BASE_URL}/tasks/rerun?id=${id}&name=${name}`,
     {
       method: 'POST',
     },
