@@ -64,7 +64,7 @@ public class TaskLogic {
 
   public GetTasksResponse getAllTasks(TaskRequestParams params) {
     List<TaskModel> tasks = TaskMapper
-            .mapAllExecutionsToTaskModel(caching.getExecutionsFromCacheOrDB(false, scheduler));
+            .mapAllExecutionsToTaskModel(caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler));
 
     tasks =
         QueryUtils.sortTasks(
@@ -75,9 +75,8 @@ public class TaskLogic {
   }
 
   public GetTasksResponse getTask(TaskDetailsRequestParams params) {
-    List<ScheduledExecution<Object>> executions = scheduler.getScheduledExecutions();
-    executions.addAll(
-        scheduler.getScheduledExecutions(ScheduledExecutionsFilter.all().withPicked(true)));
+    List<ScheduledExecution<Object>> executions = caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler);
+
     List<TaskModel> tasks =
         params.getTaskId() != null
             ? TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions).stream()

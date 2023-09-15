@@ -28,6 +28,7 @@ export const getTasks = async (
   { pageNumber = 1, limit = 10 }: PaginationParams,
   sorting = SortBy.Default,
   isAsc = true,
+  refresh = true,
 ): Promise<TasksResponse> => {
   const queryParams = new URLSearchParams();
 
@@ -36,6 +37,7 @@ export const getTasks = async (
   queryParams.append('size', limit.toString());
   queryParams.append('sorting', sorting.toUpperCase());
   queryParams.append('asc', isAsc.toString());
+  queryParams.append('refresh', refresh.toString());
 
   const response = await fetch(`${API_BASE_URL}/tasks/all?${queryParams}`, {
     method: 'GET',

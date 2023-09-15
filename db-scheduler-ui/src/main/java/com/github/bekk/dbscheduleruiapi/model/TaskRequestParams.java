@@ -7,14 +7,16 @@ public class TaskRequestParams {
   private final int size;
   private final TaskSort sorting;
   private final boolean asc;
+  private final boolean refresh;
 
   public TaskRequestParams(
-      TaskFilter filter, int pageNumber, int size, TaskSort sorting, boolean asc) {
+      TaskFilter filter, int pageNumber, int size, TaskSort sorting, boolean asc, boolean refresh) {
     this.filter = filter;
     this.pageNumber = pageNumber;
     this.size = size;
     this.sorting = sorting;
     this.asc = asc;
+    this.refresh = refresh;
   }
 
   public TaskFilter getFilter() {
@@ -35,6 +37,9 @@ public class TaskRequestParams {
 
   public boolean isAsc() {
     return asc;
+  }
+  public boolean isRefresh() {
+    return refresh;
   }
 
   public enum TaskFilter {

@@ -1,82 +1,84 @@
 import React, { useCallback, useEffect, useState } from 'react';
-
-import { Accordion, Box, Text, IconButton } from '@chakra-ui/react';
-import TaskCard from './TaskCard';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { Accordion, IconButton, Box, Text } from '@chakra-ui/react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getTask, TASK_DETAILS_QUERY_KEY } from 'src/services/getTask';
 import {
   FilterBy,
   SortBy,
-  TASK_QUERY_KEY,
   getTasks,
+  TASK_QUERY_KEY,
 } from 'src/services/getTasks';
-
-import { useQuery } from '@tanstack/react-query';
-import PaginationButtons from 'src/components/PaginationButtons';
-import { FilterBox } from 'src/components/FilterBox';
-import TitleRow from 'src/components/TitleRow';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBackIcon } from '@chakra-ui/icons';
-import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
-import TaskGroupCard from './TaskGroupCard';
 import { isStatus } from 'src/utils/determineStatus';
+import TaskCard from './TaskCard';
+import TaskGroupCard from './TaskGroupCard';
+import { ArrowBackIcon } from '@chakra-ui/icons';
+import { FilterBox } from './FilterBox';
+import TitleRow from './TitleRow';
 
 const TaskList: React.FC = () => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
   const [sortAsc, setSortAsc] = useState<boolean>(true);
 
-  const { taskName, page: rawPage } = useParams<{
-    taskName?: string;
-    page?: string;
-  }>();
-  const page = Number(rawPage) && Number(rawPage) > 0 ? Number(rawPage) : 1;
-
+  const { taskName } = useParams<{ taskName?: string }>();
+  const navigate = useNavigate();
   const limit = 10;
   const isDetailsView = !!taskName;
-  const { data, refetch } = useQuery(
-    isDetailsView
-      ? [
-          TASK_DETAILS_QUERY_KEY,
-          currentFilter,
-          page,
-          currentSort,
-          sortAsc,
-          taskName,
-        ]
-      : [TASK_QUERY_KEY, currentFilter, page, currentSort, sortAsc],
-    () =>
-      isDetailsView
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(2000);
+
+  // TODO: Make a hook for the infinite scroll stuff
+  // TODO: Clear when switching between filters (now it reappears when you switch back to the original filter)
+  const fetchTasks = useCallback(
+    ({ pageParam = 0 }) => {
+      return isDetailsView
         ? getTask(
             currentFilter,
-            { pageNumber: page - 1, limit: limit },
+            { pageNumber: pageParam, limit: limit },
             currentSort,
             sortAsc,
+            pageParam === 0 ? true : false,
             taskName,
           )
         : getTasks(
             currentFilter,
-            { pageNumber: page - 1, limit: limit },
+            { pageNumber: pageParam, limit: limit },
             currentSort,
             sortAsc,
-          ),
-  );
-  const navigate = useNavigate();
-
-  const setPage = useCallback(
-    (page: number) => {
-      navigate(`/${taskName ? taskName + '/' : ''}/page/${page}`);
+            pageParam === 0 ? true : false,
+          );
     },
-    [navigate, taskName],
+    [currentFilter, currentSort, sortAsc, taskName, isDetailsView],
   );
 
-  useEffect(() => {
-    setSortAsc(true);
-  }, [currentSort]);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+    useInfiniteQuery(
+      isDetailsView
+        ? [
+            TASK_DETAILS_QUERY_KEY,
+            currentFilter,
+            currentSort,
+            sortAsc,
+            taskName,
+          ]
+        : [TASK_QUERY_KEY, currentFilter, currentSort, sortAsc],
+      fetchTasks,
+      {
+        getNextPageParam: (lastPage, allPages) => {
+          const nextPage = allPages.length + 1;
+          return nextPage <= lastPage.numberOfPages ? nextPage : undefined;
+        },
+        refetchInterval: refetchInterval,
+      },
+    );
 
   useEffect(() => {
-    if (data?.numberOfPages && page > data.numberOfPages) {
-      setPage(data.numberOfPages);
+    if ((data?.pages?.length || 0) > 1) {
+      setRefetchInterval(false);
+    } else {
+      setRefetchInterval(2000);
     }
-  }, [data, page, setPage]);
+  }, [data]);
 
   return (
     <Box>
@@ -106,24 +108,30 @@ const TaskList: React.FC = () => {
         isDetailsView={isDetailsView}
       />
       <Accordion allowMultiple key={taskName || 'all'}>
-        {data?.tasks.map((task) =>
-          !isStatus('Group', task) ? (
-            <TaskCard
-              key={task.taskInstance + task.taskName}
-              {...task}
-              refetch={refetch}
-            />
-          ) : (
-            <TaskGroupCard key={task.taskName} {...task} refetch={refetch} />
+        {data?.pages.map((p) =>
+          p.tasks.map((task) =>
+            !isStatus('Group', task) ? (
+              <TaskCard
+                key={task.taskInstance + task.taskName}
+                {...task}
+                refetch={refetch}
+              />
+            ) : (
+              <TaskGroupCard key={task.taskName} {...task} refetch={refetch} />
+            ),
           ),
         )}
       </Accordion>
-      <PaginationButtons
-        page={page}
-        limit={10}
-        setPage={setPage}
-        numberOfPages={data?.numberOfPages}
-      />
+      <button
+        onClick={() => fetchNextPage()}
+        disabled={!hasNextPage || isFetchingNextPage}
+      >
+        {isFetchingNextPage
+          ? 'Loading more...'
+          : hasNextPage
+          ? 'Load More'
+          : 'Nothing more to load'}
+      </button>
     </Box>
   );
 };
