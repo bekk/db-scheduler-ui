@@ -54,8 +54,7 @@ public class LogLogic {
 
     QueryUtils.logSearchCondition(params, requestParams.getSearchTerm(), conditions);
     QueryUtils.logFilterCondition(requestParams.getFilter(), conditions);
-
-    if (!conditions.isEmpty()) {
+      if (!conditions.isEmpty()) {
       baseQuery.append(" WHERE ").append(String.join(" AND ", conditions));
     }
 
