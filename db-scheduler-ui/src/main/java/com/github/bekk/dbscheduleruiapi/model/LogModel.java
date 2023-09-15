@@ -44,8 +44,16 @@ public class LogModel {
     return taskInstance;
   }
 
+  public String getTaskName() {
+    return taskName;
+  }
+
   public String getTaskData() {
     return taskData;
+  }
+
+  public Long getId() {
+    return id;
   }
 
   public Instant getTimeStarted() {
