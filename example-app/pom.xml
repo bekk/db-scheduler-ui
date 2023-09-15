@@ -93,7 +93,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.github.bekk.exampleapp.ExampleApp</mainClass>
+                    <mainClass>com.github.bekk.dbscheduler.ui.exampleapp.ExampleApp</mainClass>
                     <layout>JAR</layout>
                 </configuration>
                 <executions>
