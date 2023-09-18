@@ -27,8 +27,8 @@ const statusColors: Record<
     color: colors.primary['900'],
   },
   Group: {
-    borderColor: colors.primary['600'],
-    backgroundColor: colors.primary['100'],
+    borderColor: colors.primary['900'],
+    backgroundColor: colors.primary['200'],
     color: colors.primary['900'],
   },
 };
@@ -38,7 +38,9 @@ export const StatusBox: React.FC<StatusBoxProps> = ({
   consecutiveFailures,
 }) => {
   const statusInfo =
-    status === 'Group' && consecutiveFailures > 0
+    status === 'Group'
+      ? statusColors['Group']
+      : consecutiveFailures > 0
       ? statusColors['Failed']
       : statusColors[status] || statusColors['Scheduled'];
   const { borderColor, backgroundColor, color } = statusInfo;
