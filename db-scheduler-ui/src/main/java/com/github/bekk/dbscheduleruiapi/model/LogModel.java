@@ -1,10 +1,9 @@
 package com.github.bekk.dbscheduleruiapi.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.util.SerializationUtils;
-
 import java.io.IOException;
 import java.time.Instant;
+import org.springframework.util.SerializationUtils;
 
 public class LogModel {
   private final Long id;
@@ -20,7 +19,6 @@ public class LogModel {
   private final String exceptionStackTrace;
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
-
 
   public LogModel(
       Long id,
@@ -47,19 +45,18 @@ public class LogModel {
     this.exceptionStackTrace = exceptionStackTrace;
   }
 
-  private Object stringTaskData(byte[] inputTaskData){
+  private Object stringTaskData(byte[] inputTaskData) {
     try {
-      if (inputTaskData != null){
+      if (inputTaskData != null) {
         Object dataclass = SerializationUtils.deserialize(inputTaskData);
         String serializedData = objectMapper.writeValueAsString(dataclass);
         return objectMapper.readValue(serializedData, Object.class);
-        }
+      }
     } catch (IOException e) {
-        throw new RuntimeException(e);
+      throw new RuntimeException(e);
     }
-      return null;
+    return null;
   }
-
 
   public String getTaskInstance() {
     return taskInstance;
