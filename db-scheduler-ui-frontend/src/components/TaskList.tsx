@@ -1,18 +1,16 @@
 import React from 'react';
-import { Accordion, IconButton, Box, Text } from '@chakra-ui/react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Accordion, Box } from '@chakra-ui/react';
+import { useParams } from 'react-router-dom';
 import { isStatus } from 'src/utils/determineStatus';
 import TaskCard from './TaskCard';
 import TaskGroupCard from './TaskGroupCard';
-import { ArrowBackIcon } from '@chakra-ui/icons';
-import { FilterBox } from './FilterBox';
 import TitleRow from './TitleRow';
 import { useInfiniteTaskScrolling } from 'src/hooks/useInfiniteTaskScrolling';
 import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
 import { TASK_QUERY_KEY, getTasks } from 'src/services/getTasks';
+import { HeaderBar } from './HeaderBar';
 
 const TaskList: React.FC = () => {
-  const navigate = useNavigate();
   const { taskName } = useParams<{ taskName?: string }>();
   const isDetailsView = !!taskName;
 
@@ -28,6 +26,7 @@ const TaskList: React.FC = () => {
     setCurrentSort,
     sortAsc,
     setSortAsc,
+    setSearchTerm,
   } = useInfiniteTaskScrolling(
     isDetailsView
       ? {
@@ -40,24 +39,15 @@ const TaskList: React.FC = () => {
 
   return (
     <Box>
-      <Box display={'flex'} mb={14} alignItems={'center'}>
-        {isDetailsView && (
-          <IconButton
-            icon={<ArrowBackIcon boxSize={8} />}
-            onClick={() => navigate('/')}
-            aria-label={'Back button'}
-            variant={'ghost'}
-            isRound
-          />
-        )}
-        <Text ml={5} fontSize={'3xl'} fontWeight={'semibold'}>
-          {isDetailsView ? taskName : 'All Tasks'}
-        </Text>
-        <FilterBox
-          currentFilter={currentFilter}
-          setCurrentFilter={setCurrentFilter}
-        />
-      </Box>
+      <HeaderBar
+        title={isDetailsView ? taskName : 'All Tasks'}
+        inputPlaceholder={`search for ${isDetailsView ? '' : 'name or'}task id`}
+        taskName={taskName || ''}
+        currentFilter={currentFilter}
+        setCurrentFilter={setCurrentFilter}
+        setSearchTerm={setSearchTerm}
+      />
+
       <TitleRow
         currentSort={currentSort}
         setCurrentSort={setCurrentSort}

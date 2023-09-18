@@ -13,6 +13,7 @@ export const useInfiniteTaskScrolling = ({ getTasksFunction, taskName, baseQuery
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
   const [sortAsc, setSortAsc] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const limit = 10;
   const [refetchInterval, setRefetchInterval] = useState<number | false>(2000);
 
@@ -25,7 +26,8 @@ export const useInfiniteTaskScrolling = ({ getTasksFunction, taskName, baseQuery
           currentSort,
           sortAsc,
           pageParam === 0 ? true : false,
-          taskName
+          searchTerm,
+          taskName,
         );
       } else {
         return getTasksFunction(
@@ -33,14 +35,15 @@ export const useInfiniteTaskScrolling = ({ getTasksFunction, taskName, baseQuery
           { pageNumber: pageParam, limit: limit },
           currentSort,
           sortAsc,
-          pageParam === 0 ? true : false
+          pageParam === 0 ? true : false,
+          searchTerm
         );
       }
     },
-    [currentFilter, currentSort, sortAsc, taskName, getTasksFunction]
+    [currentFilter, currentSort, sortAsc, taskName, getTasksFunction,searchTerm]
   );
   
-  const queryKey = [baseQueryKey, currentFilter, currentSort, sortAsc, ...(taskName ? [taskName] : [])];
+  const queryKey = [baseQueryKey, currentFilter, currentSort, sortAsc, ...(taskName ? [taskName] : []), searchTerm];
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteQuery(
     queryKey,
@@ -52,7 +55,7 @@ export const useInfiniteTaskScrolling = ({ getTasksFunction, taskName, baseQuery
       },
       refetchInterval: refetchInterval,
     }
-  );
+      );
 
   useEffect(() => {
     if ((data?.pages?.length || 0) > 1) {
@@ -74,6 +77,8 @@ export const useInfiniteTaskScrolling = ({ getTasksFunction, taskName, baseQuery
     setCurrentSort,
     sortAsc,
     setSortAsc,
-    isDetailsView: !!taskName,
+    searchTerm,
+    setSearchTerm,
+    isDetailsView: !!taskName
   };
 };

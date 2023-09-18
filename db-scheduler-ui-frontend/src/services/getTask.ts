@@ -13,6 +13,7 @@ export const getTask = async (
   sorting = SortBy.Default,
   isAsc = true,
   refresh = true,
+  searchTerm="",
   taskName?: string,
   taskId?: string,
 ): Promise<TasksResponse> => {
@@ -24,6 +25,7 @@ export const getTask = async (
   queryParams.append('sorting', sorting.toUpperCase());
   queryParams.append('asc', isAsc.toString());
   queryParams.append('refresh', refresh.toString());
+  queryParams.append('searchTerm', searchTerm.trim());
   taskName && queryParams.append('taskName', taskName);
   taskId && queryParams.append('taskId', taskId);
 

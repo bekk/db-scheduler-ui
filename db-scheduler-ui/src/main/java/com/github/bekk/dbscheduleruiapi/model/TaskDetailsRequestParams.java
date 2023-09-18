@@ -7,14 +7,15 @@ public class TaskDetailsRequestParams extends TaskRequestParams {
 
   public TaskDetailsRequestParams(
       TaskFilter filter,
-      int pageNumber,
-      int size,
+      Integer pageNumber,
+      Integer size,
       TaskSort sorting,
-      boolean asc,
-      boolean refresh,
+      Boolean asc,
+      Boolean refresh,
+      String searchTerm,
       String taskName,
       String taskId) {
-    super(filter, pageNumber, size, sorting, asc, refresh);
+    super(filter, pageNumber, size, sorting, asc, refresh, searchTerm);
     this.taskId = taskId;
     this.taskName = taskName;
   }
