@@ -10,13 +10,13 @@ public class TaskRequestParams {
   private final boolean refresh;
 
   public TaskRequestParams(
-      TaskFilter filter, int pageNumber, int size, TaskSort sorting, boolean asc, boolean refresh) {
-    this.filter = filter;
-    this.pageNumber = pageNumber;
-    this.size = size;
-    this.sorting = sorting;
-    this.asc = asc;
-    this.refresh = refresh;
+      TaskFilter filter, Integer pageNumber, Integer size, TaskSort sorting, Boolean asc, Boolean refresh) {
+    this.filter = filter != null ? filter : TaskFilter.ALL;
+    this.pageNumber = pageNumber!=null ? pageNumber : 0;
+    this.size = size!=null ? size : 10;
+    this.sorting = sorting != null ? sorting : TaskSort.DEFAULT;
+    this.asc = asc!=null ? asc : true;
+    this.refresh = refresh!=null ? refresh : true;
   }
 
   public TaskFilter getFilter() {
