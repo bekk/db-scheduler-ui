@@ -85,9 +85,7 @@ const TaskList: React.FC = () => {
     <Box>
       <HeaderBar
         title={isDetailsView ? taskName : 'All Tasks'}
-        inputPlaceholder={`search for ${
-          isDetailsView ? '' : 'name, '
-        }task id or server id (if picked by)`}
+        inputPlaceholder={`search for ${isDetailsView ? '' : 'name or'}task id`}
         taskName={taskName || ''}
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}

@@ -72,13 +72,7 @@ public class QueryUtils {
                     || task.getTaskInstance().stream()
                         .anyMatch(
                             instance ->
-                                instance != null && instance.toLowerCase().contains(lowerCaseTerm))
-                    || (task.getPickedBy() != null
-                        && task.getPickedBy().stream()
-                            .anyMatch(
-                                picked ->
-                                    picked != null
-                                        && picked.toLowerCase().contains(lowerCaseTerm))))
+                                instance != null && instance.toLowerCase().contains(lowerCaseTerm)))
         .collect(Collectors.toList());
   }
 
