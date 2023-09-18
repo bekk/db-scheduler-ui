@@ -7,14 +7,21 @@ public class TaskRequestParams {
   private final int size;
   private final TaskSort sorting;
   private final boolean asc;
+  private final String searchTerm;
 
   public TaskRequestParams(
-      TaskFilter filter, int pageNumber, int size, TaskSort sorting, boolean asc) {
+      TaskFilter filter,
+      Integer pageNumber,
+      Integer size,
+      TaskSort sorting,
+      Boolean asc,
+      String searchTerm) {
     this.filter = filter;
-    this.pageNumber = pageNumber;
-    this.size = size;
+    this.pageNumber = pageNumber != null ? pageNumber : 0;
+    this.size = size != null ? size : 10;
     this.sorting = sorting;
-    this.asc = asc;
+    this.asc = asc != null ? asc : true;
+    this.searchTerm = searchTerm;
   }
 
   public TaskFilter getFilter() {
@@ -37,11 +44,16 @@ public class TaskRequestParams {
     return asc;
   }
 
+  public String getSearchTerm() {
+    return searchTerm;
+  }
+
   public enum TaskFilter {
     ALL,
     FAILED,
     RUNNING,
-    SCHEDULED;
+    SCHEDULED,
+    SUCCEEDED;
   }
 
   public enum TaskSort {

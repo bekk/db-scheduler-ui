@@ -64,7 +64,7 @@ public class TaskLogic {
     executions.addAll(
         scheduler.getScheduledExecutions(ScheduledExecutionsFilter.all().withPicked(true)));
     List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(executions);
-
+    tasks = QueryUtils.search(tasks, params.getSearchTerm());
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
@@ -100,6 +100,7 @@ public class TaskLogic {
               + ", taskId: "
               + params.getTaskId());
     }
+    tasks = QueryUtils.search(tasks, params.getSearchTerm());
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());

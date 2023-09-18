@@ -9,6 +9,7 @@ export enum FilterBy {
   Failed = 'Failed',
   Running = 'Running',
   Scheduled = 'Scheduled',
+  Succeeded = 'Succeeded',
 }
 
 export interface PaginationParams {
@@ -28,14 +29,17 @@ export const getTasks = async (
   { pageNumber = 1, limit = 10 }: PaginationParams,
   sorting = SortBy.Default,
   isAsc = true,
+  searchTerm="",
 ): Promise<TasksResponse> => {
   const queryParams = new URLSearchParams();
+  console.log("searchTerm: ", searchTerm)
 
   queryParams.append('filter', filter.toUpperCase());
   queryParams.append('pageNumber', pageNumber.toString());
   queryParams.append('size', limit.toString());
   queryParams.append('sorting', sorting.toUpperCase());
   queryParams.append('asc', isAsc.toString());
+  queryParams.append('searchTerm', searchTerm.trim());
 
   const response = await fetch(`${API_BASE_URL}/tasks/all?${queryParams}`, {
     method: 'GET',

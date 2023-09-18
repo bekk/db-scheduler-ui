@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Accordion, Box, Text, IconButton } from '@chakra-ui/react';
+import { Accordion, Box } from '@chakra-ui/react';
 import TaskCard from './TaskCard';
 import {
   FilterBy,
@@ -11,18 +11,18 @@ import {
 
 import { useQuery } from '@tanstack/react-query';
 import PaginationButtons from 'src/components/PaginationButtons';
-import { FilterBox } from 'src/components/FilterBox';
 import TitleRow from 'src/components/TitleRow';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowBackIcon } from '@chakra-ui/icons';
 import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
 import TaskGroupCard from './TaskGroupCard';
 import { isStatus } from 'src/utils/determineStatus';
+import { HeaderBar } from './HeaderBar';
 
 const TaskList: React.FC = () => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
   const [sortAsc, setSortAsc] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const { taskName, page: rawPage } = useParams<{
     taskName?: string;
@@ -41,8 +41,9 @@ const TaskList: React.FC = () => {
           currentSort,
           sortAsc,
           taskName,
+          searchTerm,
         ]
-      : [TASK_QUERY_KEY, currentFilter, page, currentSort, sortAsc],
+      : [TASK_QUERY_KEY, currentFilter, page, currentSort, sortAsc, searchTerm],
     () =>
       isDetailsView
         ? getTask(
@@ -50,6 +51,7 @@ const TaskList: React.FC = () => {
             { pageNumber: page - 1, limit: limit },
             currentSort,
             sortAsc,
+            searchTerm,
             taskName,
           )
         : getTasks(
@@ -57,6 +59,7 @@ const TaskList: React.FC = () => {
             { pageNumber: page - 1, limit: limit },
             currentSort,
             sortAsc,
+            searchTerm,
           ),
   );
   const navigate = useNavigate();
@@ -80,24 +83,15 @@ const TaskList: React.FC = () => {
 
   return (
     <Box>
-      <Box display={'flex'} mb={14} alignItems={'center'}>
-        {isDetailsView && (
-          <IconButton
-            icon={<ArrowBackIcon boxSize={8} />}
-            onClick={() => navigate('/')}
-            aria-label={'Back button'}
-            variant={'ghost'}
-            isRound
-          />
-        )}
-        <Text ml={5} fontSize={'3xl'} fontWeight={'semibold'}>
-          {isDetailsView ? taskName : 'All Tasks'}
-        </Text>
-        <FilterBox
-          currentFilter={currentFilter}
-          setCurrentFilter={setCurrentFilter}
-        />
-      </Box>
+      <HeaderBar
+        title={isDetailsView ? taskName : 'All Tasks'}
+        inputPlaceholder={`search for ${isDetailsView ? '' : 'name or'}task id`}
+        taskName={taskName || ''}
+        currentFilter={currentFilter}
+        setCurrentFilter={setCurrentFilter}
+        setSearchTerm={setSearchTerm}
+      />
+
       <TitleRow
         currentSort={currentSort}
         setCurrentSort={setCurrentSort}
