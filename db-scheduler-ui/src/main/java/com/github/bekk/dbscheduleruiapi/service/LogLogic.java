@@ -69,7 +69,7 @@ public class LogLogic {
           rs.getLong("id"),
           rs.getString("task_name"),
           rs.getString("task_instance"),
-          rs.getString("task_data"),
+          rs.getBytes("task_data"),
           rs.getTimestamp("time_started").toInstant(),
           rs.getTimestamp("time_finished").toInstant(),
           rs.getBoolean("succeeded"),

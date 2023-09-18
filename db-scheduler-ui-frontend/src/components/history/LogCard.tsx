@@ -21,6 +21,7 @@ export const LogCard: React.FC<LogCardProps> = ({ log }) => (
       id={log.id}
       taskInstance={log.taskInstance}
       taskName={log.taskName}
+      taskData={log.taskData}
       exceptionClass={log.exceptionClass}
       exceptionMessage={log.exceptionMessage}
       timeFinished={log.timeFinished}

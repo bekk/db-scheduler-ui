@@ -1,12 +1,16 @@
 package com.github.bekk.dbscheduleruiapi.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.util.SerializationUtils;
+
+import java.io.IOException;
 import java.time.Instant;
 
 public class LogModel {
   private final Long id;
   private final String taskName;
   private final String taskInstance;
-  private final String taskData;
+  private final Object taskData;
   private final Instant timeStarted;
   private final Instant timeFinished;
   private final boolean succeeded;
@@ -15,11 +19,14 @@ public class LogModel {
   private final String exceptionMessage;
   private final String exceptionStackTrace;
 
+  private static final ObjectMapper objectMapper = new ObjectMapper();
+
+
   public LogModel(
       Long id,
       String taskName,
       String taskInstance,
-      String taskData,
+      byte[] inputTaskData,
       Instant timeStarted,
       Instant timeFinished,
       boolean succeeded,
@@ -30,7 +37,7 @@ public class LogModel {
     this.id = id;
     this.taskName = taskName;
     this.taskInstance = taskInstance;
-    this.taskData = taskData;
+    this.taskData = stringTaskData(inputTaskData);
     this.timeStarted = timeStarted;
     this.timeFinished = timeFinished;
     this.succeeded = succeeded;
@@ -40,6 +47,20 @@ public class LogModel {
     this.exceptionStackTrace = exceptionStackTrace;
   }
 
+  private Object stringTaskData(byte[] inputTaskData){
+    try {
+      if (inputTaskData != null){
+        Object dataclass = SerializationUtils.deserialize(inputTaskData);
+        String serializedData = objectMapper.writeValueAsString(dataclass);
+        return objectMapper.readValue(serializedData, Object.class);
+        }
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+      return null;
+  }
+
+
   public String getTaskInstance() {
     return taskInstance;
   }
@@ -48,7 +69,7 @@ public class LogModel {
     return taskName;
   }
 
-  public String getTaskData() {
+  public Object getTaskData() {
     return taskData;
   }
 

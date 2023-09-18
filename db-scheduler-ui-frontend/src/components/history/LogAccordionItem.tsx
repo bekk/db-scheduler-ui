@@ -1,7 +1,7 @@
 import { AccordionPanel, Box, VStack } from '@chakra-ui/react';
 import colors from 'src/styles/colors';
 interface LogAccordionItemProps {
-  taskData: string | null;
+  taskData: object | null;
   stackTrace: string | null;
 }
 
