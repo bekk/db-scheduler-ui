@@ -1,5 +1,5 @@
 import React from 'react';
-import { Accordion, Box } from '@chakra-ui/react';
+import { Accordion, Box, Button, Flex } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 import { isStatus } from 'src/utils/determineStatus';
 import TaskCard from './TaskCard';
@@ -9,6 +9,7 @@ import { useInfiniteTaskScrolling } from 'src/hooks/useInfiniteTaskScrolling';
 import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
 import { TASK_QUERY_KEY, getTasks } from 'src/services/getTasks';
 import { HeaderBar } from './HeaderBar';
+import colors from 'src/styles/colors';
 
 const TaskList: React.FC = () => {
   const { taskName } = useParams<{ taskName?: string }>();
@@ -41,7 +42,9 @@ const TaskList: React.FC = () => {
     <Box>
       <HeaderBar
         title={isDetailsView ? taskName : 'All Tasks'}
-        inputPlaceholder={`search for ${isDetailsView ? '' : 'name or'}task id`}
+        inputPlaceholder={`search for ${
+          isDetailsView ? '' : 'name or '
+        }task id`}
         taskName={taskName || ''}
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}
@@ -70,16 +73,23 @@ const TaskList: React.FC = () => {
           ),
         )}
       </Accordion>
-      <button
-        onClick={() => fetchNextPage()}
-        disabled={!hasNextPage || isFetchingNextPage}
-      >
-        {isFetchingNextPage
-          ? 'Loading more...'
-          : hasNextPage
-          ? 'Load More'
-          : 'Nothing more to load'}
-      </button>
+      <Flex justifyContent="center" alignItems="center" mt={4}>
+        <Button
+          onClick={() => fetchNextPage()}
+          bgColor={'white'}
+          isDisabled={!hasNextPage || isFetchingNextPage}
+          borderColor={colors.primary}
+          borderWidth={1}
+          fontWeight={'medium'}
+          mb={24}
+        >
+          {isFetchingNextPage
+            ? 'Loading...'
+            : hasNextPage
+            ? 'Load More'
+            : 'Nothing more to load'}
+        </Button>
+      </Flex>
     </Box>
   );
 };
