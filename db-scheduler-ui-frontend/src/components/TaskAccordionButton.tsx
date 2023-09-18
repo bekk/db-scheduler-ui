@@ -49,7 +49,12 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
                 consecutiveFailures.find((val) => val > 0) ?? 0
               }
             />
-            {taskData[0] != null && <AttachmentIcon />}
+            {taskData[0] != null && (
+              <AttachmentIcon
+                position={'relative'}
+                style={{ marginLeft: '-25', marginBottom: '-26' }}
+              />
+            )}
           </Box>
           {!isDetailsView && (
             <Box

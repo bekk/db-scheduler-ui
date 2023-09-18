@@ -1,5 +1,6 @@
 import { AccordionPanel, Box, VStack } from '@chakra-ui/react';
 import colors from 'src/styles/colors';
+import { LogDataRow } from 'src/components/history/LogDataRow';
 interface LogAccordionItemProps {
   taskData: object | null;
   stackTrace: string | null;
@@ -7,6 +8,7 @@ interface LogAccordionItemProps {
 
 export const LogAccordionItem: React.FC<LogAccordionItemProps> = ({
   stackTrace,
+  taskData,
 }) => {
   return (
     <AccordionPanel>
@@ -31,6 +33,7 @@ export const LogAccordionItem: React.FC<LogAccordionItemProps> = ({
             ),
           )}
         </Box>
+        <LogDataRow taskData={taskData} />
       </VStack>
     </AccordionPanel>
   );
