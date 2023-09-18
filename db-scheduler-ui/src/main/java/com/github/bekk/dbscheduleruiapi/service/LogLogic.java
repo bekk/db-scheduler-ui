@@ -1,15 +1,15 @@
 package com.github.bekk.dbscheduleruiapi.service;
 
 import com.github.bekk.dbscheduleruiapi.model.LogModel;
+import com.github.bekk.dbscheduleruiapi.util.AndCondition;
+import com.github.bekk.dbscheduleruiapi.util.QueryBuilder;
 import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -27,39 +27,81 @@ public class LogLogic {
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
   }
 
-  public List<LogModel> getLogsById(TaskDetailsRequestParams requestParams) {
-    Map<String, Object> params = new HashMap<>();
-    params.put("taskName", requestParams.getTaskName());
-    params.put("taskInstance", requestParams.getTaskId());
-    StringBuilder baseQuery =
-        new StringBuilder(
-            "SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName AND task_instance = :taskInstance");
+  public List<LogModel> getLogs(
+      Optional<Instant> startInstant,
+      Optional<Instant> endInstant,
+      Optional<String> taskName,
+      Optional<String> taskInstance) {
 
-    List<String> conditions = new ArrayList<>();
-    QueryUtils.logSearchCondition(params, requestParams.getSearchTerm(), conditions);
-    QueryUtils.logFilterCondition(requestParams.getFilter(), conditions);
-
-    if (!conditions.isEmpty()) {
-      baseQuery.append(" AND ").append(String.join(" AND ", conditions));
-    }
-
-    baseQuery.append(" ORDER BY time_started DESC");
-    return namedParameterJdbcTemplate.query(baseQuery.toString(), params, new LogModelRowMapper());
+    QueryBuilder queryBuilder = QueryBuilder.selectFromTable("scheduled_execution_logs");
+    startInstant.ifPresent(
+        s -> queryBuilder.andCondition(new LogCondition("time_started", ">=", s.toString())));
+    endInstant.ifPresent(
+        e -> queryBuilder.andCondition(new LogCondition("time_finished", "<=", e.toString())));
+    taskName.ifPresent(tn -> queryBuilder.andCondition(new LogCondition("task_name", "=", tn)));
+    taskInstance.ifPresent(
+        ti -> queryBuilder.andCondition(new LogCondition("task_instance", "=", ti)));
+    queryBuilder.orderBy("time_started DESC");
+    queryBuilder.limit(500);
+    return namedParameterJdbcTemplate.query(
+        queryBuilder.getQuery(), queryBuilder.getParameters(), new LogModelRowMapper());
   }
 
-  public List<LogModel> getAllLogs(TaskDetailsRequestParams requestParams) {
-    StringBuilder baseQuery = new StringBuilder("SELECT * FROM scheduled_execution_logs");
-    Map<String, Object> params = new HashMap<>();
-    List<String> conditions = new ArrayList<>();
+    public List<LogModel> getLogsById(TaskDetailsRequestParams requestParams) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("taskName", requestParams.getTaskName());
+        params.put("taskInstance", requestParams.getTaskId());
+        StringBuilder baseQuery =
+                new StringBuilder(
+                        "SELECT * FROM scheduled_execution_logs WHERE task_name = :taskName AND task_instance = :taskInstance");
 
-    QueryUtils.logSearchCondition(params, requestParams.getSearchTerm(), conditions);
-    QueryUtils.logFilterCondition(requestParams.getFilter(), conditions);
-      if (!conditions.isEmpty()) {
-      baseQuery.append(" WHERE ").append(String.join(" AND ", conditions));
+        List<String> conditions = new ArrayList<>();
+        QueryUtils.logSearchCondition(params, requestParams.getSearchTerm(), conditions);
+        QueryUtils.logFilterCondition(requestParams.getFilter(), conditions);
+
+        if (!conditions.isEmpty()) {
+            baseQuery.append(" AND ").append(String.join(" AND ", conditions));
+        }
+
+        baseQuery.append(" ORDER BY time_started DESC");
+        return namedParameterJdbcTemplate.query(baseQuery.toString(), params, new LogModelRowMapper());
     }
 
-    baseQuery.append(" LIMIT 20");
-    return namedParameterJdbcTemplate.query(baseQuery.toString(), params, new LogModelRowMapper());
+    public List<LogModel> getAllLogs(TaskDetailsRequestParams requestParams) {
+        StringBuilder baseQuery = new StringBuilder("SELECT * FROM scheduled_execution_logs");
+        Map<String, Object> params = new HashMap<>();
+        List<String> conditions = new ArrayList<>();
+
+        QueryUtils.logSearchCondition(params, requestParams.getSearchTerm(), conditions);
+        QueryUtils.logFilterCondition(requestParams.getFilter(), conditions);
+        if (!conditions.isEmpty()) {
+            baseQuery.append(" WHERE ").append(String.join(" AND ", conditions));
+        }
+
+        baseQuery.append(" LIMIT 20");
+        return namedParameterJdbcTemplate.query(baseQuery.toString(), params, new LogModelRowMapper());
+    }
+
+  private static class LogCondition implements AndCondition {
+    private final String varName;
+    private final String operator;
+    private final String value;
+
+    public LogCondition(String varName, String operator, String value) {
+      this.varName = varName;
+      this.operator = operator;
+      this.value = value;
+    }
+
+    @Override
+    public String getQueryPart() {
+      return varName + " " + operator + " :" + varName;
+    }
+
+    @Override
+    public void setParameters(MapSqlParameterSource p) {
+      p.addValue(varName, value);
+    }
   }
 
   public static class LogModelRowMapper implements RowMapper<LogModel> {

@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { getLogs, LOG_QUERY_KEY } from 'src/services/getLogs';
 import { Accordion, Box, Flex, HStack, Text } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { Log } from 'src/models/Log';
@@ -19,13 +18,11 @@ export const LogList: React.FC = () => {
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
   const { data } = useQuery(
-    !taskName
-      ? [LOG_QUERY_KEY, taskName, currentFilter, searchTerm]
-      : [ALL_LOG_QUERY_KEY, currentFilter, searchTerm, startDate, endDate],
+   
+       [ALL_LOG_QUERY_KEY, currentFilter, searchTerm, startDate, endDate, taskName, taskInstance],
     () =>
-      !taskName
-        ? getAllLogs(currentFilter, searchTerm, startDate, endDate)
-        : getLogs(taskName!, taskInstance!, currentFilter, searchTerm),
+         getAllLogs(currentFilter, searchTerm, startDate, endDate, taskName, taskInstance)
+
   );
 
   return (

@@ -11,12 +11,16 @@ export const getAllLogs = async (
   endDate: Date | null,
   filter: FilterBy,
   searchTerm: string
+  taskName: string | undefined,
+  taskInstance: string | undefined,
 ) => {
   const queryParams = new URLSearchParams();
   queryParams.append('startDate', startDate?.toISOString() ?? '');
   queryParams.append('endDate', endDate?.toISOString() ?? '');
   queryParams.append('filter', filter.toUpperCase());
   queryParams.append('searchTerm', searchTerm.trim());
+  queryParams.append('taskName', taskName ?? '');
+  queryParams.append('taskInstance', taskInstance ?? '');
 
   const response = await fetch(`${API_BASE_URL}/logs/all?${queryParams}`, {
     method: 'GET',
