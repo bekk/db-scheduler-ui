@@ -1,84 +1,42 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import React from 'react';
 import { Accordion, IconButton, Box, Text } from '@chakra-ui/react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getTask, TASK_DETAILS_QUERY_KEY } from 'src/services/getTask';
-import {
-  FilterBy,
-  SortBy,
-  getTasks,
-  TASK_QUERY_KEY,
-} from 'src/services/getTasks';
 import { isStatus } from 'src/utils/determineStatus';
 import TaskCard from './TaskCard';
 import TaskGroupCard from './TaskGroupCard';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { FilterBox } from './FilterBox';
 import TitleRow from './TitleRow';
+import { useInfiniteTaskScrolling } from 'src/hooks/useInfiniteTaskScrolling';
+import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
+import { TASK_QUERY_KEY, getTasks } from 'src/services/getTasks';
 
 const TaskList: React.FC = () => {
-  const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
-  const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
-  const [sortAsc, setSortAsc] = useState<boolean>(true);
-
-  const { taskName } = useParams<{ taskName?: string }>();
   const navigate = useNavigate();
-  const limit = 10;
+  const { taskName } = useParams<{ taskName?: string }>();
   const isDetailsView = !!taskName;
-  const [refetchInterval, setRefetchInterval] = useState<number | false>(2000);
 
-  // TODO: Make a hook for the infinite scroll stuff
-  // TODO: Clear when switching between filters (now it reappears when you switch back to the original filter)
-  const fetchTasks = useCallback(
-    ({ pageParam = 0 }) => {
-      return isDetailsView
-        ? getTask(
-            currentFilter,
-            { pageNumber: pageParam, limit: limit },
-            currentSort,
-            sortAsc,
-            pageParam === 0 ? true : false,
-            taskName,
-          )
-        : getTasks(
-            currentFilter,
-            { pageNumber: pageParam, limit: limit },
-            currentSort,
-            sortAsc,
-            pageParam === 0 ? true : false,
-          );
-    },
-    [currentFilter, currentSort, sortAsc, taskName, isDetailsView],
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    currentFilter,
+    setCurrentFilter,
+    currentSort,
+    setCurrentSort,
+    sortAsc,
+    setSortAsc,
+  } = useInfiniteTaskScrolling(
+    isDetailsView
+      ? {
+          getTasksFunction: getTask,
+          taskName: taskName,
+          baseQueryKey: TASK_DETAILS_QUERY_KEY,
+        }
+      : { getTasksFunction: getTasks, baseQueryKey: TASK_QUERY_KEY },
   );
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
-    useInfiniteQuery(
-      isDetailsView
-        ? [
-            TASK_DETAILS_QUERY_KEY,
-            currentFilter,
-            currentSort,
-            sortAsc,
-            taskName,
-          ]
-        : [TASK_QUERY_KEY, currentFilter, currentSort, sortAsc],
-      fetchTasks,
-      {
-        getNextPageParam: (lastPage, allPages) => {
-          const nextPage = allPages.length + 1;
-          return nextPage <= lastPage.numberOfPages ? nextPage : undefined;
-        },
-        refetchInterval: refetchInterval,
-      },
-    );
-
-  useEffect(() => {
-    if ((data?.pages?.length || 0) > 1) {
-      setRefetchInterval(false);
-    } else {
-      setRefetchInterval(2000);
-    }
-  }, [data]);
 
   return (
     <Box>
