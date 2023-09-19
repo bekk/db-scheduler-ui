@@ -55,6 +55,7 @@ public class TaskRequestParams {
   public String getSearchTerm() {
     return searchTerm;
   }
+
   public Instant getStartTime() {
     return startTime;
   }

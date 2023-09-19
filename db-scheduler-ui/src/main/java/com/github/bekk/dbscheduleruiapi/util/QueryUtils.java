@@ -1,7 +1,6 @@
 package com.github.bekk.dbscheduleruiapi.util;
 
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
-import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskFilter;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskSort;
 import java.time.Instant;
@@ -76,9 +75,7 @@ public class QueryUtils {
         .collect(Collectors.toList());
   }
 
-  public static String logSearchCondition(
-      String searchTerm,
-    Map<String, Object> params) {
+  public static String logSearchCondition(String searchTerm, Map<String, Object> params) {
     StringBuilder conditions = new StringBuilder();
     List<String> terms = splitSearchTerm(searchTerm);
     if (terms.size() > 0) {
@@ -93,9 +90,9 @@ public class QueryUtils {
                 + "))");
         params.put(termKey, "%" + terms.get(i) + "%");
       }
-     return conditions.append(String.join(" AND ", termConditions)).toString();
+      return conditions.append(String.join(" AND ", termConditions)).toString();
     }
-      return "";
+    return "";
   }
 
   private static List<String> splitSearchTerm(String searchTerm) {
