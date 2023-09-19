@@ -15,12 +15,13 @@ export const getAllLogs = async (
   taskInstance: string | undefined,
 ) => {
   const queryParams = new URLSearchParams();
-  queryParams.append('startTime', startTime?.toISOString() ?? '');
-  queryParams.append('endTime', endTime?.toISOString() ?? '');
-  queryParams.append('filter', filter.toUpperCase());
-  queryParams.append('searchTerm', searchTerm.trim());
-  queryParams.append('taskName', taskName ?? '');
-  queryParams.append('taskInstance', taskInstance ?? '');
+
+  startTime && queryParams.append('startTime', startTime.toISOString());
+  endTime && queryParams.append('endTime', endTime.toISOString());
+  filter && queryParams.append('filter', filter.toUpperCase());
+  searchTerm && queryParams.append('searchTerm', searchTerm.trim());
+  taskName && queryParams.append('taskName', taskName);
+  taskInstance && queryParams.append('taskInstance', taskInstance);
 
   const response = await fetch(`${API_BASE_URL}/logs/all?${queryParams}`, {
     method: 'GET',

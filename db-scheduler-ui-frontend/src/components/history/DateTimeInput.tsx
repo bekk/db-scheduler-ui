@@ -27,7 +27,7 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
         timeFormat={'HH:mm'}
         dateFormat={'yyyy-MM-dd HH:mm'}
         placeholderText={'YYYY-MM-DD HH:mm'}
-        useWeekdaysShort={true}
+        useWeekdaysShort
       ></DatePicker>
     </Box>
   );

@@ -86,10 +86,7 @@ export const LogList: React.FC = () => {
       </HStack>
       <Accordion allowMultiple>
         {data?.map((log: Log) => (
-          <LogCard
-            key={log.id + log.taskName + log.taskInstance + log.id}
-            log={log}
-          />
+          <LogCard key={log.id + log.taskName + log.taskInstance} log={log} />
         ))}
       </Accordion>
     </Box>

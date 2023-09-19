@@ -22,6 +22,8 @@ public class LogLogic {
 
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+  private static final int DEFAULT_LIMIT = 500;
+
   @Autowired
   public LogLogic(DataSource dataSource) {
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
@@ -29,19 +31,32 @@ public class LogLogic {
 
   public List<LogModel> getLogs(TaskDetailsRequestParams requestParams) {
     QueryBuilder queryBuilder = QueryBuilder.selectFromTable("scheduled_execution_logs");
-    queryBuilder.andCondition(
-        new TimeCondition("time_started", ">=", requestParams.getStartTime()));
-    queryBuilder.andCondition(new TimeCondition("time_finished", "<=", requestParams.getEndTime()));
+    if (requestParams.getStartTime() != null) {
+      queryBuilder.andCondition(
+          new TimeCondition(
+              "time_started",
+              Operators.GREATER_THAN_OR_EQUALS.getOperator(),
+              requestParams.getStartTime()));
+    }
+    if (requestParams.getEndTime() != null) {
+      queryBuilder.andCondition(
+          new TimeCondition(
+              "time_started",
+              Operators.LESS_THAN_OR_EQUALS.getOperator(),
+              requestParams.getEndTime()));
+    }
     if (requestParams.getFilter() != null
         && requestParams.getFilter() != TaskRequestParams.TaskFilter.ALL) {
       queryBuilder.andCondition(new FilterCondition(requestParams.getFilter()));
     }
-
-    if (requestParams.getSearchTerm() != null && !requestParams.getSearchTerm().isEmpty()) {
+    if (requestParams.getSearchTerm() != null) {
       queryBuilder.andCondition(
           new SearchCondition(requestParams.getSearchTerm(), new HashMap<>()));
     }
-    queryBuilder.limit(20);
+
+    queryBuilder.orderBy("time_started DESC");
+
+    queryBuilder.limit(DEFAULT_LIMIT);
 
     return namedParameterJdbcTemplate.query(
         queryBuilder.getQuery(), queryBuilder.getParameters(), new LogModelRowMapper());
@@ -127,6 +142,21 @@ public class LogLogic {
           rs.getString("exception_class"),
           rs.getString("exception_message"),
           rs.getString("exception_stacktrace"));
+    }
+  }
+
+  private enum Operators {
+    GREATER_THAN_OR_EQUALS(">="),
+    LESS_THAN_OR_EQUALS("<=");
+
+    private final String operator;
+
+    Operators(String operator) {
+      this.operator = operator;
+    }
+
+    public String getOperator() {
+      return operator;
     }
   }
 }
