@@ -11,7 +11,7 @@ import { TaskRunButton } from 'src/components/TaskRunButton';
 import React from 'react';
 import { DotButton } from 'src/components/DotButton';
 import { dateFormatText } from 'src/utils/dateFormatText';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Task } from 'src/models/Task';
 import { NumberCircleGroup } from './NumberCircleGroup';
 import { AttachmentIcon } from '@chakra-ui/icons';
@@ -34,12 +34,21 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
     refetch,
   } = props;
   const { taskName: isDetailsView } = useParams<{ taskName?: string }>();
+  const navigate = useNavigate();
   return (
     <h2>
       <AccordionButton
+        borderRadius={4}
         background={colors.primary['100']}
         _hover={{ backgroundColor: colors.primary['100'] }}
-        cursor={!isStatus('Group', props) ? 'pointer' : 'default'}
+        onClick={(event) => {
+          event.stopPropagation();
+          isStatus('Group', props)
+            ? navigate(`/${taskName}`, {
+                state: { taskName: taskName },
+              })
+            : undefined;
+        }}
       >
         <HStack w={'100%'} spacing={5}>
           <Box flex="1" display="inline-flex" alignItems={'center'}>
