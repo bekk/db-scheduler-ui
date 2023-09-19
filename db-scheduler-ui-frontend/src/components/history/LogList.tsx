@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getLogs, LOG_QUERY_KEY } from 'src/services/getLogs';
-import { Accordion, Box, HStack } from '@chakra-ui/react';
+import { Accordion, Box, Flex, HStack, Text } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { Log } from 'src/models/Log';
 import { LogCard } from 'src/components/history/LogCard';
@@ -9,20 +8,34 @@ import colors from 'src/styles/colors';
 import { HeaderBar } from '../HeaderBar';
 import { FilterBy } from 'src/services/getTasks';
 import { ALL_LOG_QUERY_KEY, getAllLogs } from 'src/services/getAllLogs';
+import { DateTimeInput } from 'src/components/history/DateTimeInput';
 
 export const LogList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
 
   const { taskName, taskInstance } = useParams();
+  const [startTime, setStartTime] = React.useState<Date | null>(null);
+  const [endTime, setEndTime] = React.useState<Date | null>(null);
   const { data } = useQuery(
-    !taskName
-      ? [LOG_QUERY_KEY, taskName, currentFilter, searchTerm]
-      : [ALL_LOG_QUERY_KEY, currentFilter, searchTerm],
+    [
+      ALL_LOG_QUERY_KEY,
+      currentFilter,
+      searchTerm,
+      startTime,
+      endTime,
+      taskName,
+      taskInstance,
+    ],
     () =>
-      !taskName
-        ? getAllLogs(currentFilter, searchTerm)
-        : getLogs(taskName!, taskInstance!, currentFilter, searchTerm),
+      getAllLogs(
+        currentFilter,
+        searchTerm,
+        startTime,
+        endTime,
+        taskName,
+        taskInstance,
+      ),
   );
 
   return (
@@ -38,6 +51,21 @@ export const LogList: React.FC = () => {
         setSearchTerm={setSearchTerm}
         history
       />
+      <Box mb={14}>
+        <Flex alignItems={'center'}>
+          <DateTimeInput
+            selectedDate={startTime}
+            onChange={(date) => {
+              setStartTime(date);
+            }}
+          />
+          <Text mx={3}>-</Text>
+          <DateTimeInput
+            selectedDate={endTime}
+            onChange={(date) => setEndTime(date)}
+          />
+        </Flex>
+      </Box>
       <HStack
         display={'flex'}
         p="8px 16px"
@@ -58,7 +86,10 @@ export const LogList: React.FC = () => {
       </HStack>
       <Accordion allowMultiple>
         {data?.map((log: Log) => (
-          <LogCard key={log.taskName + log.taskInstance + log.id} log={log} />
+          <LogCard
+            key={log.id + log.taskName + log.taskInstance + log.id}
+            log={log}
+          />
         ))}
       </Accordion>
     </Box>

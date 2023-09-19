@@ -1,5 +1,7 @@
 package com.github.bekk.dbscheduleruiapi.model;
 
+import java.time.Instant;
+
 public class TaskRequestParams {
 
   private final TaskFilter filter;
@@ -8,6 +10,8 @@ public class TaskRequestParams {
   private final TaskSort sorting;
   private final boolean asc;
   private final String searchTerm;
+  private final Instant startTime;
+  private final Instant endTime;
 
   public TaskRequestParams(
       TaskFilter filter,
@@ -15,13 +19,17 @@ public class TaskRequestParams {
       Integer size,
       TaskSort sorting,
       Boolean asc,
-      String searchTerm) {
+      String searchTerm,
+      Instant startTime,
+      Instant endTime) {
     this.filter = filter;
     this.pageNumber = pageNumber != null ? pageNumber : 0;
     this.size = size != null ? size : 10;
     this.sorting = sorting;
     this.asc = asc != null ? asc : true;
     this.searchTerm = searchTerm;
+    this.startTime = startTime != null ? startTime : Instant.MIN;
+    this.endTime = endTime != null ? endTime : Instant.MAX;
   }
 
   public TaskFilter getFilter() {
@@ -46,6 +54,14 @@ public class TaskRequestParams {
 
   public String getSearchTerm() {
     return searchTerm;
+  }
+
+  public Instant getStartTime() {
+    return startTime;
+  }
+
+  public Instant getEndTime() {
+    return endTime;
   }
 
   public enum TaskFilter {
