@@ -15,14 +15,27 @@ export const LogList: React.FC = () => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
 
   const { taskName, taskInstance } = useParams();
-  const [startDate, setStartDate] = React.useState<Date | null>(null);
-  const [endDate, setEndDate] = React.useState<Date | null>(null);
+  const [startTime, setStartTime] = React.useState<Date | null>(null);
+  const [endTime, setEndTime] = React.useState<Date | null>(null);
   const { data } = useQuery(
-   
-       [ALL_LOG_QUERY_KEY, currentFilter, searchTerm, startDate, endDate, taskName, taskInstance],
+    [
+      ALL_LOG_QUERY_KEY,
+      currentFilter,
+      searchTerm,
+      startTime,
+      endTime,
+      taskName,
+      taskInstance,
+    ],
     () =>
-         getAllLogs(currentFilter, searchTerm, startDate, endDate, taskName, taskInstance)
-
+      getAllLogs(
+        currentFilter,
+        searchTerm,
+        startTime,
+        endTime,
+        taskName,
+        taskInstance,
+      ),
   );
 
   return (
@@ -41,15 +54,15 @@ export const LogList: React.FC = () => {
       <Box mb={14}>
         <Flex alignItems={'center'}>
           <DateTimeInput
-            selectedDate={startDate}
+            selectedDate={startTime}
             onChange={(date) => {
-              setStartDate(date);
+              setStartTime(date);
             }}
           />
           <Text mx={3}>-</Text>
           <DateTimeInput
-            selectedDate={endDate}
-            onChange={(date) => setEndDate(date)}
+            selectedDate={endTime}
+            onChange={(date) => setEndTime(date)}
           />
         </Flex>
       </Box>
@@ -73,7 +86,10 @@ export const LogList: React.FC = () => {
       </HStack>
       <Accordion allowMultiple>
         {data?.map((log: Log) => (
-          <LogCard key={log.id + log.taskName + log.taskInstance + log.id} log={log} />
+          <LogCard
+            key={log.id + log.taskName + log.taskInstance + log.id}
+            log={log}
+          />
         ))}
       </Accordion>
     </Box>

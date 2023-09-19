@@ -12,6 +12,7 @@ public class QueryBuilder {
   private final String tableName;
 
   private final List<AndCondition> andConditions = new ArrayList<>();
+
   private Optional<String> orderBy = empty();
 
   private Optional<Integer> limit = empty();

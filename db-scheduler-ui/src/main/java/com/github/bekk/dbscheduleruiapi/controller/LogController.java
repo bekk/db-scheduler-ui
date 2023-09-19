@@ -21,14 +21,9 @@ public class LogController {
     this.logLogic = logLogic;
   }
 
-  @GetMapping("/id")
-  public List<LogModel> getLogsById(TaskDetailsRequestParams params) {
-    return logLogic.getLogsById(params);
-  }
-
   @GetMapping("/all")
   public List<LogModel> getAllLogs(
       TaskDetailsRequestParams params) {
-    return logLogic.getAllLogs(params);
+    return logLogic.getLogs(params);
   }
 }
