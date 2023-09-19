@@ -53,8 +53,8 @@ public class LogLogic {
       queryBuilder.andCondition(
           new SearchCondition(requestParams.getSearchTerm(), new HashMap<>()));
     }
-
-    queryBuilder.orderBy("time_started DESC");
+    queryBuilder.limit(20);
+    queryBuilder.orderBy(requestParams.isAsc() ? "time_started desc" : "time_started asc");
 
     queryBuilder.limit(DEFAULT_LIMIT);
 
