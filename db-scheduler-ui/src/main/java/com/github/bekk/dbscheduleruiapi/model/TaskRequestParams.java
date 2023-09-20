@@ -28,8 +28,8 @@ public class TaskRequestParams {
     this.sorting = sorting;
     this.asc = asc != null ? asc : true;
     this.searchTerm = searchTerm;
-    this.startTime = startTime != null ? startTime : Instant.MIN;
-    this.endTime = endTime != null ? endTime : Instant.MAX;
+    this.startTime = startTime;
+    this.endTime = endTime;
   }
 
   public TaskFilter getFilter() {
@@ -69,11 +69,11 @@ public class TaskRequestParams {
     FAILED,
     RUNNING,
     SCHEDULED,
-    SUCCEEDED;
+    SUCCEEDED
   }
 
   public enum TaskSort {
     DEFAULT,
-    NAME;
+    NAME
   }
 }
