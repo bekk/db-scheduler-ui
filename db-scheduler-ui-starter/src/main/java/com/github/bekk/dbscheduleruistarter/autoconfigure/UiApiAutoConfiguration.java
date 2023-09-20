@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
@@ -29,6 +30,7 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
+  @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "history", havingValue = "true")
   public LogLogic logLogic(DataSource dataSource) {
     return new LogLogic(dataSource);
   }
@@ -41,6 +43,7 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
+  @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "history", havingValue = "true")
   public LogController logController(LogLogic logLogic) {
     return new LogController(logLogic);
   }
