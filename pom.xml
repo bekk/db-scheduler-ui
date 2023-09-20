@@ -3,19 +3,60 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.bekk</groupId>
+    <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-parent</artifactId>
     <version>main-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <name>db-scheduler-ui: Parent</name>
     <description>Provides a UI for db-scheduler</description>
+    <url>https://github.com/bekk/db-scheduler-ui</url>
+    <inceptionYear>2023</inceptionYear>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.release>11</maven.compiler.release>
         <spring-boot.version>2.7.15</spring-boot.version>
         <db-scheduler.version>12.5.0</db-scheduler.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Svein Manum</name>
+            <email>svein.manum@bekk.no</email>
+        </developer>
+        <developer>
+            <name>Johanna Björemo</name>
+            <email>johanna.bjoremo@bekk.no</email>
+        </developer>
+        <developer>
+            <name>Eskil Torland</name>
+            <email>eskil.torland@bekk.no</email>
+        </developer>
+        <developer>
+            <name>Vegard Rognstad Smines</name>
+            <email>vegard.smines@bekk.no</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/bekk/db-scheduler-ui.git</connection>
+        <developerConnection>scm:git:https://github.com/bekk/db-scheduler-ui.git</developerConnection>
+        <url>https://github.com/bekk/db-scheduler-ui.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
 
     <dependencyManagement>
         <dependencies>
@@ -53,6 +94,42 @@
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.10.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.5.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jreleaser</groupId>
+                    <artifactId>jreleaser-maven-plugin</artifactId>
+                    <version>1.8.0</version>
+                    <configuration>
+                        <jreleaser>
+                            <release>
+                                <github>
+                                    <enabled>true</enabled>
+                                    <skipTag>true</skipTag>
+                                    <skipRelease>true</skipRelease>
+                                </github>
+                            </release>
+                        </jreleaser>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -98,6 +175,60 @@
                     <doclint>none</doclint>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jreleaser</groupId>
+                <artifactId>jreleaser-maven-plugin</artifactId>
+                <inherited>false</inherited>
+                <configuration>
+                    <jreleaser>
+                        <signing>
+                            <active>ALWAYS</active>
+                            <armored>true</armored>
+                        </signing>
+                        <release>
+                            <github>
+                                <enabled>true</enabled>
+                                <skipTag>true</skipTag>
+                                <skipRelease>true</skipRelease>
+                            </github>
+                        </release>
+                        <deploy>
+                            <maven>
+                                <nexus2>
+                                    <maven-central>
+                                        <active>ALWAYS</active>
+                                        <url>https://oss.sonatype.org/service/local/</url>
+                                        <snapshotUrl>https://oss.sonatype.org/content/repositories/snapshots</snapshotUrl>
+                                        <closeRepository>true</closeRepository>
+                                        <releaseRepository>false</releaseRepository>
+                                        <stagingRepositories>target/staging-deploy</stagingRepositories>
+                                    </maven-central>
+                                </nexus2>
+                            </maven>
+                        </deploy>
+                    </jreleaser>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -108,10 +239,57 @@
     </modules>
 
     <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
         <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/bekk/db-scheduler-ui</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>publication</id>
+            <properties>
+                <altDeploymentRepository>local::file:./target/staging-deploy</altDeploymentRepository>
+            </properties>
+            <build>
+                <defaultGoal>deploy</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

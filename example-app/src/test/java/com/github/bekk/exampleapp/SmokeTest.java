@@ -3,8 +3,8 @@ package com.github.bekk.exampleapp;
 import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.ONE_TIME_TASK;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.github.bekk.dbscheduleruiapi.controller.TaskController;
-import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
+import no.bekk.dbscheduler.ui.controller.TaskController;
+import no.bekk.dbscheduler.ui.model.GetTasksResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

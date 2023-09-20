@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.github.bekk</groupId>
+        <groupId>no.bekk.db-scheduler-ui</groupId>
         <artifactId>db-scheduler-ui-parent</artifactId>
         <version>main-SNAPSHOT</version>
     </parent>
@@ -37,11 +37,6 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.bekk</groupId>
-            <artifactId>db-scheduler-ui-starter</artifactId>
-            <version>main-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -83,6 +78,11 @@
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>no.bekk.db-scheduler-ui</groupId>
+            <artifactId>db-scheduler-ui-starter</artifactId>
+            <version>main-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
