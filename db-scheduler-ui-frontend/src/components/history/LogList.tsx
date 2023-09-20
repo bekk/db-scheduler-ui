@@ -1,18 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { Accordion, Box, Flex, HStack, Text } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Log } from 'src/models/Log';
 import { LogCard } from 'src/components/history/LogCard';
 import { useParams } from 'react-router-dom';
 import colors from 'src/styles/colors';
 import { HeaderBar } from '../HeaderBar';
-import { FilterBy } from 'src/services/getTasks';
+import { FilterBy, SortBy } from 'src/services/getTasks';
 import { ALL_LOG_QUERY_KEY, getAllLogs } from 'src/services/getAllLogs';
 import { DateTimeInput } from 'src/components/history/DateTimeInput';
+import { SortButton } from 'src/components/SortButton';
 
 export const LogList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
+  const [sortAsc, setSortAsc] = useState<boolean>(true);
+  const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
 
   const { taskName, taskInstance } = useParams();
   const [startTime, setStartTime] = React.useState<Date | null>(null);
@@ -26,6 +29,8 @@ export const LogList: React.FC = () => {
       endTime,
       taskName,
       taskInstance,
+      sortAsc,
+      currentSort,
     ],
     () =>
       getAllLogs(
@@ -35,8 +40,14 @@ export const LogList: React.FC = () => {
         endTime,
         taskName,
         taskInstance,
+        sortAsc,
+        currentSort,
       ),
   );
+
+  useEffect(() => {
+    setSortAsc(true);
+  }, [currentSort]);
 
   return (
     <Box>
@@ -76,11 +87,16 @@ export const LogList: React.FC = () => {
         textAlign="left"
       >
         <Box flex="1">Status</Box>
-        <Box flex="2" hidden={!!taskName}>
-          Task Name
-        </Box>
+        <Box flex={2}>Task Name</Box>
         <Box flex="2">Task-ID</Box>
-        <Box flex="2">Time Finished</Box>
+        <SortButton
+          currentSort={currentSort}
+          setCurrentSort={setCurrentSort}
+          sortAsc={sortAsc}
+          setSortAsc={setSortAsc}
+          title={'Time Finished'}
+          name={SortBy.Default}
+        ></SortButton>
         <Box flex="2">Exception Message</Box>
         <Box flex="0.2" />
       </HStack>
