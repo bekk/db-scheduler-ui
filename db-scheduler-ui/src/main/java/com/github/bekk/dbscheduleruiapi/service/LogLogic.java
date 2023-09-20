@@ -41,7 +41,7 @@ public class LogLogic {
     if (requestParams.getEndTime() != null) {
       queryBuilder.andCondition(
           new TimeCondition(
-              "time_started",
+              "time_finished",
               Operators.LESS_THAN_OR_EQUALS.getOperator(),
               requestParams.getEndTime()));
     }
