@@ -1,9 +1,6 @@
 package com.github.bekk.dbscheduleruiapi.service;
 
-import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
-import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
-import com.github.bekk.dbscheduleruiapi.model.TaskModel;
-import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
+import com.github.bekk.dbscheduleruiapi.model.*;
 import com.github.bekk.dbscheduleruiapi.util.Caching;
 import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
 import com.github.bekk.dbscheduleruiapi.util.mapper.TaskMapper;
@@ -68,7 +65,9 @@ public class TaskLogic {
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(
-              QueryUtils.search(tasks, params.getSearchTerm()), params.getFilter()), params.getSorting(), params.isAsc());
+                QueryUtils.search(tasks, params.getSearchTerm()), params.getFilter()),
+            params.getSorting(),
+            params.isAsc());
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
     return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
@@ -108,5 +107,31 @@ public class TaskLogic {
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
     return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
+  }
+
+  public PollResponse pollTasks(TaskRequestParams params) {
+    // Fetch all tasks from the database
+    List<ScheduledExecution<Object>> allTasks = caching.getExecutionsFromDBWithoutUpdatingCache(scheduler);
+
+    int newFailures = 0;
+    int newRunning = 0;
+    int newTasks = 0;
+
+    for (ScheduledExecution<Object> task : allTasks) {
+      boolean isFailed = task.getConsecutiveFailures() > 0;
+      boolean isRunning = task.getPickedBy()!=null;
+
+      if (!caching.isTaskInCache(task.getTaskInstance(), isFailed ? "FAILED" : "NOT_FAILED")) {
+        newTasks++;
+        if (isFailed) {
+          newFailures++;
+        }
+        if (isRunning) {
+          newRunning++;
+        }
+      }
+    }
+
+    return new PollResponse(newFailures, newRunning, newTasks);
   }
 }

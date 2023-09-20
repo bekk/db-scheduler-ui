@@ -66,12 +66,15 @@ public class QueryUtils {
     List<String> terms = splitSearchTerm(searchTerm);
 
     return tasks.stream()
-            .filter(task -> {
+        .filter(
+            task -> {
               for (String term : terms) {
                 String lowerCaseTerm = term.toLowerCase();
                 boolean isTermInTaskName = task.getTaskName().toLowerCase().contains(lowerCaseTerm);
-                boolean isTermInAnyTaskInstance = task.getTaskInstance().stream()
-                        .anyMatch(instance ->
+                boolean isTermInAnyTaskInstance =
+                    task.getTaskInstance().stream()
+                        .anyMatch(
+                            instance ->
                                 instance != null && instance.toLowerCase().contains(lowerCaseTerm));
                 if (!isTermInTaskName && !isTermInAnyTaskInstance) {
                   return false;
@@ -79,10 +82,8 @@ public class QueryUtils {
               }
               return true;
             })
-            .collect(Collectors.toList());
+        .collect(Collectors.toList());
   }
-
-
 
   public static void logSearchCondition(
       Map<String, Object> params, String searchTerm, List<String> conditions) {

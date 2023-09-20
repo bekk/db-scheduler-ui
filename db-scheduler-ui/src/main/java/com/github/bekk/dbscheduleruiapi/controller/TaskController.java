@@ -1,6 +1,7 @@
 package com.github.bekk.dbscheduleruiapi.controller;
 
 import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
+import com.github.bekk.dbscheduleruiapi.model.PollResponse;
 import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 import com.github.bekk.dbscheduleruiapi.service.TaskLogic;
@@ -26,6 +27,11 @@ public class TaskController {
   @GetMapping("/details")
   public GetTasksResponse getTaskDetails(TaskDetailsRequestParams params) {
     return taskLogic.getTask(params);
+  }
+
+  @GetMapping("/poll")
+  public PollResponse pollForUpdates(TaskDetailsRequestParams params){ // TODO: Make work for TaskRequestParams
+    return taskLogic.pollTasks(params);
   }
 
   @PostMapping("/rerun")

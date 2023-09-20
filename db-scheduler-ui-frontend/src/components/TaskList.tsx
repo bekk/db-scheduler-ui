@@ -15,6 +15,8 @@ const TaskList: React.FC = () => {
   const { taskName } = useParams<{ taskName?: string }>();
   const isDetailsView = !!taskName;
 
+  // TODO: Make no-polling default
+  // TODO: Add a way to force refresh
   const {
     data,
     fetchNextPage,

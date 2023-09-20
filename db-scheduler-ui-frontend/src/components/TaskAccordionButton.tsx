@@ -37,6 +37,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
   return (
     <h2>
       <AccordionButton
+        as={'div'}
         background={colors.primary['100']}
         _hover={{ backgroundColor: colors.primary['100'] }}
         cursor={!isStatus('Group', props) ? 'pointer' : 'default'}

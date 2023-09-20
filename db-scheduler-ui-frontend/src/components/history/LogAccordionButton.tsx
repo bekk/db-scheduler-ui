@@ -23,7 +23,8 @@ export const LogAccordionButton: React.FC<LogAccordionButtonProps> = (
     <h2>
       <AccordionButton
         justifyContent={'space-between'}
-        _hover={{ backgroundColor: colors.primary['100'] }}
+        _hover={{ backgroundColor: colors.primary['100'], cursor: 'pointer' }}
+        as={'div'}
       >
         <HStack w={'100%'} spacing={5}>
           <Box flex="1" display="inline-flex">

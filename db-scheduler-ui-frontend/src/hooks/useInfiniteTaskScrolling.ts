@@ -1,7 +1,8 @@
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useRef, useMemo } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { FilterBy, SortBy, getTasks } from 'src/services/getTasks';
 import { getTask } from 'src/services/getTask';
+import { TasksResponse } from 'src/models/TasksResponse';
 
 interface UseInfiniteTaskScrollingProps {
   getTasksFunction: typeof getTasks | typeof getTask;
@@ -19,7 +20,6 @@ export const useInfiniteTaskScrolling = ({
   const [sortAsc, setSortAsc] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const limit = 10;
-  const [refetchInterval, setRefetchInterval] = useState<number | false>(2000);
 
   const prevFilterRef = useRef<FilterBy>();
   const prevSortRef = useRef<SortBy>();
@@ -28,6 +28,16 @@ export const useInfiniteTaskScrolling = ({
 
   const queryClient = useQueryClient();
 
+  const queryKey = useMemo(() => [
+    baseQueryKey,
+    currentFilter,
+    currentSort,
+    sortAsc,
+    ...(taskName ? [taskName] : []),
+    searchTerm,
+  ], [baseQueryKey, currentFilter, currentSort, sortAsc, taskName, searchTerm]);
+  
+
   const fetchTasks = useCallback(
     ({ pageParam = 0 }) => {
       const hasFilterChanged = prevFilterRef.current !== currentFilter;
@@ -35,12 +45,9 @@ export const useInfiniteTaskScrolling = ({
       const hasSortAscChanged = prevSortAscRef.current !== sortAsc;
       const hasSearchTermChanged = prevSearchTermRef.current !== searchTerm;
 
-      if (
-        hasFilterChanged ||
-        hasSortChanged ||
-        hasSortAscChanged ||
-        hasSearchTermChanged
-      ) {
+      const shouldRefresh = pageParam === 0 || hasFilterChanged || hasSortChanged || hasSortAscChanged || hasSearchTermChanged;
+
+      if (hasFilterChanged || hasSortChanged || hasSortAscChanged || hasSearchTermChanged) {
         queryClient.removeQueries(queryKey);
       }
 
@@ -48,8 +55,6 @@ export const useInfiniteTaskScrolling = ({
       prevSortRef.current = currentSort;
       prevSortAscRef.current = sortAsc;
       prevSearchTermRef.current = searchTerm;
-
-      const shouldRefresh = pageParam === 0;
 
       if (taskName) {
         return getTasksFunction(
@@ -72,42 +77,18 @@ export const useInfiniteTaskScrolling = ({
         );
       }
     },
-    [
-      currentFilter,
-      currentSort,
-      sortAsc,
-      taskName,
-      getTasksFunction,
-      searchTerm,
-      queryClient,
-    ],
+    [currentFilter, currentSort, sortAsc, searchTerm, taskName, queryClient, queryKey, getTasksFunction],
   );
 
-  const queryKey = [
-    baseQueryKey,
-    currentFilter,
-    currentSort,
-    sortAsc,
-    ...(taskName ? [taskName] : []),
-    searchTerm,
-  ];
+
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
-    useInfiniteQuery(queryKey, fetchTasks, {
+    useInfiniteQuery<TasksResponse>(queryKey, fetchTasks, {
       getNextPageParam: (lastPage, allPages) => {
         const nextPage = allPages.length + 1;
         return nextPage <= lastPage.numberOfPages ? nextPage : undefined;
-      },
-      refetchInterval: refetchInterval,
+      },refetchInterval:0,
     });
-
-  useEffect(() => {
-    if ((data?.pages?.length || 0) > 1) {
-      setRefetchInterval(false);
-    } else {
-      setRefetchInterval(2000);
-    }
-  }, [data]);
 
   return {
     currentFilter,
