@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Task } from 'src/models/Task';
 import { isStatus } from 'src/utils/determineStatus';
 import colors from 'src/styles/colors';
+import { ArrowRightIcon } from '@chakra-ui/icons';
 
 interface TaskRunButtonProps extends Task {
   style?: React.CSSProperties;
@@ -31,26 +32,41 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = (props) => {
           iconSpacing={2}
           width={100}
           bgColor={
-            isStatus('Failed', props)
+            isStatus('Group', props)
+              ? colors.primary['100']
+              : isStatus('Failed', props)
               ? colors.running['300']
               : colors.running['100']
           }
           textColor={
-            isStatus('Failed', props)
+            isStatus('Group', props)
+              ? colors.primary['600']
+              : isStatus('Failed', props)
               ? colors.primary['100']
               : colors.running['500']
           }
           _hover={{
-            bgColor: isStatus('Failed', props)
+            bgColor: isStatus('Group', props)
+              ? colors.primary['100']
+              : isStatus('Failed', props)
               ? colors.running['400']
               : colors.running['200'],
+            textColor: isStatus('Group', props) && colors.primary['400'],
           }}
           _active={{
-            bgColor: isStatus('Failed', props)
+            bgColor: isStatus('Group', props)
+              ? colors.primary['100']
+              : isStatus('Failed', props)
               ? colors.running['300']
               : colors.running['100'],
+            textColor: isStatus('Group', props) && colors.primary['500'],
           }}
           fontWeight="normal"
+          rightIcon={
+            isStatus('Group', props) ? (
+              <ArrowRightIcon boxSize={3} />
+            ) : undefined
+          }
           leftIcon={
             isStatus('Group', props) ? undefined : isStatus('Failed', props) ? (
               <RepeatIcon boxSize={6} />

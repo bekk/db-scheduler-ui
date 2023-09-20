@@ -1,7 +1,6 @@
 package com.github.bekk.dbscheduleruiapi.util;
 
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
-import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskFilter;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskSort;
 import java.time.Instant;
@@ -85,8 +84,8 @@ public class QueryUtils {
         .collect(Collectors.toList());
   }
 
-  public static void logSearchCondition(
-      Map<String, Object> params, String searchTerm, List<String> conditions) {
+  public static String logSearchCondition(String searchTerm, Map<String, Object> params) {
+    StringBuilder conditions = new StringBuilder();
     List<String> terms = splitSearchTerm(searchTerm);
     if (terms.size() > 0) {
       List<String> termConditions = new ArrayList<>();
@@ -100,19 +99,9 @@ public class QueryUtils {
                 + "))");
         params.put(termKey, "%" + terms.get(i) + "%");
       }
-      conditions.add(String.join(" AND ", termConditions));
+      return conditions.append(String.join(" AND ", termConditions)).toString();
     }
-  }
-
-  public static void logFilterCondition(
-      TaskRequestParams.TaskFilter filter, List<String> conditions) {
-    if (filter != null && filter != TaskRequestParams.TaskFilter.ALL) {
-      String filterCondition =
-          filter == TaskRequestParams.TaskFilter.SUCCEEDED
-              ? "succeeded = TRUE"
-              : "succeeded = FALSE";
-      conditions.add(filterCondition);
-    }
+    return "";
   }
 
   private static List<String> splitSearchTerm(String searchTerm) {

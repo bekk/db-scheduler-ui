@@ -1,5 +1,7 @@
 package com.github.bekk.dbscheduleruiapi.model;
 
+import java.time.Instant;
+
 public class TaskDetailsRequestParams extends TaskRequestParams {
 
   private final String taskId;
@@ -11,11 +13,12 @@ public class TaskDetailsRequestParams extends TaskRequestParams {
       Integer size,
       TaskSort sorting,
       Boolean asc,
-      Boolean refresh,
       String searchTerm,
+      Instant startTime,
+      Instant endTime,
       String taskName,
-      String taskId) {
-    super(filter, pageNumber, size, sorting, asc, refresh, searchTerm);
+      String taskId,Boolean refresh) {
+    super(filter, pageNumber, size, sorting, asc, searchTerm, startTime, endTime, refresh);
     this.taskId = taskId;
     this.taskName = taskName;
   }

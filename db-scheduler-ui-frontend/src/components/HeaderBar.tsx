@@ -1,9 +1,8 @@
 import React from 'react';
-import { Box, IconButton, Input, Text } from '@chakra-ui/react';
+import { Box, Input, Text } from '@chakra-ui/react';
 import { FilterBy } from 'src/services/getTasks';
 import { FilterBox } from './FilterBox';
-import colors from 'src/styles/colors';
-import { RepeatIcon } from '@chakra-ui/icons';
+import { RefreshButton } from './RefreshButton';
 
 interface HeaderBarProps {
   inputPlaceholder: string;
@@ -20,6 +19,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   currentFilter,
   setCurrentFilter,
   setSearchTerm,
+  refetch,
   title,
   history,
 }) => (
@@ -52,18 +52,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         history={history}
       />
       <Box display={'flex'} float={'right'} alignItems={'center'}>
-        <Text>Refresh</Text>
-        <IconButton // TODO: add refresh functionality
-          borderColor={colors.primary['300']}
-          borderWidth={1}
-          textAlign={'left'}
-          fontWeight={'normal'}
-          bgColor={colors.primary[100]}
-          aria-label={'refresh tasks'}
-          icon={<RepeatIcon boxSize={7} />}
-          ml={2}
-          boxSize={45}
-        />
+        <RefreshButton s="sad" />
       </Box>
     </Box>
   </Box>

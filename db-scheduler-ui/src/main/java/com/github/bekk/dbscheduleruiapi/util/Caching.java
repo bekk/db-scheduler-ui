@@ -8,13 +8,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class Caching {
 
-  private final Set<String> taskIdsCache = ConcurrentHashMap.newKeySet();
+  private final Map<String, String> taskStatusCache= new ConcurrentHashMap<>();
   private final List<ScheduledExecution<Object>> taskDataCache = new ArrayList<>();
 
   public List<ScheduledExecution<Object>> getExecutionsFromCacheOrDB(boolean isRefresh, Scheduler scheduler) {
@@ -37,19 +38,23 @@ public class Caching {
   }
 
   public void updateCache(List<ScheduledExecution<Object>> executions) {
-    taskIdsCache.clear();
+    taskStatusCache.clear();
     taskDataCache.clear();
     taskDataCache.addAll(executions);
-    for (ScheduledExecution<Object> execution : executions) {
-      String status = (execution.getConsecutiveFailures()>0?"1":"0")+(execution.getPickedBy().isEmpty() ? "1" : "0");
-      String uniqueId = execution.getTaskInstance().getTaskName() + "_" + execution.getTaskInstance().getId() + "_" + status;
-      taskIdsCache.add(uniqueId);
+      for (ScheduledExecution<Object> execution : executions) {
+        taskStatusCache.put(getUniqueId(execution), getStatus(execution));
     }
   }
+  public String getUniqueId(ScheduledExecution<Object> task) {
+    return task.getTaskInstance().getTaskName() + "_" + task.getTaskInstance().getId();
+  }
+  public String getStatus(ScheduledExecution<Object> task) {
+    return (task.getConsecutiveFailures() > 0 ? "1" : "0") + (task.getPickedBy() != null ? "1" : "0");
+  }
 
-  public boolean isTaskInCache(TaskInstanceId taskInstance, String status) {
-    String uniqueId = taskInstance.getTaskName() + "_" + taskInstance.getId() + "_" + status;
-    return taskIdsCache.contains(uniqueId);
+  public String getStatusFromCache(TaskInstanceId taskInstance) {
+    String uniqueId = taskInstance.getTaskName() + "_" + taskInstance.getId();
+    return taskStatusCache.get(uniqueId);
   }
 
   public List<ScheduledExecution<Object>> getTaskDataCache() {

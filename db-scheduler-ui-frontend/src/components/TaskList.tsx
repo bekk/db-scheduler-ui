@@ -51,6 +51,7 @@ const TaskList: React.FC = () => {
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}
         setSearchTerm={setSearchTerm}
+        refetch={refetch}
       />
 
       <TitleRow

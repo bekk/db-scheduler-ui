@@ -51,23 +51,23 @@ export const DotButton: React.FC<TaskProps> = ({
             rounded={6}
             minBlockSize={10}
             onClick={(event) => {
+              navigate(`/history/${taskName}/${taskInstance}`);
+              event.stopPropagation();
+            }}
+            icon={<InfoOutlineIcon boxSize={4} />}
+          >
+            See history for task
+          </MenuItem>
+          <MenuItem
+            rounded={6}
+            minBlockSize={10}
+            onClick={(event) => {
               event.stopPropagation();
               setIsOpen(true);
             }}
             icon={<DeleteIcon boxSize={4} />}
           >
             Delete task
-          </MenuItem>
-          <MenuItem
-            rounded={6}
-            minBlockSize={10}
-            onClick={(event) => {
-              navigate(`/history/${taskName}/${taskInstance}`);
-              event.stopPropagation();
-            }}
-            icon={<InfoOutlineIcon boxSize={4} />}
-          >
-            See logs
           </MenuItem>
         </MenuList>
       </Menu>

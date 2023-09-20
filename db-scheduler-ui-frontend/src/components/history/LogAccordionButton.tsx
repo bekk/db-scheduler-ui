@@ -4,11 +4,13 @@ import { dateFormatText } from 'src/utils/dateFormatText';
 import colors from 'src/styles/colors';
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { AttachmentIcon } from '@chakra-ui/icons';
 
 interface LogAccordionButtonProps {
   succeeded: boolean;
   id: number;
   taskName: string;
+  taskData: object | null;
   taskInstance: string;
   exceptionClass: string | null;
   exceptionMessage: string | null;
@@ -27,8 +29,14 @@ export const LogAccordionButton: React.FC<LogAccordionButtonProps> = (
         as={'div'}
       >
         <HStack w={'100%'} spacing={5}>
-          <Box flex="1" display="inline-flex">
+          <Box flex="1" display="inline-flex" alignItems={'center'}>
             <LogStatus succeeded={props.succeeded} />
+            {props.taskData != null && (
+              <AttachmentIcon
+                position={'relative'}
+                style={{ marginLeft: '-25', marginBottom: '-26' }}
+              />
+            )}
           </Box>
           <Box flex="2" textAlign="left" hidden={!!taskName}>
             {props.taskName}

@@ -12,7 +12,7 @@ export const TaskDataRow: React.FC<{ taskData: (object | null)[] }> = ({
           {Object.entries(taskData.length > 1 ? taskData : taskData[0]).map(
             ([key, value]) => (
               <Box key={key} mr={4} display={'flex'} flexDirection={'column'}>
-                <Text color={colors.primary['100']}>{key}</Text>{' '}
+                <Text color={colors.primary['400']}>{key}</Text>{' '}
                 <Text>{JSON.stringify(value)}</Text>
               </Box>
             ),

@@ -1,5 +1,7 @@
 package com.github.bekk.dbscheduleruiapi.model;
 
+import java.time.Instant;
+
 public class TaskRequestParams {
 
   private final TaskFilter filter;
@@ -9,6 +11,8 @@ public class TaskRequestParams {
   private final boolean asc;
   private boolean refresh;
   private final String searchTerm;
+  private final Instant startTime;
+  private final Instant endTime;
 
   public TaskRequestParams(
       TaskFilter filter,
@@ -16,15 +20,19 @@ public class TaskRequestParams {
       Integer size,
       TaskSort sorting,
       Boolean asc,
-      Boolean refresh,
-      String searchTerm) {
-    this.filter = filter != null ? filter : TaskFilter.ALL;
+      String searchTerm,
+      Instant startTime,
+      Instant endTime,
+      Boolean refresh) {
+    this.filter = filter;
     this.pageNumber = pageNumber != null ? pageNumber : 0;
     this.size = size != null ? size : 10;
     this.sorting = sorting != null ? sorting : TaskSort.DEFAULT;
     this.asc = asc != null ? asc : true;
-    this.refresh = refresh != null ? refresh : true;
     this.searchTerm = searchTerm;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.refresh = refresh != null ? refresh : true;
   }
 
   public TaskFilter getFilter() {
@@ -56,7 +64,14 @@ public class TaskRequestParams {
   }
 
   public void setRefresh(boolean refresh){
-    this.refresh = refresh;
+    this.refresh = refresh;}
+    
+  public Instant getStartTime() {
+    return startTime;
+  }
+
+  public Instant getEndTime() {
+    return endTime;
   }
 
   public enum TaskFilter {
@@ -64,11 +79,11 @@ public class TaskRequestParams {
     FAILED,
     RUNNING,
     SCHEDULED,
-    SUCCEEDED;
+    SUCCEEDED
   }
 
   public enum TaskSort {
     DEFAULT,
-    NAME;
+    NAME
   }
 }

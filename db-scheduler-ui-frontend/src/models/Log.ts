@@ -2,7 +2,7 @@ export type Log = {
   id: number;
   taskName: string;
   taskInstance: string;
-  taskData: string | null;
+  taskData: object | null;
   pickedBy: string | null;
   timeStarted: Date;
   timeFinished: Date;

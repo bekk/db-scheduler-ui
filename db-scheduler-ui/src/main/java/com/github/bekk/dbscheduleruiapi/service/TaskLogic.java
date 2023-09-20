@@ -110,28 +110,32 @@ public class TaskLogic {
   }
 
   public PollResponse pollTasks(TaskRequestParams params) {
-    // Fetch all tasks from the database
     List<ScheduledExecution<Object>> allTasks = caching.getExecutionsFromDBWithoutUpdatingCache(scheduler);
 
     int newFailures = 0;
+    int stoppedFailing = 0;
     int newRunning = 0;
+    int finishedRunning = 0;
     int newTasks = 0;
 
     for (ScheduledExecution<Object> task : allTasks) {
-      boolean isFailed = task.getConsecutiveFailures() > 0;
-      boolean isRunning = task.getPickedBy()!=null;
+      String status = (task.getConsecutiveFailures() > 0 ? "1" : "0") + (task.getPickedBy() != null ? "1" : "0");
+      String cachedStatus = caching.getStatusFromCache(task.getTaskInstance());
 
-      if (!caching.isTaskInCache(task.getTaskInstance(), isFailed ? "FAILED" : "NOT_FAILED")) {
+      if (cachedStatus == null) {
         newTasks++;
-        if (isFailed) {
-          newFailures++;
-        }
-        if (isRunning) {
-          newRunning++;
-        }
+        if (status.charAt(0) == '1') newFailures++;
+        if (status.charAt(1) == '1') newRunning++;
+      } else if (!cachedStatus.equals(status)) {
+        if (cachedStatus.charAt(0) == '0' && status.charAt(0) == '1') newFailures++;
+        if (cachedStatus.charAt(0) == '1' && status.charAt(0) == '0') stoppedFailing++;
+        if (cachedStatus.charAt(1) == '0' && status.charAt(1) == '1') newRunning++;
+        if (cachedStatus.charAt(1) == '1' && status.charAt(1) == '0') finishedRunning++;
       }
     }
 
-    return new PollResponse(newFailures, newRunning, newTasks);
+    return new PollResponse(newFailures, stoppedFailing, newRunning, finishedRunning, newTasks);
   }
+
+
 }
