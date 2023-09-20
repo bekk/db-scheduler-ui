@@ -45,8 +45,6 @@ export const LogList: React.FC = () => {
       ),
   );
 
-  console.log(sortAsc);
-
   useEffect(() => {
     setSortAsc(true);
   }, [currentSort]);
