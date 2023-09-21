@@ -1,37 +1,56 @@
 import { Box } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { NumberCircle } from './NumberCircle';
-import { RefreshCircleProps } from './RefreshButton';
+
+type RefreshCircleProps = {
+  number: number;
+  color: string;
+  textColor?: string;
+  visible?: boolean;
+  hoverText: string;
+};
 
 export const RefreshCircle: React.FC<RefreshCircleProps> = ({
   number,
   color,
+  textColor,
+  visible,
+  hoverText,
 }) => {
   const [hovered, setHovered] = useState(false);
 
+  const text = hovered ? hoverText : '';
+
+  const powerOfTen = (number + hoverText).length - 1;
+  const isExpanded = 1 <= powerOfTen;
+  const baseSize: number = 22;
+  const width = isExpanded ? baseSize + 7 * powerOfTen : baseSize;
+
+  const marginLeft = isExpanded ? -width : 0;
+
   return (
     <Box
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       alignItems={'end'}
       display={'flex'}
       justifyContent={'flex-end'}
       overflow={'visible'}
-      ml={'-0.75em'}
+      ml={marginLeft}
       position="relative"
+      visibility={visible ? 'visible' : 'hidden'}
     >
-      <NumberCircle
-        number={number}
-        bgColor={color}
-        position="relative"
-        top={'auto'}
-        style={{ bottom: '0', left: '0' }}
-      />
-      {hovered && (
-        <Box position="absolute" right="100%" mr={2} whiteSpace="nowrap">
-          Some Text
-        </Box>
-      )}
+      <Box
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <NumberCircle
+          number={number + text}
+          bgColor={color}
+          textColor={textColor}
+          position="relative"
+          top={'auto'}
+          style={{ bottom: '0', left: '0' }}
+        />
+      </Box>
     </Box>
   );
 };
