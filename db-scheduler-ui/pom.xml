@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.github.bekk</groupId>
+        <groupId>no.bekk.db-scheduler-ui</groupId>
         <artifactId>db-scheduler-ui-parent</artifactId>
         <version>main-SNAPSHOT</version>
     </parent>
@@ -12,6 +12,7 @@
     <artifactId>db-scheduler-ui</artifactId>
     <name>db-scheduler-ui</name>
     <description>Provides a UI for db-scheduler</description>
+    <url>https://github.com/bekk/db-scheduler-ui</url>
 
     <dependencies>
         <dependency>
@@ -31,4 +32,23 @@
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jreleaser</groupId>
+                <artifactId>jreleaser-maven-plugin</artifactId>
+                <configuration>
+                    <jreleaser>
+                        <release>
+                            <github>
+                                <enabled>true</enabled>
+                                <skipTag>true</skipTag>
+                                <skipRelease>true</skipRelease>
+                            </github>
+                        </release>
+                    </jreleaser>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

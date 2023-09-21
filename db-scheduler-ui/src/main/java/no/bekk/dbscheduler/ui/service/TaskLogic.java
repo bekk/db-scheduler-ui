@@ -1,11 +1,11 @@
-package com.github.bekk.dbscheduleruiapi.service;
+package no.bekk.dbscheduler.ui.service;
 
-import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
-import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
-import com.github.bekk.dbscheduleruiapi.model.TaskModel;
-import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
-import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
-import com.github.bekk.dbscheduleruiapi.util.mapper.TaskMapper;
+import no.bekk.dbscheduler.ui.model.GetTasksResponse;
+import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
+import no.bekk.dbscheduler.ui.model.TaskModel;
+import no.bekk.dbscheduler.ui.model.TaskRequestParams;
+import no.bekk.dbscheduler.ui.util.QueryUtils;
+import no.bekk.dbscheduler.ui.util.mapper.TaskMapper;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.ScheduledExecutionsFilter;
 import com.github.kagkarlsson.scheduler.Scheduler;
@@ -13,6 +13,7 @@ import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
