@@ -93,7 +93,7 @@ export const useInfiniteTaskScrolling = ({
         return nextPage <= lastPage.numberOfPages ? nextPage : undefined;
       },refetchInterval:0,
     });
-console.log(isFetched)
+    
   return {
     currentFilter,
     currentSort,

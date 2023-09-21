@@ -1,24 +1,29 @@
 import { Box, Button } from '@chakra-ui/react';
 import { RepeatIcon } from '@chakra-ui/icons';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import colors from 'src/styles/colors';
-import { useQuery } from '@tanstack/react-query';
+import {
+  InfiniteData,
+  QueryObserverResult,
+  useQuery,
+} from '@tanstack/react-query';
 import { POLL_TASKS_QUERY_KEY, pollTasks } from 'src/services/pollTasks';
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 import { NumberCircle } from './NumberCircle';
+import { TasksResponse } from 'src/models/TasksResponse';
 
 interface RefreshButtonProps {
-  refetch: () => void;
+  refetch?: () => Promise<
+    QueryObserverResult<InfiniteData<TasksResponse>, unknown>
+  >;
   params: TaskDetailsRequestParams;
-  isFetched: boolean;
 }
 
 export const RefreshButton: React.FC<RefreshButtonProps> = ({
   refetch,
   params,
-  isFetched,
 }) => {
-  const { data, fetchStatus } = useQuery(
+  const { data, refetch: repoll } = useQuery(
     [
       POLL_TASKS_QUERY_KEY,
       params.filter,
@@ -43,16 +48,11 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
       }),
   );
 
-  useEffect(() => {
-    console.log('isFetched', isFetched, fetchStatus);
-    isFetched && refetch();
-  }, [isFetched, refetch]);
-
   return (
     <Box position="relative" display="inline-block">
       <Button
         onClick={() => {
-          refetch();
+          refetch && refetch().then(() => repoll());
         }}
         iconSpacing={3}
         p={4}

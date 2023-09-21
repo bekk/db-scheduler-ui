@@ -3,6 +3,8 @@ package com.github.bekk.dbscheduleruiapi.util;
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskFilter;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskSort;
+import com.github.kagkarlsson.scheduler.ScheduledExecution;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,23 +26,44 @@ public class QueryUtils {
 
   public static List<TaskModel> filterTasks(List<TaskModel> tasks, TaskFilter filter) {
     return tasks.stream()
-        .filter(
-            task -> {
-              switch (filter) {
-                case FAILED:
-                  return task.getConsecutiveFailures().stream().anyMatch(failures -> failures != 0);
-                case RUNNING:
-                  return task.isPicked().stream().anyMatch(Boolean::booleanValue);
-                case SCHEDULED:
-                  return IntStream.range(0, task.isPicked().size())
-                      .anyMatch(
-                          i ->
-                              !task.isPicked().get(i) && task.getConsecutiveFailures().get(i) == 0);
-                default:
-                  return true;
-              }
-            })
-        .collect(Collectors.toList());
+            .filter(
+                    task -> {
+                      switch (filter) {
+                        case FAILED:
+                          return task.getConsecutiveFailures().stream().anyMatch(failures -> failures != 0);
+                        case RUNNING:
+                          return task.isPicked().stream().anyMatch(Boolean::booleanValue);
+                        case SCHEDULED:
+                          return IntStream.range(0, task.isPicked().size())
+                                  .anyMatch(
+                                          i ->
+                                                  !task.isPicked().get(i) && task.getConsecutiveFailures().get(i) == 0);
+                        default:
+                          return true;
+                      }
+                    })
+            .collect(Collectors.toList());
+  }
+
+  public static List<ScheduledExecution<Object>> filterExecutions(List<ScheduledExecution<Object>> executions, TaskFilter filter, String taskName){
+    return executions.stream()
+            .filter(
+                    execution -> {
+                      if(taskName!=null && !taskName.equals(execution.getTaskInstance().getTaskName())){
+                        return false;
+                      }
+                      switch (filter) {
+                        case FAILED:
+                          return execution.getConsecutiveFailures()!=0;
+                        case RUNNING:
+                          return execution.isPicked();
+                        case SCHEDULED:
+                          return execution.getConsecutiveFailures()==0 && !execution.isPicked();
+                        default:
+                          return true;
+                      }
+                    })
+            .collect(Collectors.toList());
   }
 
   public static List<TaskModel> sortTasks(List<TaskModel> tasks, TaskSort sortType, boolean isAsc) {

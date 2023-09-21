@@ -9,11 +9,14 @@ import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import static com.github.bekk.dbscheduleruiapi.util.QueryUtils.filterExecutions;
 
 @Service
 public class TaskLogic {
@@ -109,33 +112,47 @@ public class TaskLogic {
     return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
   }
 
-  public PollResponse pollTasks(TaskRequestParams params) { // TODO: create for logging
-    List<ScheduledExecution<Object>> allTasks = caching.getExecutionsFromDBWithoutUpdatingCache(scheduler);
+  public PollResponse pollTasks(TaskDetailsRequestParams params) {
+    List<ScheduledExecution<Object>> allTasks =
+            filterExecutions(caching.getExecutionsFromDBWithoutUpdatingCache(scheduler), TaskRequestParams.TaskFilter.ALL, params.getTaskName());
 
-    int newFailures = 0;
+    Set<String> newTaskNames = new HashSet<>();
+    Set<String> newFailureTaskNames = new HashSet<>();
+    Set<String> newRunningTaskNames = new HashSet<>();
+
     int stoppedFailing = 0;
-    int newRunning = 0;
     int finishedRunning = 0;
-    int newTasks = 0;
 
     for (ScheduledExecution<Object> task : allTasks) {
-      String status = (task.getConsecutiveFailures() > 0 ? "1" : "0") + (task.getPickedBy() != null ? "1" : "0");
+      String taskName = task.getTaskInstance().getTaskName();
+      String status = getStatus(task);
       String cachedStatus = caching.getStatusFromCache(task.getTaskInstance());
 
       if (cachedStatus == null) {
-        newTasks++;
-        if (status.charAt(0) == '1') newFailures++;
-        if (status.charAt(1) == '1') newRunning++;
+        if (!newTaskNames.contains(taskName) || params.getTaskName() != null) {
+          newTaskNames.add(taskName);
+          if (status.charAt(0) == '1') newFailureTaskNames.add(taskName);
+          if (status.charAt(1) == '1') newRunningTaskNames.add(taskName);
+        }
       } else if (!cachedStatus.equals(status)) {
-        if (cachedStatus.charAt(0) == '0' && status.charAt(0) == '1') newFailures++;
+        if (cachedStatus.charAt(0) == '0' && status.charAt(0) == '1' && (!newFailureTaskNames.contains(taskName) || params.getTaskName() != null)) {
+          newFailureTaskNames.add(taskName);
+        }
         if (cachedStatus.charAt(0) == '1' && status.charAt(0) == '0') stoppedFailing++;
-        if (cachedStatus.charAt(1) == '0' && status.charAt(1) == '1') newRunning++;
+        if (cachedStatus.charAt(1) == '0' && status.charAt(1) == '1' && (!newRunningTaskNames.contains(taskName) || params.getTaskName() != null)) {
+          newRunningTaskNames.add(taskName);
+        }
         if (cachedStatus.charAt(1) == '1' && status.charAt(1) == '0') finishedRunning++;
       }
     }
 
-    return new PollResponse(newFailures, stoppedFailing, newRunning, finishedRunning, newTasks);
+    return new PollResponse(newFailureTaskNames.size(), newRunningTaskNames.size(), newTaskNames.size(), stoppedFailing, finishedRunning);
   }
+
+  private String getStatus(ScheduledExecution<Object> task) {
+    return (task.getConsecutiveFailures() > 0 ? "1" : "0") + (task.getPickedBy() != null ? "1" : "0");
+  }
+
 
 
 }

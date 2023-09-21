@@ -3,6 +3,8 @@ import { Box, Input, Text } from '@chakra-ui/react';
 import { FilterBy } from 'src/models/QueryParams';
 import { FilterBox } from './FilterBox';
 import { RefreshButton } from 'src/components/RefreshButton';
+import { QueryObserverResult, InfiniteData } from '@tanstack/react-query';
+import { TasksResponse } from 'src/models/TasksResponse';
 
 interface HeaderBarProps {
   inputPlaceholder: string;
@@ -10,10 +12,11 @@ interface HeaderBarProps {
   currentFilter: FilterBy;
   setCurrentFilter: (filter: FilterBy) => void;
   setSearchTerm: (searchTerm: string) => void;
-  refetch?: () => void;
+  refetch?: () => Promise<
+    QueryObserverResult<InfiniteData<TasksResponse>, unknown>
+  >;
   title: string;
   history?: boolean;
-  isFetched?: boolean;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
@@ -24,7 +27,6 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   refetch,
   title,
   history,
-  isFetched,
 }) => (
   <Box
     display={'flex'}
@@ -56,11 +58,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
       />
       {!history && (
         <Box display={'flex'} float={'right'} alignItems={'center'}>
-          <RefreshButton
-            refetch={refetch ?? (() => {})}
-            params={{ filter: FilterBy.All }}
-            isFetched={isFetched}
-          />
+          <RefreshButton refetch={refetch} params={{ filter: FilterBy.All }} />
         </Box>
       )}
     </Box>

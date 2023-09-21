@@ -10,8 +10,6 @@ export const POLL_TASKS_QUERY_KEY = `tasks/poll`;
 export const pollTasks = async (params: TaskDetailsRequestParams): Promise<PollResponse> => {
   const queryParams = new URLSearchParams();
 
-  console.log('pollTasks params', params);
-
   queryParams.append('filter', params.filter.toUpperCase());
   params.pageNumber && queryParams.append('pageNumber', params.pageNumber.toString());
   params.size && queryParams.append('size', params.size.toString());
