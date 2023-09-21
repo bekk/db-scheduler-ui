@@ -4,6 +4,7 @@ import com.github.bekk.dbscheduleruiapi.model.LogModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
 import com.github.bekk.dbscheduleruiapi.util.AndCondition;
+import com.github.bekk.dbscheduleruiapi.util.Caching;
 import com.github.bekk.dbscheduleruiapi.util.QueryBuilder;
 import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
 import java.sql.ResultSet;
@@ -22,7 +23,10 @@ public class LogLogic {
 
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+
   private static final int DEFAULT_LIMIT = 500;
+  @Autowired
+  private Caching caching;
 
   @Autowired
   public LogLogic(DataSource dataSource) {
@@ -30,6 +34,11 @@ public class LogLogic {
   }
 
   public List<LogModel> getLogs(TaskDetailsRequestParams requestParams) {
+    return caching.getLogsFromCacheOrDB(false, this, requestParams);
+  }
+
+
+  public List<LogModel> getLogsDirectlyFromDB(TaskDetailsRequestParams requestParams) {
     QueryBuilder queryBuilder = QueryBuilder.selectFromTable("scheduled_execution_logs");
     if (requestParams.getStartTime() != null) {
       queryBuilder.andCondition(
