@@ -14,8 +14,8 @@ export const getTasks = async (params: TaskRequestParams): Promise<TasksResponse
   params.pageNumber && queryParams.append('pageNumber', params.pageNumber.toString());
   params.limit && queryParams.append('size', params.limit.toString());
   params.sorting && queryParams.append('sorting', params.sorting.toUpperCase());
-  params.asc && queryParams.append('asc', params.asc.toString());
-  params.refresh && queryParams.append('refresh', params.refresh.toString());
+  params.asc !==undefined  && queryParams.append('asc', params.asc.toString());
+  params.refresh !==undefined  && queryParams.append('refresh', params.refresh.toString());
   params.searchTerm && queryParams.append('searchTerm', params.searchTerm.trim());
 
 

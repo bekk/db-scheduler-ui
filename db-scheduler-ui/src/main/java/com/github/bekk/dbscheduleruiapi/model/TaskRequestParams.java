@@ -28,6 +28,7 @@ public class TaskRequestParams {
     this.pageNumber = pageNumber != null ? pageNumber : 0;
     this.size = size != null ? size : 10;
     this.sorting = sorting != null ? sorting : TaskSort.DEFAULT;
+    System.out.println(asc);
     this.asc = asc != null ? asc : true;
     this.searchTerm = searchTerm;
     this.startTime = startTime != null ? startTime : Instant.MIN;
