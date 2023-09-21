@@ -33,7 +33,7 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = (props) => {
           width={100}
           bgColor={
             isStatus('Group', props)
-              ? colors.primary['100']
+              ? 'transparent'
               : isStatus('Failed', props)
               ? colors.running['300']
               : colors.running['100']
@@ -46,11 +46,11 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = (props) => {
               : colors.running['500']
           }
           _hover={{
-            bgColor: isStatus('Group', props)
-              ? colors.primary['100']
-              : isStatus('Failed', props)
-              ? colors.running['400']
-              : colors.running['200'],
+            bgColor: !isStatus('Group', props)
+              ? isStatus('Failed', props)
+                ? colors.running['400']
+                : colors.running['200']
+              : 'transparent',
             textColor: isStatus('Group', props) && colors.primary['400'],
           }}
           _active={{

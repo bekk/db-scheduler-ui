@@ -28,6 +28,7 @@ const TaskList: React.FC = () => {
     sortAsc,
     setSortAsc,
     setSearchTerm,
+    isFetched,
   } = useInfiniteTaskScrolling(
     isDetailsView
       ? {
@@ -50,6 +51,7 @@ const TaskList: React.FC = () => {
         setCurrentFilter={setCurrentFilter}
         setSearchTerm={setSearchTerm}
         refetch={refetch}
+        isFetched={isFetched}
       />
 
       <TitleRow

@@ -21,16 +21,12 @@ export const NumberCircle: React.FC<NumberCircleProps> = ({
   style,
   top,
 }) => {
-  const powerOfTen = Math.floor(Math.log10(number)); // TODO: Fix this
+  const powerOfTen = (number + '').length - 1;
   const isExpanded = 1 <= powerOfTen;
 
   const baseSize: number = 22;
-  //const minWidth:number = 24;
-  const maxWidth: number = 48;
 
-  const width = isExpanded
-    ? Math.min(maxWidth, baseSize + 7 * powerOfTen)
-    : baseSize;
+  const width = isExpanded ? baseSize + 7 * powerOfTen : baseSize;
 
   const height: number = 22;
 

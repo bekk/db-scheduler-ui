@@ -1,6 +1,6 @@
 import { Box, Button } from '@chakra-ui/react';
 import { RepeatIcon } from '@chakra-ui/icons';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import colors from 'src/styles/colors';
 import { useQuery } from '@tanstack/react-query';
 import { POLL_TASKS_QUERY_KEY, pollTasks } from 'src/services/pollTasks';
@@ -10,13 +10,15 @@ import { NumberCircle } from './NumberCircle';
 interface RefreshButtonProps {
   refetch: () => void;
   params: TaskDetailsRequestParams;
+  isFetched: boolean;
 }
 
 export const RefreshButton: React.FC<RefreshButtonProps> = ({
   refetch,
   params,
+  isFetched,
 }) => {
-  const { data } = useQuery(
+  const { data, fetchStatus } = useQuery(
     [
       POLL_TASKS_QUERY_KEY,
       params.filter,
@@ -40,59 +42,57 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
         searchTerm: params.searchTerm,
       }),
   );
-  console.log(data);
-  const testData = {
-    newFailures: 1,
-    newRunning: 22,
-    newTasks: 333,
-  };
+
+  useEffect(() => {
+    console.log('isFetched', isFetched, fetchStatus);
+    isFetched && refetch();
+  }, [isFetched, refetch]);
 
   return (
     <Box position="relative" display="inline-block">
       <Button
-        onClick={(event) => {
-          console.log('event', event);
+        onClick={() => {
           refetch();
         }}
         iconSpacing={3}
-        width={'auto'}
-        height={'100'}
-        transition="all 0.8s"
-        p={3}
+        p={4}
+        py={7}
+        borderColor={colors.primary['300']}
+        borderWidth={1}
         bgColor={colors.primary['100']}
         fontWeight="normal"
         rightIcon={<RepeatIcon boxSize={'7'} />}
-        _hover={{
-          height: '200',
-          '.circleContainer': { transform: 'rotate(0.25turn)' },
-          '.singleCircle': {
-            transform: 'rotate(-0.25turn)',
-            transition: 'all 0.8s ease-in-out',
-          },
-        }}
-        animation={''}
       >
-        <Box textAlign={'left'}>
-          Refresh
-          <Box
-            mt={2}
-            className="circleContainer"
-            display="flex"
-            flexDirection="row"
-            transition="all 0.8s ease-in-out"
-          >
-            {testData?.newFailures && (
-              <RefreshCircle number={testData?.newFailures} color={'red'} />
-            )}
-            {testData?.newRunning && (
-              <RefreshCircle number={testData?.newRunning} color={'blue'} />
-            )}
-            {testData?.newTasks && (
-              <RefreshCircle number={testData?.newTasks} color={'grey'} />
-            )}
-          </Box>
-        </Box>
+        <Box textAlign={'left'}>Refresh</Box>
       </Button>
+      <Box
+        pos="absolute"
+        left={2}
+        justifyContent={'flex-end'}
+        top={-1}
+        display="flex"
+        flexDirection="column"
+      >
+        <RefreshCircle
+          number={data?.newFailures ?? 0}
+          color={colors.failed['200']}
+          visible={data?.newFailures !== 0}
+          hoverText=" failed since refresh"
+        />
+        <RefreshCircle
+          number={data?.newRunning ?? 0}
+          color={colors.running['300']}
+          visible={data?.newRunning !== 0}
+          hoverText=" running since refresh"
+        />
+        <RefreshCircle
+          number={data?.newTasks ?? 0}
+          color={colors.primary['300']}
+          textColor={colors.primary['900']}
+          visible={data?.newTasks !== 0}
+          hoverText=" added since refresh"
+        />
+      </Box>
     </Box>
   );
 };
@@ -100,19 +100,52 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
 type RefreshCircleProps = {
   number: number;
   color: string;
-  transform?: string;
+  textColor?: string;
+  visible?: boolean;
+  hoverText: string;
 };
 
-const RefreshCircle: React.FC<RefreshCircleProps> = ({ number, color }) => {
+const RefreshCircle: React.FC<RefreshCircleProps> = ({
+  number,
+  color,
+  textColor,
+  visible,
+  hoverText,
+}) => {
+  const [hovered, setHovered] = useState(false);
+
+  const text = hovered ? hoverText : '';
+
+  const powerOfTen = (number + hoverText).length - 1; // TODO: Fix this
+  const isExpanded = 1 <= powerOfTen;
+  const baseSize: number = 22;
+  const width = isExpanded ? baseSize + 7 * powerOfTen : baseSize;
+
+  const marginLeft = isExpanded ? -width : 0;
+
   return (
-    <Box className="singleCircle">
-      <NumberCircle
-        number={number}
-        bgColor={color}
-        position="relative"
-        top={'auto'}
-        style={{ bottom: '0', left: '0' }}
-      />
+    <Box
+      alignItems={'end'}
+      display={'flex'}
+      justifyContent={'flex-end'}
+      overflow={'visible'}
+      ml={marginLeft}
+      position="relative"
+      visibility={visible ? 'visible' : 'hidden'}
+    >
+      <Box
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <NumberCircle
+          number={number + text}
+          bgColor={color}
+          textColor={textColor}
+          position="relative"
+          top={'auto'}
+          style={{ bottom: '0', left: '0' }}
+        />
+      </Box>
     </Box>
   );
 };

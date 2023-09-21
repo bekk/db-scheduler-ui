@@ -86,14 +86,14 @@ export const useInfiniteTaskScrolling = ({
 
 
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isFetched } =
     useInfiniteQuery<TasksResponse>(queryKey, fetchTasks, {
       getNextPageParam: (lastPage, allPages) => {
         const nextPage = allPages.length + 1;
         return nextPage <= lastPage.numberOfPages ? nextPage : undefined;
       },refetchInterval:0,
     });
-
+console.log(isFetched)
   return {
     currentFilter,
     currentSort,
@@ -109,5 +109,6 @@ export const useInfiniteTaskScrolling = ({
     searchTerm,
     setSearchTerm,
     isDetailsView: !!taskName,
+    isFetched
   };
 };

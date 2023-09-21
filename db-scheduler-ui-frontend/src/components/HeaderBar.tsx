@@ -13,6 +13,7 @@ interface HeaderBarProps {
   refetch?: () => void;
   title: string;
   history?: boolean;
+  isFetched?: boolean;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
@@ -23,6 +24,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   refetch,
   title,
   history,
+  isFetched,
 }) => (
   <Box
     display={'flex'}
@@ -57,6 +59,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
           <RefreshButton
             refetch={refetch ?? (() => {})}
             params={{ filter: FilterBy.All }}
+            isFetched={isFetched}
           />
         </Box>
       )}
