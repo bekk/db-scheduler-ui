@@ -1,5 +1,7 @@
 package com.github.bekk.dbscheduleruiapi.service;
 
+import static com.github.bekk.dbscheduleruiapi.util.QueryUtils.filterExecutions;
+
 import com.github.bekk.dbscheduleruiapi.model.*;
 import com.github.bekk.dbscheduleruiapi.util.Caching;
 import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
@@ -9,14 +11,11 @@ import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import static com.github.bekk.dbscheduleruiapi.util.QueryUtils.filterExecutions;
 
 @Service
 public class TaskLogic {
@@ -114,7 +113,10 @@ public class TaskLogic {
 
   public PollResponse pollTasks(TaskDetailsRequestParams params) {
     List<ScheduledExecution<Object>> allTasks =
-            filterExecutions(caching.getExecutionsFromDBWithoutUpdatingCache(scheduler), TaskRequestParams.TaskFilter.ALL, params.getTaskName());
+        filterExecutions(
+            caching.getExecutionsFromDBWithoutUpdatingCache(scheduler),
+            TaskRequestParams.TaskFilter.ALL,
+            params.getTaskName());
 
     Set<String> newTaskNames = new HashSet<>();
     Set<String> newFailureTaskNames = new HashSet<>();
@@ -135,24 +137,31 @@ public class TaskLogic {
           if (status.charAt(1) == '1') newRunningTaskNames.add(taskName);
         }
       } else if (!cachedStatus.equals(status)) {
-        if (cachedStatus.charAt(0) == '0' && status.charAt(0) == '1' && (!newFailureTaskNames.contains(taskName) || params.getTaskName() != null)) {
+        if (cachedStatus.charAt(0) == '0'
+            && status.charAt(0) == '1'
+            && (!newFailureTaskNames.contains(taskName) || params.getTaskName() != null)) {
           newFailureTaskNames.add(taskName);
         }
         if (cachedStatus.charAt(0) == '1' && status.charAt(0) == '0') stoppedFailing++;
-        if (cachedStatus.charAt(1) == '0' && status.charAt(1) == '1' && (!newRunningTaskNames.contains(taskName) || params.getTaskName() != null)) {
+        if (cachedStatus.charAt(1) == '0'
+            && status.charAt(1) == '1'
+            && (!newRunningTaskNames.contains(taskName) || params.getTaskName() != null)) {
           newRunningTaskNames.add(taskName);
         }
         if (cachedStatus.charAt(1) == '1' && status.charAt(1) == '0') finishedRunning++;
       }
     }
 
-    return new PollResponse(newFailureTaskNames.size(), newRunningTaskNames.size(), newTaskNames.size(), stoppedFailing, finishedRunning);
+    return new PollResponse(
+        newFailureTaskNames.size(),
+        newRunningTaskNames.size(),
+        newTaskNames.size(),
+        stoppedFailing,
+        finishedRunning);
   }
 
   private String getStatus(ScheduledExecution<Object> task) {
-    return (task.getConsecutiveFailures() > 0 ? "1" : "0") + (task.getPickedBy() != null ? "1" : "0");
+    return (task.getConsecutiveFailures() > 0 ? "1" : "0")
+        + (task.getPickedBy() != null ? "1" : "0");
   }
-
-
-
 }

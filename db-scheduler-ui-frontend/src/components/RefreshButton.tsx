@@ -116,7 +116,7 @@ const RefreshCircle: React.FC<RefreshCircleProps> = ({
 
   const text = hovered ? hoverText : '';
 
-  const powerOfTen = (number + hoverText).length - 1; // TODO: Fix this
+  const powerOfTen = (number + hoverText).length - 1;
   const isExpanded = 1 <= powerOfTen;
   const baseSize: number = 22;
   const width = isExpanded ? baseSize + 7 * powerOfTen : baseSize;

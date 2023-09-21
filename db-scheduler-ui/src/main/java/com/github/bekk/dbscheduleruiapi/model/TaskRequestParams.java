@@ -24,7 +24,7 @@ public class TaskRequestParams {
       Instant startTime,
       Instant endTime,
       Boolean refresh) {
-    this.filter = filter != null ? filter :TaskFilter.ALL;
+    this.filter = filter != null ? filter : TaskFilter.ALL;
     this.pageNumber = pageNumber != null ? pageNumber : 0;
     this.size = size != null ? size : 10;
     this.sorting = sorting != null ? sorting : TaskSort.DEFAULT;
@@ -63,9 +63,10 @@ public class TaskRequestParams {
     return searchTerm;
   }
 
-  public void setRefresh(boolean refresh){
-    this.refresh = refresh;}
-    
+  public void setRefresh(boolean refresh) {
+    this.refresh = refresh;
+  }
+
   public Instant getStartTime() {
     return startTime;
   }

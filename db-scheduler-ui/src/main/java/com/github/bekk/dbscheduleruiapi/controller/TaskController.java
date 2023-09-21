@@ -30,7 +30,8 @@ public class TaskController {
   }
 
   @GetMapping("/poll")
-  public PollResponse pollForUpdates(TaskDetailsRequestParams params){ // TODO: Make work for TaskRequestParams
+  public PollResponse pollForUpdates(
+      TaskDetailsRequestParams params) {
     return taskLogic.pollTasks(params);
   }
 
