@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.github.bekk.dbscheduleruistarter.autoconfigure.UiApiAutoConfiguration
+  no.bekk.dbscheduler.uistarter.autoconfigure.UiApiAutoConfiguration

@@ -1,9 +1,9 @@
-package com.github.bekk.dbscheduleruiapi.controller;
+package no.bekk.dbscheduler.ui.controller;
 
-import com.github.bekk.dbscheduleruiapi.model.GetTasksResponse;
-import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
-import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
-import com.github.bekk.dbscheduleruiapi.service.TaskLogic;
+import no.bekk.dbscheduler.ui.model.GetTasksResponse;
+import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
+import no.bekk.dbscheduler.ui.model.TaskRequestParams;
+import no.bekk.dbscheduler.ui.service.TaskLogic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

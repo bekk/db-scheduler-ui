@@ -1,4 +1,4 @@
-package com.github.bekk.dbscheduleruiapi.controller;
+package no.bekk.dbscheduler.ui.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;

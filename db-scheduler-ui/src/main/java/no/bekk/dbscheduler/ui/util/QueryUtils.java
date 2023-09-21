@@ -1,9 +1,8 @@
-package com.github.bekk.dbscheduleruiapi.util;
+package no.bekk.dbscheduler.ui.util;
 
-import com.github.bekk.dbscheduleruiapi.model.TaskModel;
-import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
-import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskFilter;
-import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskSort;
+import no.bekk.dbscheduler.ui.model.TaskModel;
+import no.bekk.dbscheduler.ui.model.TaskRequestParams;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,7 +22,7 @@ public class QueryUtils {
     return (startIndex < endIndex) ? allItems.subList(startIndex, endIndex) : new ArrayList<>();
   }
 
-  public static List<TaskModel> filterTasks(List<TaskModel> tasks, TaskFilter filter) {
+  public static List<TaskModel> filterTasks(List<TaskModel> tasks, TaskRequestParams.TaskFilter filter) {
     return tasks.stream()
         .filter(
             task -> {
@@ -44,11 +43,11 @@ public class QueryUtils {
         .collect(Collectors.toList());
   }
 
-  public static List<TaskModel> sortTasks(List<TaskModel> tasks, TaskSort sortType, boolean isAsc) {
-    if (sortType == TaskSort.NAME) {
+  public static List<TaskModel> sortTasks(List<TaskModel> tasks, TaskRequestParams.TaskSort sortType, boolean isAsc) {
+    if (sortType == TaskRequestParams.TaskSort.NAME) {
       Comparator<TaskModel> compareTasks = Comparator.comparing(TaskModel::getTaskName);
       tasks.sort(isAsc ? compareTasks : compareTasks.reversed());
-    } else if (sortType == TaskSort.DEFAULT) {
+    } else if (sortType == TaskRequestParams.TaskSort.DEFAULT) {
       Comparator<TaskModel> comparator =
           Comparator.comparing(
               task -> task.getExecutionTime().stream().min(Instant::compareTo).orElse(Instant.MAX),
