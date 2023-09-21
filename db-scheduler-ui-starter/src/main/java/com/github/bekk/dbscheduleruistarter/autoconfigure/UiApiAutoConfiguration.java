@@ -5,6 +5,7 @@ import com.github.bekk.dbscheduleruiapi.controller.TaskController;
 import com.github.bekk.dbscheduleruiapi.controller.UIController;
 import com.github.bekk.dbscheduleruiapi.service.LogLogic;
 import com.github.bekk.dbscheduleruiapi.service.TaskLogic;
+import com.github.bekk.dbscheduleruiapi.util.Caching;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
@@ -23,8 +24,14 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public TaskLogic taskLogic(Scheduler scheduler) {
-    return new TaskLogic(scheduler);
+  public Caching caching() {
+    return new Caching();
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public TaskLogic taskLogic(Scheduler scheduler, Caching caching) {
+    return new TaskLogic(scheduler, caching);
   }
 
   @Bean

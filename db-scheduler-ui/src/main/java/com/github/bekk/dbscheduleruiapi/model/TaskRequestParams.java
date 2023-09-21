@@ -9,6 +9,7 @@ public class TaskRequestParams {
   private final int size;
   private final TaskSort sorting;
   private final boolean asc;
+  private boolean refresh;
   private final String searchTerm;
   private final Instant startTime;
   private final Instant endTime;
@@ -21,15 +22,18 @@ public class TaskRequestParams {
       Boolean asc,
       String searchTerm,
       Instant startTime,
-      Instant endTime) {
-    this.filter = filter;
+      Instant endTime,
+      Boolean refresh) {
+    this.filter = filter != null ? filter : TaskFilter.ALL;
     this.pageNumber = pageNumber != null ? pageNumber : 0;
     this.size = size != null ? size : 10;
-    this.sorting = sorting;
+    this.sorting = sorting != null ? sorting : TaskSort.DEFAULT;
+    System.out.println(asc);
     this.asc = asc != null ? asc : true;
     this.searchTerm = searchTerm;
-    this.startTime = startTime;
-    this.endTime = endTime;
+    this.startTime = startTime != null ? startTime : Instant.MIN;
+    this.endTime = endTime != null ? endTime : Instant.MAX;
+    this.refresh = refresh != null ? refresh : true;
   }
 
   public TaskFilter getFilter() {
@@ -52,8 +56,16 @@ public class TaskRequestParams {
     return asc;
   }
 
+  public boolean isRefresh() {
+    return refresh;
+  }
+
   public String getSearchTerm() {
     return searchTerm;
+  }
+
+  public void setRefresh(boolean refresh) {
+    this.refresh = refresh;
   }
 
   public Instant getStartTime() {

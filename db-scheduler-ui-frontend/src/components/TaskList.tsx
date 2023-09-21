@@ -1,95 +1,55 @@
-import React, { useCallback, useEffect, useState } from 'react';
-
-import { Accordion, Box } from '@chakra-ui/react';
-import TaskCard from './TaskCard';
-import {
-  FilterBy,
-  SortBy,
-  TASK_QUERY_KEY,
-  getTasks,
-} from 'src/services/getTasks';
-
-import { useQuery } from '@tanstack/react-query';
-import PaginationButtons from 'src/components/PaginationButtons';
-import TitleRow from 'src/components/TitleRow';
-import { useNavigate, useParams } from 'react-router-dom';
-import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
-import TaskGroupCard from './TaskGroupCard';
+import React from 'react';
+import { Accordion, Box, Button, Flex } from '@chakra-ui/react';
+import { useParams } from 'react-router-dom';
 import { isStatus } from 'src/utils/determineStatus';
+import TaskCard from './TaskCard';
+import TaskGroupCard from './TaskGroupCard';
+import TitleRow from './TitleRow';
+import { useInfiniteTaskScrolling } from 'src/hooks/useInfiniteTaskScrolling';
+import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
+import { TASK_QUERY_KEY, getTasks } from 'src/services/getTasks';
+import colors from 'src/styles/colors';
 import { HeaderBar } from './HeaderBar';
 
 const TaskList: React.FC = () => {
-  const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
-  const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
-  const [sortAsc, setSortAsc] = useState<boolean>(true);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-
-  const { taskName, page: rawPage } = useParams<{
-    taskName?: string;
-    page?: string;
-  }>();
-  const page = Number(rawPage) && Number(rawPage) > 0 ? Number(rawPage) : 1;
-
-  const limit = 10;
+  const { taskName } = useParams<{ taskName?: string }>();
   const isDetailsView = !!taskName;
-  const { data, refetch } = useQuery(
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    currentFilter,
+    setCurrentFilter,
+    currentSort,
+    setCurrentSort,
+    sortAsc,
+    setSortAsc,
+    setSearchTerm,
+  } = useInfiniteTaskScrolling(
     isDetailsView
-      ? [
-          TASK_DETAILS_QUERY_KEY,
-          currentFilter,
-          page,
-          currentSort,
-          sortAsc,
-          taskName,
-          searchTerm,
-        ]
-      : [TASK_QUERY_KEY, currentFilter, page, currentSort, sortAsc, searchTerm],
-    () =>
-      isDetailsView
-        ? getTask(
-            currentFilter,
-            { pageNumber: page - 1, limit: limit },
-            currentSort,
-            sortAsc,
-            searchTerm,
-            taskName,
-          )
-        : getTasks(
-            currentFilter,
-            { pageNumber: page - 1, limit: limit },
-            currentSort,
-            sortAsc,
-            searchTerm,
-          ),
+      ? {
+          getTasksFunction: getTask,
+          taskName: taskName,
+          baseQueryKey: TASK_DETAILS_QUERY_KEY,
+        }
+      : { getTasksFunction: getTasks, baseQueryKey: TASK_QUERY_KEY },
   );
-  const navigate = useNavigate();
-
-  const setPage = useCallback(
-    (page: number) => {
-      navigate(`/${taskName ? taskName + '/' : ''}/page/${page}`);
-    },
-    [navigate, taskName],
-  );
-
-  useEffect(() => {
-    setSortAsc(true);
-  }, [currentSort]);
-
-  useEffect(() => {
-    if (data?.numberOfPages && page > data.numberOfPages) {
-      setPage(data.numberOfPages);
-    }
-  }, [data, page, setPage]);
 
   return (
     <Box>
       <HeaderBar
         title={isDetailsView ? taskName : 'All Tasks'}
-        inputPlaceholder={`search for ${isDetailsView ? '' : 'name or'}task id`}
+        inputPlaceholder={`search for ${
+          isDetailsView ? '' : 'name or '
+        }task id`}
         taskName={taskName || ''}
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}
         setSearchTerm={setSearchTerm}
+        refetch={refetch}
       />
 
       <TitleRow
@@ -100,24 +60,37 @@ const TaskList: React.FC = () => {
         isDetailsView={isDetailsView}
       />
       <Accordion allowMultiple key={taskName || 'all'}>
-        {data?.tasks.map((task) =>
-          !isStatus('Group', task) ? (
-            <TaskCard
-              key={task.taskInstance + task.taskName}
-              {...task}
-              refetch={refetch}
-            />
-          ) : (
-            <TaskGroupCard key={task.taskName} {...task} refetch={refetch} />
+        {data?.pages.map((p) =>
+          p.tasks.map((task) =>
+            !isStatus('Group', task) ? (
+              <TaskCard
+                key={task.taskInstance + task.taskName}
+                {...task}
+                refetch={refetch}
+              />
+            ) : (
+              <TaskGroupCard key={task.taskName} {...task} refetch={refetch} />
+            ),
           ),
         )}
       </Accordion>
-      <PaginationButtons
-        page={page}
-        limit={10}
-        setPage={setPage}
-        numberOfPages={data?.numberOfPages}
-      />
+      <Flex justifyContent="center" alignItems="center" mt={4}>
+        <Button
+          onClick={() => fetchNextPage()}
+          bgColor={'white'}
+          isDisabled={!hasNextPage || isFetchingNextPage}
+          borderColor={colors.primary}
+          borderWidth={1}
+          fontWeight={'medium'}
+          mb={24}
+        >
+          {isFetchingNextPage
+            ? 'Loading...'
+            : hasNextPage
+            ? 'Load More'
+            : 'Nothing more to load'}
+        </Button>
+      </Flex>
     </Box>
   );
 };

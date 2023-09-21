@@ -17,8 +17,9 @@ public class TaskDetailsRequestParams extends TaskRequestParams {
       Instant startTime,
       Instant endTime,
       String taskName,
-      String taskId) {
-    super(filter, pageNumber, size, sorting, asc, searchTerm, startTime, endTime);
+      String taskId,
+      Boolean refresh) {
+    super(filter, pageNumber, size, sorting, asc, searchTerm, startTime, endTime, refresh);
     this.taskId = taskId;
     this.taskName = taskName;
   }

@@ -3,6 +3,7 @@ package com.github.bekk.dbscheduleruiapi.util;
 import com.github.bekk.dbscheduleruiapi.model.TaskModel;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskFilter;
 import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams.TaskSort;
+import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -43,6 +44,28 @@ public class QueryUtils {
         .collect(Collectors.toList());
   }
 
+  public static List<ScheduledExecution<Object>> filterExecutions(
+      List<ScheduledExecution<Object>> executions, TaskFilter filter, String taskName) {
+    return executions.stream()
+        .filter(
+            execution -> {
+              if (taskName != null && !taskName.equals(execution.getTaskInstance().getTaskName())) {
+                return false;
+              }
+              switch (filter) {
+                case FAILED:
+                  return execution.getConsecutiveFailures() != 0;
+                case RUNNING:
+                  return execution.isPicked();
+                case SCHEDULED:
+                  return execution.getConsecutiveFailures() == 0 && !execution.isPicked();
+                default:
+                  return true;
+              }
+            })
+        .collect(Collectors.toList());
+  }
+
   public static List<TaskModel> sortTasks(List<TaskModel> tasks, TaskSort sortType, boolean isAsc) {
     if (sortType == TaskSort.NAME) {
       Comparator<TaskModel> compareTasks = Comparator.comparing(TaskModel::getTaskName);
@@ -62,16 +85,25 @@ public class QueryUtils {
       return tasks;
     }
 
-    String lowerCaseTerm = searchTerm.toLowerCase();
+    List<String> terms = splitSearchTerm(searchTerm);
 
     return tasks.stream()
         .filter(
-            task ->
-                task.getTaskName().toLowerCase().contains(lowerCaseTerm)
-                    || task.getTaskInstance().stream()
+            task -> {
+              for (String term : terms) {
+                String lowerCaseTerm = term.toLowerCase();
+                boolean isTermInTaskName = task.getTaskName().toLowerCase().contains(lowerCaseTerm);
+                boolean isTermInAnyTaskInstance =
+                    task.getTaskInstance().stream()
                         .anyMatch(
                             instance ->
-                                instance != null && instance.toLowerCase().contains(lowerCaseTerm)))
+                                instance != null && instance.toLowerCase().contains(lowerCaseTerm));
+                if (!isTermInTaskName && !isTermInAnyTaskInstance) {
+                  return false;
+                }
+              }
+              return true;
+            })
         .collect(Collectors.toList());
   }
 

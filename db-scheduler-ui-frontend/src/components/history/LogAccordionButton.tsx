@@ -1,7 +1,6 @@
 import { AccordionButton, AccordionIcon, Box, HStack } from '@chakra-ui/react';
 import { LogStatus } from 'src/components/history/LogStatus';
 import { dateFormatText } from 'src/utils/dateFormatText';
-import colors from 'src/styles/colors';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { AttachmentIcon } from '@chakra-ui/icons';
@@ -25,7 +24,8 @@ export const LogAccordionButton: React.FC<LogAccordionButtonProps> = (
     <h2>
       <AccordionButton
         justifyContent={'space-between'}
-        _hover={{ backgroundColor: colors.primary['100'] }}
+        cursor={'pointer'}
+        as={'div'}
       >
         <HStack w={'100%'} spacing={5}>
           <Box flex="1" display="inline-flex" alignItems={'center'}>

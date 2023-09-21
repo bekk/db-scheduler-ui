@@ -3,12 +3,13 @@ import { Property } from 'csstype';
 import colors from 'src/styles/colors';
 
 interface NumberCircleProps {
-  number: number;
+  number: number | string;
   bgColor?: string;
   textColor?: string;
   position?: ResponsiveValue<Property.Position>;
   transform?: ResponsiveValue<Property.Transform>;
   style?: React.CSSProperties;
+  top?: string | number;
 }
 
 export const NumberCircle: React.FC<NumberCircleProps> = ({
@@ -18,17 +19,14 @@ export const NumberCircle: React.FC<NumberCircleProps> = ({
   position = 'absolute',
   transform,
   style,
+  top,
 }) => {
-  const powerOfTen = Math.floor(Math.log10(number));
+  const powerOfTen = (number + '').length - 1;
   const isExpanded = 1 <= powerOfTen;
 
   const baseSize: number = 22;
-  //const minWidth:number = 24;
-  const maxWidth: number = 48;
 
-  const width = isExpanded
-    ? Math.min(maxWidth, baseSize + 7 * powerOfTen)
-    : baseSize;
+  const width = isExpanded ? baseSize + 7 * powerOfTen : baseSize;
 
   const height: number = 22;
 
@@ -41,7 +39,7 @@ export const NumberCircle: React.FC<NumberCircleProps> = ({
     <Box
       position={position}
       borderRadius={borderRadius}
-      top={0}
+      top={top ?? 0}
       right={`${leftOffset}px`}
       width={`${width}px`}
       height={`${height}px`}

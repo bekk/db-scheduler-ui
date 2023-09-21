@@ -38,9 +38,11 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
   return (
     <h2>
       <AccordionButton
+        as={'div'}
         borderRadius={4}
         background={colors.primary['100']}
-        _hover={{ backgroundColor: colors.primary['100'] }}
+        _hover={{ backgroundColor: colors.primary['200'], cursor: 'pointer' }}
+        cursor={'pointer'}
         onClick={(event) => {
           event.stopPropagation();
           isStatus('Group', props)

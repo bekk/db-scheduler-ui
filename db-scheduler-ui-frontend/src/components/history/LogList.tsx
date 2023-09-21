@@ -6,10 +6,10 @@ import { LogCard } from 'src/components/history/LogCard';
 import { useParams } from 'react-router-dom';
 import colors from 'src/styles/colors';
 import { HeaderBar } from '../HeaderBar';
-import { FilterBy, SortBy } from 'src/services/getTasks';
 import { ALL_LOG_QUERY_KEY, getAllLogs } from 'src/services/getAllLogs';
 import { DateTimeInput } from 'src/components/history/DateTimeInput';
 import { SortButton } from 'src/components/SortButton';
+import { FilterBy, SortBy } from 'src/models/QueryParams';
 
 export const LogList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
