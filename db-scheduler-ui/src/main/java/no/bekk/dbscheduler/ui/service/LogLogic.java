@@ -1,8 +1,8 @@
-package com.github.bekk.dbscheduleruiapi.service;
+package no.bekk.dbscheduler.ui.service;
 
-import com.github.bekk.dbscheduleruiapi.model.LogModel;
-import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
-import com.github.bekk.dbscheduleruiapi.util.QueryUtils;
+import no.bekk.dbscheduler.ui.model.LogModel;
+import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
+import no.bekk.dbscheduler.ui.util.QueryUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
