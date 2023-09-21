@@ -1,10 +1,10 @@
-package com.github.bekk.dbscheduleruistarter.autoconfigure;
+package no.bekk.dbscheduler.uistarter.autoconfigure;
 
-import com.github.bekk.dbscheduleruiapi.controller.LogController;
-import com.github.bekk.dbscheduleruiapi.controller.TaskController;
-import com.github.bekk.dbscheduleruiapi.controller.UIController;
-import com.github.bekk.dbscheduleruiapi.service.LogLogic;
-import com.github.bekk.dbscheduleruiapi.service.TaskLogic;
+import no.bekk.dbscheduler.ui.controller.LogController;
+import no.bekk.dbscheduler.ui.controller.TaskController;
+import no.bekk.dbscheduler.ui.controller.UIController;
+import no.bekk.dbscheduler.ui.service.LogLogic;
+import no.bekk.dbscheduler.ui.service.TaskLogic;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
