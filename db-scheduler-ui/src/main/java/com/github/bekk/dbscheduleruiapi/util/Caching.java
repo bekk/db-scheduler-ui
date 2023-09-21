@@ -1,5 +1,8 @@
 package com.github.bekk.dbscheduleruiapi.util;
 
+import com.github.bekk.dbscheduleruiapi.model.LogModel;
+import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
+import com.github.bekk.dbscheduleruiapi.service.LogLogic;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.ScheduledExecutionsFilter;
 import com.github.kagkarlsson.scheduler.Scheduler;
@@ -61,5 +64,28 @@ public class Caching {
 
   public List<ScheduledExecution<Object>> getTaskDataCache() {
     return taskDataCache;
+  }
+
+  private final Map<Long, LogModel> logCache = new ConcurrentHashMap<>();
+
+  public List<LogModel> getLogsFromCacheOrDB(boolean isRefresh, LogLogic logLogic, TaskDetailsRequestParams requestParams) {
+    if (isRefresh || logCache.isEmpty()) {
+      List<LogModel> logs = logLogic.getLogsDirectlyFromDB(requestParams);
+      updateLogCache(logs);
+      return logs;
+    } else {
+      return new ArrayList<>(logCache.values());
+    }
+  }
+
+  public void updateLogCache(List<LogModel> logs) {
+    logCache.clear();
+    for (LogModel log : logs) {
+      logCache.put(log.getId(), log);
+    }
+  }
+
+  public Map<Long, LogModel> getLogCache() {
+    return logCache;
   }
 }
