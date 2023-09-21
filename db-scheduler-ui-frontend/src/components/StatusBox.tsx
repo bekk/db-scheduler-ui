@@ -40,8 +40,6 @@ export const StatusBox: React.FC<StatusBoxProps> = ({
   const statusInfo =
     status === 'Group'
       ? statusColors['Group']
-      : consecutiveFailures > 0
-      ? statusColors['Failed']
       : statusColors[status] || statusColors['Scheduled'];
   const { borderColor, backgroundColor, color } = statusInfo;
 
