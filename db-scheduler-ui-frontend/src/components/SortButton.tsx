@@ -1,8 +1,8 @@
 import { Text } from '@chakra-ui/react';
 import React from 'react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { SortBy } from 'src/services/getTasks';
 import colors from 'src/styles/colors';
+import { SortBy } from 'src/models/QueryParams';
 
 export const SortButton: React.FC<{
   title: string;

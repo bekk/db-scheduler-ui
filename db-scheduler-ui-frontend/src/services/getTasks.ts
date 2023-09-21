@@ -1,47 +1,23 @@
 import { TasksResponse } from 'src/models/TasksResponse';
+import { TaskRequestParams} from 'src/models/TaskRequestParams';
 
 const API_BASE_URL: string =
   (import.meta.env.VITE_API_BASE_URL as string) ??
   window.location.origin + '/db-scheduler-api';
 
-export enum FilterBy {
-  All = 'All',
-  Failed = 'Failed',
-  Running = 'Running',
-  Scheduled = 'Scheduled',
-  Succeeded = 'Succeeded',
-}
-
-export interface PaginationParams {
-  pageNumber: number;
-  limit: number;
-}
-
-export enum SortBy {
-  Default = 'Default',
-  Name = 'Name',
-}
-
 export const TASK_QUERY_KEY = `tasks`;
 
-export const getTasks = async (
-  filter = FilterBy.All,
-  { pageNumber = 1, limit = 10 }: PaginationParams,
-  sorting = SortBy.Default,
-  isAsc = true,
-  refresh = true,
-  searchTerm="",
-): Promise<TasksResponse> => {
+export const getTasks = async (params: TaskRequestParams): Promise<TasksResponse> => {
   const queryParams = new URLSearchParams();
-  console.log("searchTerm: ", searchTerm)
 
-  queryParams.append('filter', filter.toUpperCase());
-  queryParams.append('pageNumber', pageNumber.toString());
-  queryParams.append('size', limit.toString());
-  queryParams.append('sorting', sorting.toUpperCase());
-  queryParams.append('asc', isAsc.toString());
-  queryParams.append('refresh', refresh.toString());
-  queryParams.append('searchTerm', searchTerm.trim());
+  params.filter && queryParams.append('filter', params.filter.toUpperCase());
+  params.pageNumber && queryParams.append('pageNumber', params.pageNumber.toString());
+  params.limit && queryParams.append('size', params.limit.toString());
+  params.sorting && queryParams.append('sorting', params.sorting.toUpperCase());
+  params.asc && queryParams.append('asc', params.asc.toString());
+  params.refresh && queryParams.append('refresh', params.refresh.toString());
+  params.searchTerm && queryParams.append('searchTerm', params.searchTerm.trim());
+
 
   const response = await fetch(`${API_BASE_URL}/tasks/all?${queryParams}`, {
     method: 'GET',

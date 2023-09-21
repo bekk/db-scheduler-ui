@@ -6,10 +6,10 @@ import {
   MenuItem,
   MenuList,
 } from '@chakra-ui/react';
-import { FilterBy } from 'src/services/getTasks';
 import React from 'react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import colors from 'src/styles/colors';
+import { FilterBy } from 'src/models/QueryParams';
 
 export const FilterBox: React.FC<{
   currentFilter: FilterBy;

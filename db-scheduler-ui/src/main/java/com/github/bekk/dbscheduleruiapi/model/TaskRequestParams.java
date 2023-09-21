@@ -24,14 +24,14 @@ public class TaskRequestParams {
       Instant startTime,
       Instant endTime,
       Boolean refresh) {
-    this.filter = filter;
+    this.filter = filter != null ? filter :TaskFilter.ALL;
     this.pageNumber = pageNumber != null ? pageNumber : 0;
     this.size = size != null ? size : 10;
     this.sorting = sorting != null ? sorting : TaskSort.DEFAULT;
     this.asc = asc != null ? asc : true;
     this.searchTerm = searchTerm;
-    this.startTime = startTime;
-    this.endTime = endTime;
+    this.startTime = startTime != null ? startTime : Instant.MIN;
+    this.endTime = endTime != null ? endTime : Instant.MAX;
     this.refresh = refresh != null ? refresh : true;
   }
 

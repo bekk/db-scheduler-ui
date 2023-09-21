@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Input, Text } from '@chakra-ui/react';
-import { FilterBy } from 'src/services/getTasks';
+import { FilterBy } from 'src/models/QueryParams';
 import { FilterBox } from './FilterBox';
-import { RefreshButton } from './RefreshButton';
+import { RefreshButton } from 'src/components/RefreshButton';
 
 interface HeaderBarProps {
   inputPlaceholder: string;
@@ -10,6 +10,7 @@ interface HeaderBarProps {
   currentFilter: FilterBy;
   setCurrentFilter: (filter: FilterBy) => void;
   setSearchTerm: (searchTerm: string) => void;
+  refetch?: () => void;
   title: string;
   history?: boolean;
 }
@@ -51,9 +52,14 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         setCurrentFilter={setCurrentFilter}
         history={history}
       />
-      <Box display={'flex'} float={'right'} alignItems={'center'}>
-        <RefreshButton s="sad" />
-      </Box>
+      {!history && (
+        <Box display={'flex'} float={'right'} alignItems={'center'}>
+          <RefreshButton
+            refetch={refetch ?? (() => {})}
+            params={{ filter: FilterBy.All }}
+          />
+        </Box>
+      )}
     </Box>
   </Box>
 );

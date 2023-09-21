@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { Box, HStack } from '@chakra-ui/react';
-import { SortBy } from 'src/services/getTasks';
 
 import { SortButton } from 'src/components/SortButton';
 import colors from 'src/styles/colors';
+import { SortBy } from 'src/models/QueryParams';
 
 interface TitleRowProps {
   currentSort: SortBy;

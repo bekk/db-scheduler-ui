@@ -1,5 +1,5 @@
 import { TasksResponse } from 'src/models/TasksResponse';
-import { FilterBy, PaginationParams, SortBy } from './getTasks';
+import { TaskDetailsRequestParams} from 'src/models/TaskRequestParams';
 
 const API_BASE_URL: string =
   (import.meta.env.VITE_API_BASE_URL as string) ??
@@ -8,26 +8,19 @@ const API_BASE_URL: string =
 export const TASK_DETAILS_QUERY_KEY = `tasks/details`;
 
 export const getTask = async (
-  filter = FilterBy.All,
-  { pageNumber = 1, limit = 10 }: PaginationParams,
-  sorting = SortBy.Default,
-  isAsc = true,
-  refresh = true,
-  searchTerm="",
-  taskName?: string,
-  taskId?: string,
+  params:TaskDetailsRequestParams
 ): Promise<TasksResponse> => {
   const queryParams = new URLSearchParams();
 
-  queryParams.append('filter', filter.toUpperCase());
-  queryParams.append('pageNumber', pageNumber.toString());
-  queryParams.append('size', limit.toString());
-  queryParams.append('sorting', sorting.toUpperCase());
-  queryParams.append('asc', isAsc.toString());
-  queryParams.append('refresh', refresh.toString());
-  queryParams.append('searchTerm', searchTerm.trim());
-  taskName && queryParams.append('taskName', taskName);
-  taskId && queryParams.append('taskId', taskId);
+  params.filter && queryParams.append('filter', params.filter.toUpperCase());
+  params.pageNumber && queryParams.append('pageNumber', params.pageNumber.toString());
+  params.limit && queryParams.append('size', params.limit.toString());
+  params.sorting && queryParams.append('sorting', params.sorting.toUpperCase());
+  params.asc && queryParams.append('asc', params.asc.toString());
+  params.refresh && queryParams.append('refresh', params.refresh.toString());
+  params.searchTerm && queryParams.append('searchTerm', params.searchTerm.trim());
+  params.taskName && queryParams.append('taskName', params.taskName);
+  params.taskId && queryParams.append('taskId', params.taskId);
 
   const response = await fetch(`${API_BASE_URL}/tasks/details?${queryParams}`, {
     method: 'GET',

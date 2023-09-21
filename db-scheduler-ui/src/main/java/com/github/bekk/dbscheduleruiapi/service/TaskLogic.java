@@ -109,7 +109,7 @@ public class TaskLogic {
     return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
   }
 
-  public PollResponse pollTasks(TaskRequestParams params) {
+  public PollResponse pollTasks(TaskRequestParams params) { // TODO: Account for grouping, create for logging
     List<ScheduledExecution<Object>> allTasks = caching.getExecutionsFromDBWithoutUpdatingCache(scheduler);
 
     int newFailures = 0;

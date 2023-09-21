@@ -8,15 +8,13 @@ import TitleRow from './TitleRow';
 import { useInfiniteTaskScrolling } from 'src/hooks/useInfiniteTaskScrolling';
 import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
 import { TASK_QUERY_KEY, getTasks } from 'src/services/getTasks';
-import { HeaderBar } from './HeaderBar';
 import colors from 'src/styles/colors';
+import { HeaderBar } from './HeaderBar';
 
 const TaskList: React.FC = () => {
   const { taskName } = useParams<{ taskName?: string }>();
   const isDetailsView = !!taskName;
 
-  // TODO: Make no-polling default
-  // TODO: Add a way to force refresh
   const {
     data,
     fetchNextPage,

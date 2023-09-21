@@ -1,8 +1,9 @@
 import { useCallback, useState, useRef, useMemo } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { FilterBy, SortBy, getTasks } from 'src/services/getTasks';
+import { getTasks } from 'src/services/getTasks';
 import { getTask } from 'src/services/getTask';
 import { TasksResponse } from 'src/models/TasksResponse';
+import { FilterBy, SortBy } from 'src/models/QueryParams';
 
 interface UseInfiniteTaskScrollingProps {
   getTasksFunction: typeof getTasks | typeof getTask;
@@ -58,22 +59,25 @@ export const useInfiniteTaskScrolling = ({
 
       if (taskName) {
         return getTasksFunction(
-          currentFilter,
-          { pageNumber: pageParam, limit: limit },
-          currentSort,
-          sortAsc,
-          shouldRefresh,
+          {filter:currentFilter,
+          pageNumber: pageParam, limit: limit,
+          sorting:currentSort,
+          asc:sortAsc,
+          refresh:shouldRefresh,
           searchTerm,
-          taskName,
+          size:limit,
+          taskName,}
         );
       } else {
         return getTasksFunction(
-          currentFilter,
-          { pageNumber: pageParam, limit: limit },
-          currentSort,
-          sortAsc,
-          shouldRefresh,
+          {filter:currentFilter,
+          pageNumber: pageParam, limit: limit,
+          sorting:currentSort,
+          asc:sortAsc,
+          refresh:shouldRefresh,
           searchTerm,
+        size:limit,
+      }
         );
       }
     },
