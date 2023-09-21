@@ -72,7 +72,7 @@ jobs:
         with:
           email: ${{ secrets.HEROKU_EMAIL }}
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: jobjugglerapi
+          heroku_app_name: db-scheduler-ui
           dockerfile_directory: ./example-app/
           dockerfile_name: Dockerfile
           docker_options: "--no-cache"
