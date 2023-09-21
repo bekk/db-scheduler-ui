@@ -38,7 +38,7 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 1. Add maven dependency
 ```xml
 <dependency>
-    <groupId>com.github.bekk</groupId>
+    <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-starter</artifactId>
     <version>0.0.1</version>
 </dependency>

@@ -1,4 +1,4 @@
-package com.github.bekk.dbscheduleruiapi.model;
+package no.bekk.dbscheduler.ui.model;
 
 import java.time.Instant;
 
