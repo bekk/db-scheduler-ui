@@ -63,7 +63,8 @@ public class Caching {
     return taskStatusCache.get(uniqueId);
   }
 
-  public List<LogModel> getLogsFromCacheOrDB(boolean isRefresh, LogLogic logLogic, TaskDetailsRequestParams requestParams) {
+  public List<LogModel> getLogsFromCacheOrDB(
+      boolean isRefresh, LogLogic logLogic, TaskDetailsRequestParams requestParams) {
     if (isRefresh || logCache.isEmpty()) {
       List<LogModel> logs = logLogic.getLogsDirectlyFromDB(requestParams);
       updateLogCache(logs);

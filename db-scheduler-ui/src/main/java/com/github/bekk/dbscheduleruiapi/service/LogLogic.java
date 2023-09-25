@@ -21,10 +21,8 @@ public class LogLogic {
 
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-
   private static final int DEFAULT_LIMIT = 500;
-  @Autowired
-  private Caching caching;
+  @Autowired private Caching caching;
 
   @Autowired
   public LogLogic(DataSource dataSource) {
@@ -32,26 +30,29 @@ public class LogLogic {
   }
 
   public GetLogsResponse getLogs(TaskDetailsRequestParams requestParams) {
-    List<LogModel> logs = caching.getLogsFromCacheOrDB(requestParams.isRefresh(),this, requestParams);
-    List<LogModel> pagedLogs = QueryUtils.paginate(logs, requestParams.getPageNumber(), requestParams.getSize());
+    List<LogModel> logs =
+        caching.getLogsFromCacheOrDB(requestParams.isRefresh(), this, requestParams);
+    List<LogModel> pagedLogs =
+        QueryUtils.paginate(logs, requestParams.getPageNumber(), requestParams.getSize());
 
-    return new GetLogsResponse(logs.size(),pagedLogs, requestParams.getSize());
+    return new GetLogsResponse(logs.size(), pagedLogs, requestParams.getSize());
   }
 
   public LogPollResponse pollLogs(TaskDetailsRequestParams requestParams) {
     List<LogModel> logsFromDB = getLogsDirectlyFromDB(requestParams);
 
-    long newFailures = logsFromDB.stream()
+    long newFailures =
+        logsFromDB.stream()
             .filter(log -> !caching.checkLogCacheForKey(log.getId()) && !log.isSucceeded())
             .count();
 
-    long newSucceeded = logsFromDB.stream()
+    long newSucceeded =
+        logsFromDB.stream()
             .filter(log -> !caching.checkLogCacheForKey(log.getId()) && log.isSucceeded())
             .count();
 
     return new LogPollResponse((int) newFailures, (int) newSucceeded);
   }
-
 
   public List<LogModel> getLogsDirectlyFromDB(TaskDetailsRequestParams requestParams) {
     QueryBuilder queryBuilder = QueryBuilder.selectFromTable("scheduled_execution_logs");

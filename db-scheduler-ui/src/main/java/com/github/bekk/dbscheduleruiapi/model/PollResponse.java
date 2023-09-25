@@ -36,4 +36,3 @@ public class PollResponse {
     return finishedRunning;
   }
 }
-
