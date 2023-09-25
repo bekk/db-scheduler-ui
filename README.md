@@ -1,5 +1,6 @@
 # DB Scheduler UI
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/facebook/react/blob/main/LICENSE) 
+![build status](https://github.com/bekk/db-scheduler-ui/workflows/Build/badge.svg)
+[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 
 Demo version.\
