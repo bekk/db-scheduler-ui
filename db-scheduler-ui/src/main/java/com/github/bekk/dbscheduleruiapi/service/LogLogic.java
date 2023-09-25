@@ -1,8 +1,6 @@
 package com.github.bekk.dbscheduleruiapi.service;
 
-import com.github.bekk.dbscheduleruiapi.model.LogModel;
-import com.github.bekk.dbscheduleruiapi.model.TaskDetailsRequestParams;
-import com.github.bekk.dbscheduleruiapi.model.TaskRequestParams;
+import com.github.bekk.dbscheduleruiapi.model.*;
 import com.github.bekk.dbscheduleruiapi.util.AndCondition;
 import com.github.bekk.dbscheduleruiapi.util.Caching;
 import com.github.bekk.dbscheduleruiapi.util.QueryBuilder;
@@ -33,8 +31,25 @@ public class LogLogic {
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
   }
 
-  public List<LogModel> getLogs(TaskDetailsRequestParams requestParams) {
-    return caching.getLogsFromCacheOrDB(false, this, requestParams);
+  public GetLogsResponse getLogs(TaskDetailsRequestParams requestParams) {
+    List<LogModel> logs = caching.getLogsFromCacheOrDB(requestParams.isRefresh(),this, requestParams);
+    List<LogModel> pagedLogs = QueryUtils.paginate(logs, requestParams.getPageNumber(), requestParams.getSize());
+
+    return new GetLogsResponse(logs.size(),pagedLogs, requestParams.getSize());
+  }
+
+  public LogPollResponse pollLogs(TaskDetailsRequestParams requestParams) {
+    List<LogModel> logsFromDB = getLogsDirectlyFromDB(requestParams);
+
+    long newFailures = logsFromDB.stream()
+            .filter(log -> !caching.checkLogCacheForKey(log.getId()) && !log.isSucceeded())
+            .count();
+
+    long newSucceeded = logsFromDB.stream()
+            .filter(log -> !caching.checkLogCacheForKey(log.getId()) && log.isSucceeded())
+            .count();
+
+    return new LogPollResponse((int) newFailures, (int) newSucceeded);
   }
 
 
@@ -62,8 +77,8 @@ public class LogLogic {
       queryBuilder.andCondition(
           new SearchCondition(requestParams.getSearchTerm(), new HashMap<>()));
     }
-    queryBuilder.limit(20);
-    queryBuilder.orderBy(requestParams.isAsc() ? "time_started desc" : "time_started asc");
+    queryBuilder.limit(500);
+    queryBuilder.orderBy(requestParams.isAsc() ? "time_finished desc" : "time_finished asc");
 
     queryBuilder.limit(DEFAULT_LIMIT);
 

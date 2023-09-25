@@ -5,11 +5,12 @@ import { isStatus } from 'src/utils/determineStatus';
 import TaskCard from './TaskCard';
 import TaskGroupCard from './TaskGroupCard';
 import TitleRow from './TitleRow';
-import { useInfiniteTaskScrolling } from 'src/hooks/useInfiniteTaskScrolling';
+import { useInfiniteScrolling } from 'src/hooks/useInfiniteTaskScrolling';
 import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
 import { TASK_QUERY_KEY, getTasks } from 'src/services/getTasks';
 import colors from 'src/styles/colors';
 import { HeaderBar } from './HeaderBar';
+import { TasksResponse } from 'src/models/TasksResponse';
 
 const TaskList: React.FC = () => {
   const { taskName } = useParams<{ taskName?: string }>();
@@ -28,14 +29,14 @@ const TaskList: React.FC = () => {
     sortAsc,
     setSortAsc,
     setSearchTerm,
-  } = useInfiniteTaskScrolling(
+  } = useInfiniteScrolling<TasksResponse>(
     isDetailsView
       ? {
-          getTasksFunction: getTask,
+          fetchDataFunction: getTask,
           taskName: taskName,
           baseQueryKey: TASK_DETAILS_QUERY_KEY,
         }
-      : { getTasksFunction: getTasks, baseQueryKey: TASK_QUERY_KEY },
+      : { fetchDataFunction: getTasks, baseQueryKey: TASK_QUERY_KEY },
   );
 
   return (
@@ -61,7 +62,7 @@ const TaskList: React.FC = () => {
       />
       <Accordion allowMultiple key={taskName || 'all'}>
         {data?.pages.map((p) =>
-          p.tasks.map((task) =>
+          p.items.map((task) =>
             !isStatus('Group', task) ? (
               <TaskCard
                 key={task.taskInstance + task.taskName}

@@ -38,7 +38,6 @@ public class TaskLogic {
       TaskInstanceId taskInstance = scheduledExecutionOpt.get().getTaskInstance();
       scheduler.reschedule(taskInstance, Instant.now());
     } else {
-      // Handle the case where the ScheduledExecution is not found
       throw new ResponseStatusException(
           HttpStatus.NOT_FOUND,
           "No ScheduledExecution found for taskName: " + taskName + ", taskId: " + taskId);
@@ -53,7 +52,6 @@ public class TaskLogic {
       TaskInstanceId taskInstance = scheduledExecutionOpt.get().getTaskInstance();
       scheduler.cancel(taskInstance);
     } else {
-      // Handle the case where the ScheduledExecution is not found
       throw new ResponseStatusException(
           HttpStatus.NOT_FOUND,
           "No ScheduledExecution found for taskName: " + taskName + ", taskId: " + taskId);

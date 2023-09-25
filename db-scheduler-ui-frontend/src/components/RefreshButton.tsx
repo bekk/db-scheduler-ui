@@ -7,25 +7,34 @@ import {
   QueryObserverResult,
   useQuery,
 } from '@tanstack/react-query';
-import { POLL_TASKS_QUERY_KEY, pollTasks } from 'src/services/pollTasks';
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
-import { TasksResponse } from 'src/models/TasksResponse';
+import { InfiniteScrollResponse } from 'src/models/TasksResponse';
 import { RefreshCircle } from './RefreshCircle';
+import { Log } from 'src/models/Log';
+import { Task } from 'src/models/Task';
+import { PollResponse } from 'src/models/PollResponse';
 
 interface RefreshButtonProps {
   refetch?: () => Promise<
-    QueryObserverResult<InfiniteData<TasksResponse>, unknown>
+    QueryObserverResult<
+      InfiniteData<InfiniteScrollResponse<Task | Log>>,
+      unknown
+    >
   >;
+  pollFunction: (params: TaskDetailsRequestParams) => Promise<PollResponse>;
+  pollKey: string;
   params: TaskDetailsRequestParams;
 }
 
 export const RefreshButton: React.FC<RefreshButtonProps> = ({
   refetch,
+  pollFunction,
+  pollKey,
   params,
 }) => {
   const { data, refetch: repoll } = useQuery(
     [
-      POLL_TASKS_QUERY_KEY,
+      pollKey,
       params.filter,
       params.sorting,
       params.asc,
@@ -36,7 +45,7 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
       params.searchTerm,
     ],
     () =>
-      pollTasks({
+      pollFunction({
         filter: params.filter,
         sorting: params.sorting,
         asc: params.asc,
@@ -47,6 +56,7 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
         searchTerm: params.searchTerm,
       }),
   );
+  console.log(data);
 
   return (
     <Box position="relative" display="inline-block">
@@ -76,20 +86,32 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
         <RefreshCircle
           number={data?.newFailures ?? 0}
           color={colors.failed['200']}
-          visible={data?.newFailures !== 0}
+          visible={data?.newFailures !== 0 && data?.newFailures !== undefined}
           hoverText=" failed since refresh"
         />
-        <RefreshCircle
-          number={data?.newRunning ?? 0}
-          color={colors.running['300']}
-          visible={data?.newRunning !== 0}
-          hoverText=" running since refresh"
-        />
+        {data?.newSucceeded ? (
+          <RefreshCircle
+            number={data?.newSucceeded ?? 0}
+            color={colors.success['200']}
+            visible={
+              data?.newSucceeded !== 0 && data?.newSucceeded !== undefined
+            }
+            hoverText=" succeeded since refresh"
+          />
+        ) : (
+          <RefreshCircle
+            number={data?.newRunning ?? 0}
+            color={colors.running['300']}
+            visible={data?.newRunning !== 0 && data?.newRunning !== undefined}
+            hoverText=" running since refresh"
+          />
+        )}
+
         <RefreshCircle
           number={data?.newTasks ?? 0}
           color={colors.primary['300']}
           textColor={colors.primary['900']}
-          visible={data?.newTasks !== 0}
+          visible={data?.newTasks !== 0 && data?.newTasks !== undefined}
           hoverText=" added since refresh"
         />
       </Box>
