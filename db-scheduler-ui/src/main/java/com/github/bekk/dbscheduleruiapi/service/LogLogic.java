@@ -17,7 +17,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class LogLogic {
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -27,7 +26,7 @@ public class LogLogic {
   @Autowired
   public LogLogic(DataSource dataSource, boolean config) {
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    this.config=config;
+    this.config = config;
   }
 
   public List<LogModel> getLogs(TaskDetailsRequestParams requestParams) {
@@ -127,13 +126,12 @@ public class LogLogic {
     }
   }
 
-
   public static class LogModelRowMapper implements RowMapper<LogModel> {
     @Override
     public LogModel mapRow(ResultSet rs, int rowNum) throws SQLException {
       byte[] taskData = null;
-      if(config){
-         taskData = rs.getBytes("task_data");
+      if (config) {
+        taskData = rs.getBytes("task_data");
       }
       return new LogModel(
           rs.getLong("id"),
@@ -164,5 +162,4 @@ public class LogLogic {
       return operator;
     }
   }
-
 }

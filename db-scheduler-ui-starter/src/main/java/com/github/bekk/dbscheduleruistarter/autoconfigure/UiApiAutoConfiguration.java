@@ -20,6 +20,7 @@ public class UiApiAutoConfiguration {
 
   @Value("${db-scheduler-ui.taskdata:true}")
   public boolean data;
+
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
 
   public UiApiAutoConfiguration() {
@@ -35,7 +36,11 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "history", havingValue = "true", matchIfMissing = true)
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "history",
+      havingValue = "true",
+      matchIfMissing = true)
   public LogLogic logLogic(DataSource dataSource) {
     return new LogLogic(dataSource, data);
   }
@@ -48,7 +53,11 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "history", havingValue = "true", matchIfMissing = true)
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "history",
+      havingValue = "true",
+      matchIfMissing = true)
   public LogController logController(LogLogic logLogic) {
     return new LogController(logLogic);
   }
