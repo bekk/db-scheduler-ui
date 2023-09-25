@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 import React from 'react';
-import { Box, Input, Text } from '@chakra-ui/react';
+import { Box, Button, Input, Text } from '@chakra-ui/react';
 import { FilterBy } from 'src/models/QueryParams';
 import { FilterBox } from './FilterBox';
 import { RefreshButton } from 'src/components/RefreshButton';
@@ -22,6 +22,8 @@ import { Log } from 'src/models/Log';
 import { Task } from 'src/models/Task';
 import { POLL_LOGS_QUERY_KEY, pollLogs } from 'src/services/pollLogs';
 import { POLL_TASKS_QUERY_KEY, pollTasks } from 'src/services/pollTasks';
+import { PlayIcon, RepeatIcon } from 'src/assets/icons';
+import colors from 'src/styles/colors';
 
 interface HeaderBarProps {
   inputPlaceholder: string;
@@ -44,6 +46,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   refetch,
   title,
   history,
+  taskName,
 }) => (
   <Box
     display={'flex'}
@@ -54,9 +57,25 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   >
     <Box display={'flex'} alignItems={'center'} flex={1}>
       <Box>
-        <Text ml={1} fontSize={'3xl'} fontWeight={'semibold'}>
-          {title}
-        </Text>
+        <Box display={'flex'} alignItems={'center'}>
+          <Text ml={1} fontSize={'3xl'} fontWeight={'semibold'}>
+            {title}
+          </Text>
+          {taskName && (
+            <>
+              <Button mx={5} rightIcon={<PlayIcon />} title="">
+                Rerun all failed
+              </Button>
+              <Button
+                rightIcon={<RepeatIcon />}
+                bgColor={colors.running['300']}
+                textColor={colors.primary['100']}
+              >
+                Run all
+              </Button>
+            </>
+          )}
+        </Box>
         <Input
           placeholder={inputPlaceholder}
           onChange={(e) => setSearchTerm(e.currentTarget.value)}

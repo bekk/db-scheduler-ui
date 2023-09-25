@@ -13,14 +13,36 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @CrossOrigin
 @RequestMapping("/db-scheduler")
 public class UIController {
+
+  public UIController(boolean taskData, boolean history) {
+    Map<String, Object> jsonMap = new HashMap<>();
+    jsonMap.put("taskData", taskData);
+    jsonMap.put("history", history);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    File file = new File("db-scheduler-ui/src/main/resources/static/db-scheduler-ui/assets/config.json");
+    System.out.println(file.getPath());
+    try {
+      objectMapper.writeValue(file, jsonMap);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   @RequestMapping("/**")
   public String forwardToIndex() {
     return "forward:/db-scheduler-ui/index.html";
