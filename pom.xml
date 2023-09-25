@@ -229,6 +229,41 @@
                     </jreleaser>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>4.2</version>
+                <configuration>
+                    <mapping>
+                        <ts>SLASHSTAR_STYLE</ts>
+                        <tsx>SLASHSTAR_STYLE</tsx>
+                    </mapping>
+                    <licenseSets>
+                        <licenseSet>
+                            <header>./.license/license-header.txt</header>
+                            <includes>
+                                <include>**/*.java</include>
+                                <include>**/*.tsx</include>
+                                <include>**/*.ts</include>
+                            </includes>
+                            <excludes>
+                                <exclude>.github/**</exclude>
+                                <exclude>**/src/test/**</exclude>
+                            </excludes>
+                        </licenseSet>
+                    </licenseSets>
+                    <failIfMissing>true</failIfMissing>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-license-header</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
