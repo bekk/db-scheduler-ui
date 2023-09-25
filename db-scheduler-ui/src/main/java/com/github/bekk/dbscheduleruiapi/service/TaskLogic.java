@@ -22,11 +22,13 @@ import org.springframework.web.server.ResponseStatusException;
 public class TaskLogic {
 
   private final Scheduler scheduler;
+  private final boolean config;
 
   @Autowired
-  public TaskLogic(Scheduler scheduler) {
+  public TaskLogic(Scheduler scheduler, boolean config) {
     this.scheduler = scheduler;
     this.scheduler.start();
+    this.config =config;
   }
 
   public void runTaskNow(String taskId, String taskName) {
@@ -65,6 +67,8 @@ public class TaskLogic {
         scheduler.getScheduledExecutions(ScheduledExecutionsFilter.all().withPicked(true)));
     List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModel(executions);
     tasks = QueryUtils.search(tasks, params.getSearchTerm());
+    if(!config){   List<Object> list = new ArrayList<Object>(){{add(null);}};
+      tasks.forEach(e -> e.setTaskData(list));}
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
@@ -101,6 +105,9 @@ public class TaskLogic {
               + params.getTaskId());
     }
     tasks = QueryUtils.search(tasks, params.getSearchTerm());
+    if(!config){
+      List<Object> list = new ArrayList<Object>(){{add(null);}};
+      tasks.forEach(e -> e.setTaskData(list));}
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
