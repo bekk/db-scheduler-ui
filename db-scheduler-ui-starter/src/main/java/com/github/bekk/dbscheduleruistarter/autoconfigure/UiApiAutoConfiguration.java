@@ -30,7 +30,6 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   public TaskLogic taskLogic(Scheduler scheduler) {
-    System.out.println(data);
     return new TaskLogic(scheduler, data);
   }
 
