@@ -32,7 +32,8 @@ export const LogList: React.FC = () => {
     taskName
       ? {
           fetchDataFunction: getLogs,
-          taskName: taskName + taskInstance, //TODO: Fix this
+          taskName: taskName,
+          taskInstance: taskInstance,
           baseQueryKey: ALL_LOG_QUERY_KEY,
         }
       : { fetchDataFunction: getLogs, baseQueryKey: ALL_LOG_QUERY_KEY },

@@ -71,7 +71,7 @@ export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log
         searchTerm,
         size: limit,
         ...(taskName ? { taskName } : {}),
-        ...(taskInstance ? { taskInstance } : {}),
+        ...(taskInstance ? { taskId:taskInstance } : {}),
       };
 
       return fetchDataFunction(params);

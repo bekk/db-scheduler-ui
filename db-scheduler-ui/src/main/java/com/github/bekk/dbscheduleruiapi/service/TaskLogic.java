@@ -101,8 +101,6 @@ public class TaskLogic {
               + params.getTaskId());
     }
     tasks = QueryUtils.search(tasks, params.getSearchTerm());
-    System.out.println(params.getSorting());
-    System.out.println(params.isAsc());
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
