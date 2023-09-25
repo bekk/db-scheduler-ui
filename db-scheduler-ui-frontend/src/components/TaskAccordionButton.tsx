@@ -38,6 +38,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
   return (
     <h2>
       <AccordionButton
+        overflowX="scroll"
         as={'div'}
         borderRadius={4}
         background={colors.primary['100']}
@@ -71,6 +72,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
             <Box
               flex="2"
               textAlign="left"
+              minWidth={28}
               display={'flex'}
               alignItems={'center'}
             >
@@ -83,13 +85,13 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
             </Box>
           )}
           <Flex wrap={'wrap'} textAlign="left" flex="2" display={'flex'}>
-            <Text>
+            <Text minWidth={28}>
               {taskInstance[0].length > 40
                 ? taskInstance[0].slice(0, 40) + '...'
                 : taskInstance[0]}
             </Text>
             {isStatus('Group', props) && (
-              <Text color={colors.primary['500']}>
+              <Text minWidth={28} color={colors.primary['500']}>
                 {` + ${taskInstance.length - 1} more`}
               </Text>
             )}
@@ -101,9 +103,12 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
             justifyContent={'flex-end'}
             flexDirection={'row'}
           >
-            <Box flex={1}>{dateFormatText(new Date(executionTime[0]))}</Box>
+            <Box flex={1} minWidth={28}>
+              {dateFormatText(new Date(executionTime[0]))}
+            </Box>
             <Box
               display={'flex'}
+              minWidth={28}
               justifyContent={
                 !isStatus('Group', props) ? 'space-between' : 'end'
               }

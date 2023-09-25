@@ -11,6 +11,7 @@ export const LogStatus: React.FC<LogStatusProps> = ({ succeeded }) => {
 
   return (
     <Box
+      textAlign={'center'}
       borderRadius={4}
       mr={4}
       width={120}

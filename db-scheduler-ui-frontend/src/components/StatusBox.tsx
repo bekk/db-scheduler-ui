@@ -45,6 +45,7 @@ export const StatusBox: React.FC<StatusBoxProps> = ({
 
   return (
     <Box
+      textAlign={'center'}
       borderRadius={4}
       mr={4}
       width={115}
