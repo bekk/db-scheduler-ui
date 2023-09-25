@@ -17,10 +17,7 @@ interface HeaderBarProps {
   setCurrentFilter: (filter: FilterBy) => void;
   setSearchTerm: (searchTerm: string) => void;
   refetch?: () => Promise<
-    QueryObserverResult<
-      InfiniteData<InfiniteScrollResponse<Task | Log>>,
-      unknown
-    >
+    QueryObserverResult<InfiniteData<InfiniteScrollResponse<Task | Log>>>
   >;
   title: string;
   history?: boolean;

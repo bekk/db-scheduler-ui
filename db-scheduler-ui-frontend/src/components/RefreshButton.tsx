@@ -16,10 +16,7 @@ import { PollResponse } from 'src/models/PollResponse';
 
 interface RefreshButtonProps {
   refetch?: () => Promise<
-    QueryObserverResult<
-      InfiniteData<InfiniteScrollResponse<Task | Log>>,
-      unknown
-    >
+    QueryObserverResult<InfiniteData<InfiniteScrollResponse<Task | Log>>>
   >;
   pollFunction: (params: TaskDetailsRequestParams) => Promise<PollResponse>;
   pollKey: string;
