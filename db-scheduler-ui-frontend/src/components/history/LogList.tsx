@@ -1,53 +1,43 @@
-import { useQuery } from '@tanstack/react-query';
-import { Accordion, Box, Flex, HStack, Text } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
-import { Log } from 'src/models/Log';
+import { Accordion, Box, Button, Flex, HStack, Text } from '@chakra-ui/react';
+import React from 'react';
 import { LogCard } from 'src/components/history/LogCard';
 import { useParams } from 'react-router-dom';
 import colors from 'src/styles/colors';
 import { HeaderBar } from '../HeaderBar';
-import { ALL_LOG_QUERY_KEY, getAllLogs } from 'src/services/getAllLogs';
+import { ALL_LOG_QUERY_KEY, getLogs } from 'src/services/getLogs';
+import { useInfiniteScrolling } from 'src/hooks/useInfiniteTaskScrolling';
 import { DateTimeInput } from 'src/components/history/DateTimeInput';
 import { SortButton } from 'src/components/SortButton';
-import { FilterBy, SortBy } from 'src/models/QueryParams';
+import { SortBy } from 'src/models/QueryParams';
+import { LogResponse } from 'src/models/TasksResponse';
 
 export const LogList: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
-  const [sortAsc, setSortAsc] = useState<boolean>(true);
-  const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
-
   const { taskName, taskInstance } = useParams();
   const [startTime, setStartTime] = React.useState<Date | null>(null);
   const [endTime, setEndTime] = React.useState<Date | null>(null);
-  const { data } = useQuery(
-    [
-      ALL_LOG_QUERY_KEY,
-      currentFilter,
-      searchTerm,
-      startTime,
-      endTime,
-      taskName,
-      taskInstance,
-      sortAsc,
-      currentSort,
-    ],
-    () =>
-      getAllLogs(
-        currentFilter,
-        searchTerm,
-        startTime,
-        endTime,
-        taskName,
-        taskInstance,
-        sortAsc,
-        currentSort,
-      ),
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    currentFilter,
+    setCurrentFilter,
+    currentSort,
+    setCurrentSort,
+    sortAsc,
+    setSortAsc,
+    setSearchTerm,
+  } = useInfiniteScrolling<LogResponse>(
+    taskName
+      ? {
+          fetchDataFunction: getLogs,
+          taskName: taskName,
+          taskInstance: taskInstance,
+          baseQueryKey: ALL_LOG_QUERY_KEY,
+        }
+      : { fetchDataFunction: getLogs, baseQueryKey: ALL_LOG_QUERY_KEY },
   );
-
-  useEffect(() => {
-    setSortAsc(true);
-  }, [currentSort]);
 
   return (
     <Box>
@@ -60,6 +50,7 @@ export const LogList: React.FC = () => {
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}
         setSearchTerm={setSearchTerm}
+        refetch={refetch}
         history
       />
       <Box mb={14}>
@@ -101,10 +92,29 @@ export const LogList: React.FC = () => {
         <Box flex="0.2" />
       </HStack>
       <Accordion allowMultiple>
-        {data?.map((log: Log) => (
-          <LogCard key={log.id + log.taskName + log.taskInstance} log={log} />
-        ))}
+        {data?.pages.map((p) =>
+          p.items.map((log) => (
+            <LogCard key={log.id + log.taskName + log.taskInstance} log={log} />
+          )),
+        )}
       </Accordion>
+      <Flex justifyContent="center" alignItems="center" mt={4}>
+        <Button
+          onClick={() => fetchNextPage()}
+          bgColor={'white'}
+          isDisabled={!hasNextPage || isFetchingNextPage}
+          borderColor={colors.primary}
+          borderWidth={1}
+          fontWeight={'medium'}
+          mb={24}
+        >
+          {isFetchingNextPage
+            ? 'Loading...'
+            : hasNextPage
+            ? 'Load More'
+            : 'Nothing more to load'}
+        </Button>
+      </Flex>
     </Box>
   );
 };

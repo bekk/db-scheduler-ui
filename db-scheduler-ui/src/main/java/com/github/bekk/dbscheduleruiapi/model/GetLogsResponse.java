@@ -4,19 +4,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
-public class GetTasksResponse {
+public class GetLogsResponse {
   private final int numberOfItems;
   private final int numberOfPages;
-  private final List<TaskModel> items;
+  private final List<LogModel> items;
 
   @JsonCreator
-  public GetTasksResponse(
-      @JsonProperty("numberOfItems") int totalTasks,
-      @JsonProperty("items") List<TaskModel> pagedTasks,
+  public GetLogsResponse(
+      @JsonProperty("numberOfItems") int totalLogs,
+      @JsonProperty("items") List<LogModel> pagedLogs,
       @JsonProperty("pageSize") int pageSize) {
-    this.numberOfItems = totalTasks;
-    this.numberOfPages = totalTasks == 0 ? 0 : (int) Math.ceil((double) totalTasks / pageSize);
-    this.items = pagedTasks;
+    this.numberOfItems = totalLogs;
+    this.numberOfPages = totalLogs == 0 ? 0 : (int) Math.ceil((double) totalLogs / pageSize);
+    this.items = pagedLogs;
   }
 
   public int getNumberOfItems() {
@@ -27,7 +27,7 @@ public class GetTasksResponse {
     return numberOfPages;
   }
 
-  public List<TaskModel> getItems() {
+  public List<LogModel> getItems() {
     return items;
   }
 }

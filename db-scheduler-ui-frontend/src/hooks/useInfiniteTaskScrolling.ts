@@ -1,21 +1,24 @@
 import { useCallback, useState, useRef, useMemo } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { getTasks } from 'src/services/getTasks';
-import { getTask } from 'src/services/getTask';
-import { TasksResponse } from 'src/models/TasksResponse';
+import { InfiniteScrollResponse } from 'src/models/TasksResponse';
 import { FilterBy, SortBy } from 'src/models/QueryParams';
+import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
+import { Log } from 'src/models/Log';
+import { Task } from 'src/models/Task';
 
-interface UseInfiniteTaskScrollingProps {
-  getTasksFunction: typeof getTasks | typeof getTask;
-  taskName?: string;
+interface UseInfiniteScrollingProps<T extends InfiniteScrollResponse<Task | Log>> {
+  fetchDataFunction: (params: TaskDetailsRequestParams) => Promise<T>;
   baseQueryKey: string;
+  taskName?: string;
+  taskInstance?: string;
 }
 
-export const useInfiniteTaskScrolling = ({
-  getTasksFunction,
+export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log>>({
+  fetchDataFunction,
   taskName,
+  taskInstance,
   baseQueryKey,
-}: UseInfiniteTaskScrollingProps) => {
+}: UseInfiniteScrollingProps<T>) => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
   const [sortAsc, setSortAsc] = useState<boolean>(true);
@@ -35,11 +38,12 @@ export const useInfiniteTaskScrolling = ({
     currentSort,
     sortAsc,
     ...(taskName ? [taskName] : []),
+    ...(taskInstance ? [taskInstance] : []),
     searchTerm,
-  ], [baseQueryKey, currentFilter, currentSort, sortAsc, taskName, searchTerm]);
+  ], [baseQueryKey, currentFilter, currentSort, sortAsc, taskName,taskInstance, searchTerm]);
   
 
-  const fetchTasks = useCallback(
+  const fetchItems = useCallback(
     ({ pageParam = 0 }) => {
       const hasFilterChanged = prevFilterRef.current !== currentFilter;
       const hasSortChanged = prevSortRef.current !== currentSort;
@@ -57,37 +61,28 @@ export const useInfiniteTaskScrolling = ({
       prevSortAscRef.current = sortAsc;
       prevSearchTermRef.current = searchTerm;
 
-      if (taskName) {
-        return getTasksFunction(
-          {filter:currentFilter,
-          pageNumber: pageParam, limit: limit,
-          sorting:currentSort,
-          asc:sortAsc,
-          refresh:shouldRefresh,
-          searchTerm,
-          size:limit,
-          taskName,}
-        );
-      } else {
-        return getTasksFunction(
-          {filter:currentFilter,
-          pageNumber: pageParam, limit: limit,
-          sorting:currentSort,
-          asc:sortAsc,
-          refresh:shouldRefresh,
-          searchTerm,
-        size:limit,
-      }
-        );
-      }
+      const params = {
+        filter: currentFilter,
+        pageNumber: pageParam,
+        limit: limit,
+        sorting: currentSort,
+        asc: sortAsc,
+        refresh: shouldRefresh,
+        searchTerm,
+        size: limit,
+        ...(taskName ? { taskName } : {}),
+        ...(taskInstance ? { taskId:taskInstance } : {}),
+      };
+
+      return fetchDataFunction(params);
     },
-    [currentFilter, currentSort, sortAsc, searchTerm, taskName, queryClient, queryKey, getTasksFunction],
+    [currentFilter, currentSort, sortAsc, searchTerm, taskName, taskInstance, queryClient, queryKey, fetchDataFunction],
   );
 
 
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isFetched } =
-    useInfiniteQuery<TasksResponse>(queryKey, fetchTasks, {
+    useInfiniteQuery<T>(queryKey, fetchItems, {
       getNextPageParam: (lastPage, allPages) => {
         const nextPage = allPages.length + 1;
         return nextPage <= lastPage.numberOfPages ? nextPage : undefined;

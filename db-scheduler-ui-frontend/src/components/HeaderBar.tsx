@@ -4,7 +4,11 @@ import { FilterBy } from 'src/models/QueryParams';
 import { FilterBox } from './FilterBox';
 import { RefreshButton } from 'src/components/RefreshButton';
 import { QueryObserverResult, InfiniteData } from '@tanstack/react-query';
-import { TasksResponse } from 'src/models/TasksResponse';
+import { InfiniteScrollResponse } from 'src/models/TasksResponse';
+import { Log } from 'src/models/Log';
+import { Task } from 'src/models/Task';
+import { POLL_LOGS_QUERY_KEY, pollLogs } from 'src/services/pollLogs';
+import { POLL_TASKS_QUERY_KEY, pollTasks } from 'src/services/pollTasks';
 
 interface HeaderBarProps {
   inputPlaceholder: string;
@@ -13,7 +17,7 @@ interface HeaderBarProps {
   setCurrentFilter: (filter: FilterBy) => void;
   setSearchTerm: (searchTerm: string) => void;
   refetch?: () => Promise<
-    QueryObserverResult<InfiniteData<TasksResponse>, unknown>
+    QueryObserverResult<InfiniteData<InfiniteScrollResponse<Task | Log>>>
   >;
   title: string;
   history?: boolean;
@@ -56,11 +60,14 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         setCurrentFilter={setCurrentFilter}
         history={history}
       />
-      {!history && (
-        <Box display={'flex'} float={'right'} alignItems={'center'}>
-          <RefreshButton refetch={refetch} params={{ filter: FilterBy.All }} />
-        </Box>
-      )}
+      <Box display={'flex'} float={'right'} alignItems={'center'}>
+        <RefreshButton
+          pollFunction={history ? pollLogs : pollTasks}
+          pollKey={history ? POLL_LOGS_QUERY_KEY : POLL_TASKS_QUERY_KEY}
+          refetch={refetch}
+          params={{ filter: FilterBy.All }}
+        />
+      </Box>
     </Box>
   </Box>
 );
