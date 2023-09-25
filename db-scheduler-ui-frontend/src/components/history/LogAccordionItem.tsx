@@ -21,7 +21,8 @@ export const LogAccordionItem: React.FC<LogAccordionItemProps> = ({
         w={'100%'}
         borderRadius={4}
       >
-        <Box>
+        <pre>{stackTrace}</pre>
+        {/*        <Box>
           {stackTrace?.split('\n').map((str, index, array) =>
             index === array.length - 1 ? (
               str
@@ -32,7 +33,7 @@ export const LogAccordionItem: React.FC<LogAccordionItemProps> = ({
               </>
             ),
           )}
-        </Box>
+        </Box>*/}
         <LogDataRow taskData={taskData} />
       </VStack>
     </AccordionPanel>
