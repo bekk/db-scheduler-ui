@@ -23,6 +23,7 @@ export const LogAccordionButton: React.FC<LogAccordionButtonProps> = (
   return (
     <h2>
       <AccordionButton
+        overflowX="scroll"
         justifyContent={'space-between'}
         cursor={'pointer'}
         as={'div'}
@@ -37,16 +38,16 @@ export const LogAccordionButton: React.FC<LogAccordionButtonProps> = (
               />
             )}
           </Box>
-          <Box flex="2" textAlign="left" hidden={!!taskName}>
+          <Box flex="2" textAlign="left" minWidth={28} hidden={!!taskName}>
             {props.taskName}
           </Box>
-          <Box flex="2" textAlign="left">
+          <Box flex="2" textAlign="left" minWidth={28}>
             {props.taskInstance}
           </Box>
-          <Box flex={'2'} textAlign={'left'}>
+          <Box flex={'2'} textAlign={'left'} minWidth={28}>
             {dateFormatText(new Date(props.timeFinished))}
           </Box>
-          <Box flex="2" textAlign="left">
+          <Box flex="2" textAlign="left" minWidth={28}>
             {props.exceptionMessage}
           </Box>
           <AccordionIcon flex="0.2" />
