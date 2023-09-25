@@ -11,7 +11,6 @@ export const getTask = async (
   params:TaskDetailsRequestParams
 ): Promise<TasksResponse> => {
   const queryParams = new URLSearchParams();
-  console.log(params.asc)
 
   params.filter && queryParams.append('filter', params.filter.toUpperCase());
   params.pageNumber && queryParams.append('pageNumber', params.pageNumber.toString());

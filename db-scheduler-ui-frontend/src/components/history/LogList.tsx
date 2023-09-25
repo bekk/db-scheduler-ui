@@ -37,7 +37,7 @@ export const LogList: React.FC = () => {
         }
       : { fetchDataFunction: getLogs, baseQueryKey: ALL_LOG_QUERY_KEY },
   );
-  console.log(data);
+
   return (
     <Box>
       <HeaderBar
