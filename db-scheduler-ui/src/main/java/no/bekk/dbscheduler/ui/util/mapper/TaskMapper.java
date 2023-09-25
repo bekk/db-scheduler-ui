@@ -13,13 +13,12 @@
  */
 package no.bekk.dbscheduler.ui.util.mapper;
 
-import no.bekk.dbscheduler.ui.model.TaskModel;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import no.bekk.dbscheduler.ui.model.TaskModel;
 
 public class TaskMapper {
   public static List<TaskModel> mapScheduledExecutionsToTaskModel(

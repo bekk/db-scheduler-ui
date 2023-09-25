@@ -13,16 +13,16 @@
  */
 package no.bekk.dbscheduler.ui.service;
 
-import no.bekk.dbscheduler.ui.model.*;
-import no.bekk.dbscheduler.ui.util.AndCondition;
-import no.bekk.dbscheduler.ui.util.Caching;
-import no.bekk.dbscheduler.ui.util.QueryBuilder;
-import no.bekk.dbscheduler.ui.util.QueryUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.*;
 import javax.sql.DataSource;
+import no.bekk.dbscheduler.ui.model.*;
+import no.bekk.dbscheduler.ui.util.AndCondition;
+import no.bekk.dbscheduler.ui.util.Caching;
+import no.bekk.dbscheduler.ui.util.QueryBuilder;
+import no.bekk.dbscheduler.ui.util.QueryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

@@ -15,7 +15,6 @@ package no.bekk.dbscheduler.ui.controller;
 
 import no.bekk.dbscheduler.ui.model.*;
 import no.bekk.dbscheduler.ui.service.LogLogic;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -13,10 +13,6 @@
  */
 package no.bekk.dbscheduler.ui.util;
 
-import no.bekk.dbscheduler.ui.model.TaskModel;
-import no.bekk.dbscheduler.ui.model.TaskRequestParams;
-import no.bekk.dbscheduler.ui.model.TaskRequestParams.TaskFilter;
-import no.bekk.dbscheduler.ui.model.TaskRequestParams.TaskSort;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -27,6 +23,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import no.bekk.dbscheduler.ui.model.TaskModel;
+import no.bekk.dbscheduler.ui.model.TaskRequestParams;
+import no.bekk.dbscheduler.ui.model.TaskRequestParams.TaskFilter;
+import no.bekk.dbscheduler.ui.model.TaskRequestParams.TaskSort;
 
 public class QueryUtils {
 
@@ -37,7 +37,8 @@ public class QueryUtils {
     return (startIndex < endIndex) ? allItems.subList(startIndex, endIndex) : new ArrayList<>();
   }
 
-  public static List<TaskModel> filterTasks(List<TaskModel> tasks, TaskRequestParams.TaskFilter filter) {
+  public static List<TaskModel> filterTasks(
+      List<TaskModel> tasks, TaskRequestParams.TaskFilter filter) {
     return tasks.stream()
         .filter(
             task -> {
