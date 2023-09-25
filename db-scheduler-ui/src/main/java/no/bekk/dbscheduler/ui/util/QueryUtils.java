@@ -129,13 +129,18 @@ public class QueryUtils {
       List<String> termConditions = new ArrayList<>();
       for (int i = 0; i < terms.size(); i++) {
         String termKey = "searchTerm" + i;
-        termConditions.add(
-            "(LOWER(task_name) LIKE LOWER(:"
+        String term = terms.get(i);
+        boolean exactMatch = term.endsWith("!");
+        if (exactMatch) {
+          term = term.substring(0, term.length() - 1); // remove the '!' from the end
+        }
+        params.put(termKey, exactMatch ? term : "%" + term + "%");
+        String condition = "(LOWER(task_name) " + (exactMatch ? "=" : "LIKE") + " LOWER(:"
                 + termKey
-                + ") OR LOWER(task_instance) LIKE LOWER(:"
+                + ") OR LOWER(task_instance) " + (exactMatch ? "=" : "LIKE") + " LOWER(:"
                 + termKey
-                + "))");
-        params.put(termKey, "%" + terms.get(i) + "%");
+                + "))";
+        termConditions.add(condition);
       }
       return conditions.append(String.join(" AND ", termConditions)).toString();
     }

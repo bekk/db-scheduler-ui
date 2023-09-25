@@ -19,14 +19,18 @@ import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 import { Log } from 'src/models/Log';
 import { Task } from 'src/models/Task';
 
-interface UseInfiniteScrollingProps<T extends InfiniteScrollResponse<Task | Log>> {
+interface UseInfiniteScrollingProps<
+  T extends InfiniteScrollResponse<Task | Log>,
+> {
   fetchDataFunction: (params: TaskDetailsRequestParams) => Promise<T>;
   baseQueryKey: string;
   taskName?: string;
   taskInstance?: string;
 }
 
-export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log>>({
+export const useInfiniteScrolling = <
+  T extends InfiniteScrollResponse<Task | Log>,
+>({
   fetchDataFunction,
   taskName,
   taskInstance,
@@ -37,46 +41,77 @@ export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log
   const [sortAsc, setSortAsc] = useState<boolean>(true);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTermTaskName, setSearchTermTaskName] = useState<string>('');
+  const [searchTermTaskInstance, setSearchTermTaskInstance] =
+    useState<string>('');
   const limit = 10;
 
   const prevFilterRef = useRef<FilterBy>();
   const prevSortRef = useRef<SortBy>();
   const prevSortAscRef = useRef<boolean>();
-  const prevSearchTermRef = useRef<string>();
+  const prevSearchTermTaskNameRef = useRef<string>();
+  const prevSearchTermTaskInstanceRef = useRef<string>();
 
   const queryClient = useQueryClient();
 
-  const queryKey = useMemo(() => [
-    baseQueryKey,
-    currentFilter,
-    currentSort,
-    sortAsc,
-    ...(startTime ? [ startTime ] : []),
+  const queryKey = useMemo(
+    () => [
+      baseQueryKey,
+      currentFilter,
+      currentSort,
+      sortAsc,
+      ...(startTime ? [ startTime ] : []),
     ...(endTime ? [ endTime ] : []),
     ...(taskName ? [taskName] : []),
-    ...(taskInstance ? [taskInstance] : []),
-    searchTerm,
-  ], [baseQueryKey, currentFilter, currentSort, sortAsc, startTime, endTime, taskName,taskInstance, searchTerm]);
-  
+      ...(taskInstance ? [taskInstance] : []),
+      searchTermTaskName,
+      searchTermTaskInstance,
+    ],
+    [
+      baseQueryKey,
+      currentFilter,
+      currentSort,
+      sortAsc,
+     startTime, endTime, taskName,
+      taskInstance,
+      searchTermTaskName,
+      searchTermTaskInstance,
+    ],
+  );
 
   const fetchItems = useCallback(
     ({ pageParam = 0 }) => {
       const hasFilterChanged = prevFilterRef.current !== currentFilter;
       const hasSortChanged = prevSortRef.current !== currentSort;
       const hasSortAscChanged = prevSortAscRef.current !== sortAsc;
-      const hasSearchTermChanged = prevSearchTermRef.current !== searchTerm;
+      const hasSearchTermTaskNameChanged =
+        prevSearchTermTaskNameRef.current !== searchTermTaskName;
+      const hasSearchTermTaskInstanceChanged =
+        prevSearchTermTaskInstanceRef.current !== searchTermTaskInstance;
 
-      const shouldRefresh = pageParam === 0 || hasFilterChanged || hasSortChanged || hasSortAscChanged || hasSearchTermChanged;
+      const shouldRefresh =
+        pageParam === 0 ||
+        hasFilterChanged ||
+        hasSortChanged ||
+        hasSortAscChanged ||
+        hasSearchTermTaskNameChanged ||
+        hasSearchTermTaskInstanceChanged;
 
-      if (hasFilterChanged || hasSortChanged || hasSortAscChanged || hasSearchTermChanged) {
+      if (
+        hasFilterChanged ||
+        hasSortChanged ||
+        hasSortAscChanged ||
+        hasSearchTermTaskNameChanged ||
+        hasSearchTermTaskInstanceChanged
+      ) {
         queryClient.removeQueries(queryKey);
       }
 
       prevFilterRef.current = currentFilter;
       prevSortRef.current = currentSort;
       prevSortAscRef.current = sortAsc;
-      prevSearchTermRef.current = searchTerm;
+      prevSearchTermTaskNameRef.current = searchTermTaskName;
+      prevSearchTermTaskInstanceRef.current = searchTermTaskInstance;
 
       const params = {
         filter: currentFilter,
@@ -87,27 +122,45 @@ export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log
         ...(startTime ? { startTime } : {}),
         ...(endTime ? { endTime } : {}),
         refresh: shouldRefresh,
-        searchTerm,
+        searchTermTaskName,
+        searchTermTaskInstance,
         size: limit,
         ...(taskName ? { taskName } : {}),
-        ...(taskInstance ? { taskId:taskInstance } : {}),
+        ...(taskInstance ? { taskId: taskInstance } : {}),
       };
 
       return fetchDataFunction(params);
     },
-    [currentFilter, currentSort, sortAsc, startTime, endTime, searchTerm, taskName, taskInstance, queryClient, queryKey, fetchDataFunction],
+    [
+      currentFilter,
+      currentSort,
+      sortAsc,
+      searchTermTaskName,
+      searchTermTaskInstance,
+      taskName,
+      taskInstance,
+      queryClient,
+      queryKey,
+      fetchDataFunction,
+        startTime, endTime
+    ],
   );
 
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    isFetched,
+  } = useInfiniteQuery<T>(queryKey, fetchItems, {
+    getNextPageParam: (lastPage, allPages) => {
+      const nextPage = allPages.length + 1;
+      return nextPage <= lastPage.numberOfPages ? nextPage : undefined;
+    },
+    refetchInterval: 0,
+  });
 
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isFetched } =
-    useInfiniteQuery<T>(queryKey, fetchItems, {
-      getNextPageParam: (lastPage, allPages) => {
-        const nextPage = allPages.length + 1;
-        return nextPage <= lastPage.numberOfPages ? nextPage : undefined;
-      },refetchInterval:0,
-    });
-    
   return {
     currentFilter,
     currentSort,
@@ -120,13 +173,15 @@ export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log
     setCurrentSort,
     sortAsc,
     setSortAsc,
-    startTime,
-    setStartTime,
-    endTime,
-    setEndTime,
-    searchTerm,
-    setSearchTerm,
+      startTime,
+      setStartTime,
+      endTime,
+      setEndTime,
+    searchTermTaskName,
+    setSearchTermTaskName,
+    searchTermTaskInstance,
+    setSearchTermTaskInstance,
     isDetailsView: !!taskName,
-    isFetched
+    isFetched,
   };
 };
