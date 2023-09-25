@@ -2,32 +2,33 @@ package com.github.bekk.dbscheduleruiapi.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class GetTasksResponse {
-  private final int numberOfTasks;
+  private final int numberOfItems;
   private final int numberOfPages;
-  private final List<TaskModel> tasks;
+  private final List<TaskModel> items;
 
   @JsonCreator
   public GetTasksResponse(
-      @JsonProperty("numberOfTasks") int totalTasks,
-      @JsonProperty("tasks") List<TaskModel> pagedTasks,
-      @JsonProperty("pageSize") int pageSize) {
-    this.numberOfTasks = totalTasks;
+          @JsonProperty("numberOfItems") int totalTasks,
+          @JsonProperty("items") List<TaskModel> pagedTasks,
+          @JsonProperty("pageSize") int pageSize) {
+    this.numberOfItems = totalTasks;
     this.numberOfPages = totalTasks == 0 ? 0 : (int) Math.ceil((double) totalTasks / pageSize);
-    this.tasks = pagedTasks;
+    this.items = pagedTasks;
   }
 
-  public int getNumberOfTasks() {
-    return numberOfTasks;
+  public int getNumberOfItems() {
+    return numberOfItems;
   }
 
   public int getNumberOfPages() {
     return numberOfPages;
   }
 
-  public List<TaskModel> getTasks() {
-    return tasks;
+  public List<TaskModel> getItems() {
+    return items;
   }
 }

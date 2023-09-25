@@ -18,6 +18,7 @@ public class Caching {
 
   private final Map<String, String> taskStatusCache = new ConcurrentHashMap<>();
   private final List<ScheduledExecution<Object>> taskDataCache = new ArrayList<>();
+  private final Map<Long, LogModel> logCache = new ConcurrentHashMap<>();
 
   public List<ScheduledExecution<Object>> getExecutionsFromCacheOrDB(
       boolean isRefresh, Scheduler scheduler) {
@@ -62,12 +63,6 @@ public class Caching {
     return taskStatusCache.get(uniqueId);
   }
 
-  public List<ScheduledExecution<Object>> getTaskDataCache() {
-    return taskDataCache;
-  }
-
-  private final Map<Long, LogModel> logCache = new ConcurrentHashMap<>();
-
   public List<LogModel> getLogsFromCacheOrDB(boolean isRefresh, LogLogic logLogic, TaskDetailsRequestParams requestParams) {
     if (isRefresh || logCache.isEmpty()) {
       List<LogModel> logs = logLogic.getLogsDirectlyFromDB(requestParams);
@@ -85,7 +80,7 @@ public class Caching {
     }
   }
 
-  public Map<Long, LogModel> getLogCache() {
-    return logCache;
+  public boolean checkLogCacheForKey(Long key) {
+    return logCache.containsKey(key);
   }
 }
