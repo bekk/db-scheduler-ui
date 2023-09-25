@@ -45,7 +45,7 @@ public class SmokeTest {
                 + ONE_TIME_TASK.getTaskName(),
             GetTasksResponse.class);
     Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
-    assertThat(result.getBody().getTasks()).hasSizeGreaterThan(0);
+    assertThat(result.getBody().getItems()).hasSizeGreaterThan(0);
   }
 
   @Test
@@ -57,8 +57,8 @@ public class SmokeTest {
                 + ONE_TIME_TASK.getTaskName(),
             GetTasksResponse.class);
     Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
-    result.getBody().getTasks().forEach(t -> System.out.println(t.getTaskName()));
-    assertThat(result.getBody().getTasks())
+    result.getBody().getItems().forEach(t -> System.out.println(t.getTaskName()));
+    assertThat(result.getBody().getItems())
         .anyMatch(taskModel -> taskModel.getTaskName().equals(ONE_TIME_TASK.getTaskName()));
   }
 
