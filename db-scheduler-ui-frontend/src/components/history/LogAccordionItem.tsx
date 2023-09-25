@@ -11,7 +11,7 @@ export const LogAccordionItem: React.FC<LogAccordionItemProps> = ({
   taskData,
 }) => {
   return (
-    <AccordionPanel overflowX="scroll">
+    <AccordionPanel overflowX="auto">
       <Box display={'flex'} justifyContent={'space-between'}></Box>
       <VStack
         align="start"

@@ -38,7 +38,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
   return (
     <h2>
       <AccordionButton
-        overflowX="scroll"
+        overflowX="auto"
         as={'div'}
         borderRadius={4}
         background={colors.primary['100']}

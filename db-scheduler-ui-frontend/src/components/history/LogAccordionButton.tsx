@@ -23,7 +23,7 @@ export const LogAccordionButton: React.FC<LogAccordionButtonProps> = (
   return (
     <h2>
       <AccordionButton
-        overflowX="scroll"
+        overflowX="auto"
         justifyContent={'space-between'}
         cursor={'pointer'}
         as={'div'}

@@ -15,7 +15,7 @@ export const TaskAccordionItem: React.FC<TaskAccordionItemProps> = ({
   lastSuccess,
   taskData,
 }) => (
-  <AccordionPanel overflowX="scroll" pb={4}>
+  <AccordionPanel overflowX="auto" pb={4}>
     <Box display="flex" justifyContent={'space-between'}>
       <VStack
         align="start"
