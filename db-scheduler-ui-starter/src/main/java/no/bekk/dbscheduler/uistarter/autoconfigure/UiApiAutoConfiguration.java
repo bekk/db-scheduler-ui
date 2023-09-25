@@ -13,14 +13,14 @@
  */
 package no.bekk.dbscheduler.uistarter.autoconfigure;
 
+import com.github.kagkarlsson.scheduler.Scheduler;
+import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.LogController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
 import no.bekk.dbscheduler.ui.controller.UIController;
 import no.bekk.dbscheduler.ui.service.LogLogic;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
 import no.bekk.dbscheduler.ui.util.Caching;
-import com.github.kagkarlsson.scheduler.Scheduler;
-import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;

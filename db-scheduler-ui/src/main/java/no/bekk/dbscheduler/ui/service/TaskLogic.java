@@ -15,18 +15,16 @@ package no.bekk.dbscheduler.ui.service;
 
 import static no.bekk.dbscheduler.ui.util.QueryUtils.filterExecutions;
 
-import no.bekk.dbscheduler.ui.model.*;
-import no.bekk.dbscheduler.ui.util.Caching;
-import no.bekk.dbscheduler.ui.util.QueryUtils;
-import no.bekk.dbscheduler.ui.util.mapper.TaskMapper;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
+import no.bekk.dbscheduler.ui.model.*;
 import no.bekk.dbscheduler.ui.util.Caching;
+import no.bekk.dbscheduler.ui.util.QueryUtils;
+import no.bekk.dbscheduler.ui.util.mapper.TaskMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

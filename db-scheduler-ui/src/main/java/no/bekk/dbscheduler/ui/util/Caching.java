@@ -13,9 +13,6 @@
  */
 package no.bekk.dbscheduler.ui.util;
 
-import no.bekk.dbscheduler.ui.model.LogModel;
-import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
-import no.bekk.dbscheduler.ui.service.LogLogic;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.ScheduledExecutionsFilter;
 import com.github.kagkarlsson.scheduler.Scheduler;
@@ -24,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import no.bekk.dbscheduler.ui.model.LogModel;
+import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
+import no.bekk.dbscheduler.ui.service.LogLogic;
 import org.springframework.stereotype.Component;
 
 @Component
