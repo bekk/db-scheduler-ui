@@ -29,7 +29,6 @@ public class TaskRequestParams {
 
   private final boolean taskNameExactMatch;
 
-
   private final boolean taskInstanceExactMatch;
   private final Instant startTime;
   private final Instant endTime;
@@ -43,7 +42,7 @@ public class TaskRequestParams {
       String searchTermTaskName,
       String searchTermTaskInstance,
       Boolean taskNameExactMatch,
-        Boolean taskInstanceExactMatch,
+      Boolean taskInstanceExactMatch,
       Instant startTime,
       Instant endTime,
       Boolean refresh) {
@@ -100,6 +99,7 @@ public class TaskRequestParams {
   public boolean isTaskInstanceExactMatch() {
     return taskInstanceExactMatch;
   }
+
   public void setRefresh(boolean refresh) {
     this.refresh = refresh;
   }

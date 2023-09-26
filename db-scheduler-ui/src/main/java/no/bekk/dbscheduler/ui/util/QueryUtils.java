@@ -95,15 +95,18 @@ public class QueryUtils {
     return tasks;
   }
 
-  public static List<TaskModel> searchByTaskName(List<TaskModel> tasks, String searchTermTaskName, boolean isExactMatch){
+  public static List<TaskModel> searchByTaskName(
+      List<TaskModel> tasks, String searchTermTaskName, boolean isExactMatch) {
     return search(tasks, searchTermTaskName, true, isExactMatch);
   }
 
-  public static List<TaskModel> searchByTaskInstance(List<TaskModel> tasks, String searchTermTaskInstance, boolean isExactMatch){
+  public static List<TaskModel> searchByTaskInstance(
+      List<TaskModel> tasks, String searchTermTaskInstance, boolean isExactMatch) {
     return search(tasks, searchTermTaskInstance, false, isExactMatch);
   }
 
-  public static List<TaskModel> search(List<TaskModel> tasks, String searchTerm, boolean isTaskNameSearch, boolean isExactMatch ){
+  public static List<TaskModel> search(
+      List<TaskModel> tasks, String searchTerm, boolean isTaskNameSearch, boolean isExactMatch) {
     if (searchTerm == null || searchTerm.trim().isEmpty()) {
       return tasks;
     }
@@ -117,13 +120,20 @@ public class QueryUtils {
                 String lowerCaseTerm = term.toLowerCase();
 
                 boolean isTermPresent;
-                if(isTaskNameSearch){
-                  isTermPresent = isExactMatch ? task.getTaskName().equalsIgnoreCase(lowerCaseTerm) : task.getTaskName().toLowerCase().contains(lowerCaseTerm);
-                } else{
-                    isTermPresent = task.getTaskInstance().stream()
-                        .anyMatch(
-                            instance ->
-                                instance != null && (isExactMatch ? instance.equalsIgnoreCase(lowerCaseTerm) : instance.toLowerCase().contains(lowerCaseTerm)));
+                if (isTaskNameSearch) {
+                  isTermPresent =
+                      isExactMatch
+                          ? task.getTaskName().equalsIgnoreCase(lowerCaseTerm)
+                          : task.getTaskName().toLowerCase().contains(lowerCaseTerm);
+                } else {
+                  isTermPresent =
+                      task.getTaskInstance().stream()
+                          .anyMatch(
+                              instance ->
+                                  instance != null
+                                      && (isExactMatch
+                                          ? instance.equalsIgnoreCase(lowerCaseTerm)
+                                          : instance.toLowerCase().contains(lowerCaseTerm)));
                 }
 
                 if (!isTermPresent) {
@@ -135,7 +145,8 @@ public class QueryUtils {
         .collect(Collectors.toList());
   }
 
-  public static String logSearchCondition(String searchTerm, Map<String, Object> params, boolean isTaskName, boolean isExactMatch) {
+  public static String logSearchCondition(
+      String searchTerm, Map<String, Object> params, boolean isTaskName, boolean isExactMatch) {
     StringBuilder conditions = new StringBuilder();
     List<String> terms = splitSearchTerm(searchTerm);
     if (terms.size() > 0) {
@@ -144,11 +155,14 @@ public class QueryUtils {
         String termKey = "searchTerm" + i + (isTaskName ? "TaskName" : "TaskInstance");
         String term = terms.get(i);
         params.put(termKey, isExactMatch ? term : "%" + term + "%");
-        String condition = isTaskName ? "LOWER(task_name) " + (isExactMatch ? "=" : "LIKE") + " LOWER(:"
-                + termKey
-                + ")" :  "LOWER(task_instance) " + (isExactMatch ? "=" : "LIKE") + " LOWER(:"
-                + termKey
-                + ")";
+        String condition =
+            isTaskName
+                ? "LOWER(task_name) " + (isExactMatch ? "=" : "LIKE") + " LOWER(:" + termKey + ")"
+                : "LOWER(task_instance) "
+                    + (isExactMatch ? "=" : "LIKE")
+                    + " LOWER(:"
+                    + termKey
+                    + ")";
         termConditions.add(condition);
       }
       return conditions.append(String.join(" AND ", termConditions)).toString();

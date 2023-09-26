@@ -89,12 +89,20 @@ public class LogLogic {
     }
     if (requestParams.getSearchTermTaskName() != null) {
       queryBuilder.andCondition(
-          new SearchCondition(requestParams.getSearchTermTaskName(), new HashMap<>(), true, requestParams.isTaskNameExactMatch()));
+          new SearchCondition(
+              requestParams.getSearchTermTaskName(),
+              new HashMap<>(),
+              true,
+              requestParams.isTaskNameExactMatch()));
     }
 
     if (requestParams.getSearchTermTaskInstance() != null) {
       queryBuilder.andCondition(
-              new SearchCondition(requestParams.getSearchTermTaskInstance(), new HashMap<>(), false, requestParams.isTaskInstanceExactMatch()));
+          new SearchCondition(
+              requestParams.getSearchTermTaskInstance(),
+              new HashMap<>(),
+              false,
+              requestParams.isTaskInstanceExactMatch()));
     }
 
     queryBuilder.orderBy(requestParams.isAsc() ? "time_finished desc" : "time_finished asc");
@@ -137,11 +145,12 @@ public class LogLogic {
 
     private final boolean isExactMatch;
 
-    public SearchCondition(String searchTerm, Map<String, Object> params, boolean isTaskName, boolean isExactMatch) {
+    public SearchCondition(
+        String searchTerm, Map<String, Object> params, boolean isTaskName, boolean isExactMatch) {
       this.searchTerm = searchTerm;
       this.params = params;
       this.isTaskName = isTaskName;
-        this.isExactMatch = isExactMatch;
+      this.isExactMatch = isExactMatch;
     }
 
     @Override
