@@ -45,6 +45,8 @@ export const LogList: React.FC = () => {
       setEndTime,
     setSearchTermTaskName,
     setSearchTermTaskInstance,
+    searchTermTaskName,
+    searchTermTaskInstance,
     setTaskNameExactMatch,
     setTaskInstanceExactMatch,
   } = useInfiniteScrolling<LogResponse>(
@@ -77,6 +79,8 @@ export const LogList: React.FC = () => {
         refetch={refetch}
         setTaskNameExactMatch={setTaskNameExactMatch}
         setTaskInstanceExactMatch={setTaskInstanceExactMatch}
+        searchTermTaskName={searchTermTaskName}
+        searchTermTaskInstance={searchTermTaskInstance}
         history
       />
       <Box mb={7}>

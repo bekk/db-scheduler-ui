@@ -41,6 +41,8 @@ const TaskList: React.FC = () => {
     setCurrentSort,
     sortAsc,
     setSortAsc,
+    searchTermTaskName,
+    searchTermTaskInstance,
     setSearchTermTaskName,
     setSearchTermTaskInstance,
     setTaskNameExactMatch,
@@ -72,6 +74,8 @@ const TaskList: React.FC = () => {
         setSearchTermTaskInstance={setSearchTermTaskInstance}
         setTaskNameExactMatch={setTaskNameExactMatch}
         setTaskInstanceExactMatch={setTaskInstanceExactMatch}
+        searchTermTaskName={searchTermTaskName}
+        searchTermTaskInstance={searchTermTaskInstance}
         refetch={refetch}
       />
 

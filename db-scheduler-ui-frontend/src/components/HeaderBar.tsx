@@ -38,6 +38,8 @@ interface HeaderBarProps {
   setCurrentFilter: (filter: FilterBy) => void;
   setSearchTermTaskName: (searchTerm: string) => void;
   setSearchTermTaskInstance: (searchTerm: string) => void;
+  searchTermTaskName: string;
+  searchTermTaskInstance: string;
   refetch?: () => Promise<
     QueryObserverResult<InfiniteData<InfiniteScrollResponse<Task | Log>>>
   >;
@@ -57,6 +59,8 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   setCurrentFilter,
   setSearchTermTaskName,
   setSearchTermTaskInstance,
+  searchTermTaskName,
+  searchTermTaskInstance,
   refetch,
   title,
   history,
@@ -186,7 +190,8 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             pollKey={history ? POLL_LOGS_QUERY_KEY : POLL_TASKS_QUERY_KEY}
             refetch={refetch}
             params={{
-              searchTerm,
+                searchTermTaskName,
+                searchTermTaskInstance,
               filter: currentFilter,
               startTime,
               endTime,
