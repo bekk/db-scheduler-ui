@@ -41,6 +41,7 @@ const TaskList: React.FC = () => {
     setCurrentSort,
     sortAsc,
     setSortAsc,
+    searchTerm,
     setSearchTerm,
   } = useInfiniteScrolling<TasksResponse>(
     isDetailsView
@@ -61,6 +62,7 @@ const TaskList: React.FC = () => {
         }task id`}
         taskName={taskName || ''}
         currentFilter={currentFilter}
+        searchTerm={searchTerm}
         setCurrentFilter={setCurrentFilter}
         setSearchTerm={setSearchTerm}
         refetch={refetch}

@@ -27,6 +27,7 @@ interface HeaderBarProps {
   inputPlaceholder: string;
   taskName: string;
   currentFilter: FilterBy;
+  searchTerm: string;
   setCurrentFilter: (filter: FilterBy) => void;
   setSearchTerm: (searchTerm: string) => void;
   refetch?: () => Promise<
@@ -39,6 +40,7 @@ interface HeaderBarProps {
 export const HeaderBar: React.FC<HeaderBarProps> = ({
   inputPlaceholder,
   currentFilter,
+  searchTerm,
   setCurrentFilter,
   setSearchTerm,
   refetch,
@@ -78,7 +80,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
           pollFunction={history ? pollLogs : pollTasks}
           pollKey={history ? POLL_LOGS_QUERY_KEY : POLL_TASKS_QUERY_KEY}
           refetch={refetch}
-          params={{ filter: FilterBy.All }}
+          params={{ searchTerm, filter: currentFilter }}
         />
       </Box>
     </Box>
