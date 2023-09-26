@@ -40,6 +40,7 @@ export const LogList: React.FC = () => {
     setCurrentSort,
     sortAsc,
     setSortAsc,
+    searchTerm,
     setSearchTerm,
   } = useInfiniteScrolling<LogResponse>(
     taskName
@@ -62,6 +63,7 @@ export const LogList: React.FC = () => {
         taskName={taskName || ''}
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}
+        searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         refetch={refetch}
         history

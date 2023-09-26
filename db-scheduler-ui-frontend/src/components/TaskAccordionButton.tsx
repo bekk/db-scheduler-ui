@@ -88,6 +88,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
               minWidth={28}
               display={'flex'}
               alignItems={'center'}
+              overflow={'hidden'}
             >
               {taskName}
               {isStatus('Group', props) && (
