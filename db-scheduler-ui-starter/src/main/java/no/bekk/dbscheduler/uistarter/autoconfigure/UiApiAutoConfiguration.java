@@ -33,8 +33,10 @@ public class UiApiAutoConfiguration {
 
   @Value("${db-scheduler-ui.task-data}")
   private boolean showTaskData;
+
   @Value("${db-scheduler-ui.history}")
   private boolean showHistory;
+
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
 
   public UiApiAutoConfiguration() {

@@ -24,6 +24,7 @@ import { POLL_LOGS_QUERY_KEY, pollLogs } from 'src/services/pollLogs';
 import { POLL_TASKS_QUERY_KEY, pollTasks } from 'src/services/pollTasks';
 import { PlayIcon, RepeatIcon } from 'src/assets/icons';
 import colors from 'src/styles/colors';
+import runTaskGroup from 'src/services/runTaskGroup';
 
 interface HeaderBarProps {
   inputPlaceholder: string;
@@ -63,15 +64,27 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
           </Text>
           {taskName && (
             <>
-              <Button mx={5} rightIcon={<PlayIcon />} title="">
-                Rerun all failed
-              </Button>
               <Button
-                rightIcon={<RepeatIcon />}
+                rightIcon={<PlayIcon />}
                 bgColor={colors.running['300']}
                 textColor={colors.primary['100']}
+                ml={5}
+                onClick={() => {
+                  runTaskGroup(taskName, false);
+                }}
               >
                 Run all
+              </Button>
+              <Button
+                rightIcon={<RepeatIcon boxSize={6} />}
+                bgColor={colors.failed['200']}
+                textColor={colors.primary['100']}
+                mx={5}
+                onClick={() => {
+                  runTaskGroup(taskName, true);
+                }}
+              >
+                Rerun all failed
               </Button>
             </>
           )}
@@ -79,7 +92,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         <Input
           placeholder={inputPlaceholder}
           onChange={(e) => setSearchTerm(e.currentTarget.value)}
-          bgColor={'white'}
+          bgColor={colors.primary['100']}
           w={'30vmax'}
           mt={7}
           ml={1}

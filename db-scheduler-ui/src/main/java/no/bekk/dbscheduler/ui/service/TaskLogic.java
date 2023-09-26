@@ -57,6 +57,22 @@ public class TaskLogic {
     }
   }
 
+  public void runTaskGroupNow(String taskName, boolean onlyFailed) {
+    System.out.println(caching
+            .getExecutionsFromCacheOrDB(false, scheduler).size());
+    caching
+        .getExecutionsFromCacheOrDB(false, scheduler)
+        .forEach(
+            (execution) -> {
+              if ((!onlyFailed || execution.getConsecutiveFailures() > 0)
+                  && taskName.equals(execution.getTaskInstance().getTaskName())) {
+                runTaskNow(
+                    execution.getTaskInstance().getId(), execution.getTaskInstance().getTaskName());
+              }
+              ;
+            });
+  }
+
   public void deleteTask(String taskId, String taskName) {
     Optional<ScheduledExecution<Object>> scheduledExecutionOpt =
         scheduler.getScheduledExecution(TaskInstanceId.of(taskName, taskId));
