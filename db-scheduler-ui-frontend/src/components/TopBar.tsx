@@ -16,13 +16,23 @@ import React from 'react';
 import { LogoIcon } from 'src/assets/icons/Logo';
 import colors from 'src/styles/colors';
 import { useNavigate } from 'react-router-dom';
+//import noe from '../../public/config.json';
 
 interface TopBarProps {
   title: string;
 }
 
+const CONFIG: string =
+  (import.meta.env.VITE_CONFIG_URL as string) ?? '/db-scheduler-ui/config.json';
+
 export const TopBar: React.FC<TopBarProps> = ({ title }) => {
   const navigate = useNavigate();
+  fetch(CONFIG)
+    .then((r) => r.json())
+    .then((data) => {
+      console.log('hello ' + data);
+    });
+
   return (
     <Box
       backgroundColor={colors.primary['100']}
@@ -69,6 +79,7 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
           Scheduled
         </Button>
         <Button
+          //display={!noe.showHistory ? 'none' : 'unset'}
           _hover={{
             bgColor: colors.primary['100'],
             borderColor: colors.dbBlue,
