@@ -93,12 +93,9 @@ public class TaskLogic {
     List<TaskModel> tasks =
         TaskMapper.mapAllExecutionsToTaskModel(
             caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler));
-    tasks =
-        QueryUtils.sortTasks(
-            QueryUtils.filterTasks(
-                QueryUtils.search(tasks, params.getSearchTerm()), params.getFilter()),
-            params.getSorting(),
-            params.isAsc());
+    tasks = QueryUtils.searchByTaskName(tasks, params.getSearchTermTaskName(), params.isTaskNameExactMatch());
+    tasks = QueryUtils.searchByTaskInstance(tasks, params.getSearchTermTaskInstance(), params.isTaskInstanceExactMatch());
+    tasks = QueryUtils.sortTasks(QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
     return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
@@ -131,7 +128,8 @@ public class TaskLogic {
               + ", taskId: "
               + params.getTaskId());
     }
-    tasks = QueryUtils.search(tasks, params.getSearchTerm());
+    tasks = QueryUtils.searchByTaskName(tasks, params.getSearchTermTaskName(), params.isTaskNameExactMatch());
+    tasks = QueryUtils.searchByTaskInstance(tasks, params.getSearchTermTaskInstance(), params.isTaskInstanceExactMatch());
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());

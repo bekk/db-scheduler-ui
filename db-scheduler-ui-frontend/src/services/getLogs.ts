@@ -44,6 +44,16 @@ export const getLogs = async (
     );
   params.taskName && queryParams.append('taskName', params.taskName);
   params.taskId && queryParams.append('taskId', params.taskId);
+  params.taskNameExactMatch !== undefined &&
+    queryParams.append(
+      'taskNameExactMatch',
+      params.taskNameExactMatch.toString(),
+    );
+  params.taskInstanceExactMatch !== undefined &&
+    queryParams.append(
+      'taskInstanceExactMatch',
+      params.taskInstanceExactMatch.toString(),
+    );
 
   const response = await fetch(`${API_BASE_URL}/logs/all?${queryParams}`, {
     method: 'GET',

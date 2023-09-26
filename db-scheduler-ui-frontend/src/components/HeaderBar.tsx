@@ -11,8 +11,8 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
-import { Box, Button, Input, Text } from '@chakra-ui/react';
+import React, { useEffect } from 'react';
+import { Box, Checkbox, HStack, Input, Text, VStack, Button } from '@chakra-ui/react';
 import { FilterBy } from 'src/models/QueryParams';
 import { FilterBox } from './FilterBox';
 import { RefreshButton } from 'src/components/RefreshButton';
@@ -29,6 +29,7 @@ import { RunAllAlert } from './RunAllAlert';
 interface HeaderBarProps {
   inputPlaceholder: string;
   taskName: string;
+  taskInstance: string;
   currentFilter: FilterBy;
   searchTerm: string;
   startTime?: Date;
@@ -42,6 +43,8 @@ interface HeaderBarProps {
   >;
   title: string;
   history?: boolean;
+  setTaskNameExactMatch: (exactMatch: boolean) => void;
+  setTaskInstanceExactMatch: (exactMatch: boolean) => void;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
@@ -111,26 +114,64 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
                       refetch={refetch ?? (() => {})}
                   />
               </>
-            )}
-          </Box>
-          <Input
-            placeholder={inputPlaceholder}
-            defaultValue={taskName}
-            onChange={(e) => setSearchTermTaskName(e.currentTarget.value)}
-            bgColor={colors.primary['100']}
-            w={'30vmax'}
-            mt={7}
-            ml={1}
-          />
-          <Input
-              placeholder={inputPlaceholder}
-              defaultValue={taskName}
-              onChange={(e) => setSearchTermTaskInstance(e.currentTarget.value)}
-              bgColor={colors.primary['100']}
-              w={'30vmax'}
-              mt={7}
-              ml={1}
-          />
+          )}
+      </Box>
+          <HStack>
+              <VStack align="start">
+                  <Input
+                      placeholder={inputPlaceholder}
+                      defaultValue={taskName}
+                      onChange={(e) => setSearchTermTaskName(e.currentTarget.value)}
+                      bgColor={colors.primary['100']}
+                      w={'20vmax'}
+                      mt={7}
+                      ml={1}
+                  />
+                  <Checkbox
+                      ml={1}
+                      onChange={(e) => setTaskNameExactMatch(e.target.checked)}
+                      sx={{
+                          '.chakra-checkbox__control': {
+                              bg: colors.primary['100'],
+                              _checked: {
+                                  bg: colors.primary['500'],
+                                  borderColor: colors.primary['500'],
+                              },
+                          },
+                      }}
+                  >
+                      Exact match
+                  </Checkbox>
+              </VStack>
+              <VStack align="start" spacing={2}>
+                  <Input
+                      placeholder={inputPlaceholder}
+                      defaultValue={taskInstance}
+                      onChange={(e) =>
+                          setSearchTermTaskInstance(e.currentTarget.value)
+                      }
+                      bgColor={colors.primary['100']}
+                      w={'20vmax'}
+                      mt={7}
+                      ml={1}
+                  />
+                  <Checkbox
+                      ml={1}
+                      onChange={(e) => setTaskInstanceExactMatch(e.target.checked)}
+                      sx={{
+                          '.chakra-checkbox__control': {
+                              bg: colors.primary['100'],
+                              _checked: {
+                                  bg: colors.primary['500'],
+                                  borderColor: colors.primary['500'],
+                              },
+                          },
+                      }}
+                  >
+                      Exact match
+                  </Checkbox>
+              </VStack>
+          </HStack>
         </Box>
       </Box>
       <Box height={'100%'}>

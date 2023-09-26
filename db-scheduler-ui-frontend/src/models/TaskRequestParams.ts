@@ -11,7 +11,7 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FilterBy, SortBy } from "./QueryParams";
+import { FilterBy, SortBy } from './QueryParams';
 
 export interface TaskRequestParams {
   filter: FilterBy;
@@ -20,11 +20,13 @@ export interface TaskRequestParams {
   size?: number;
   sorting?: SortBy;
   asc?: boolean;
-  searchTermTaskName: string;
-  searchTermTaskInstance: string;
+  searchTermTaskName?: string;
+  searchTermTaskInstance?: string;
   startTime?: Date;
   endTime?: Date;
   refresh?: boolean;
+  taskNameExactMatch?: boolean;
+  taskInstanceExactMatch?: boolean;
 }
 
 export interface TaskDetailsRequestParams extends TaskRequestParams {

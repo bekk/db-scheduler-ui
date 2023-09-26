@@ -45,6 +45,8 @@ export const LogList: React.FC = () => {
       setEndTime,
     setSearchTermTaskName,
     setSearchTermTaskInstance,
+    setTaskNameExactMatch,
+    setTaskInstanceExactMatch,
   } = useInfiniteScrolling<LogResponse>(
     taskName
       ? {
@@ -63,7 +65,8 @@ export const LogList: React.FC = () => {
         inputPlaceholder={`search for ${
           taskName ? '' : 'task name or '
         }task id`}
-        taskName={taskName || ''}
+        taskName={taskName}
+        taskInstance={taskInstance}
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}
         setSearchTermTaskName={setSearchTermTaskName}
@@ -72,9 +75,11 @@ export const LogList: React.FC = () => {
         startTime={startTime ?? undefined}
         endTime={endTime ?? undefined}
         refetch={refetch}
+        setTaskNameExactMatch={setTaskNameExactMatch}
+        setTaskInstanceExactMatch={setTaskInstanceExactMatch}
         history
       />
-      <Box mb={14}>
+      <Box mb={7}>
         <Flex alignItems={'center'}>
           <DateTimeInput
             selectedDate={startTime}

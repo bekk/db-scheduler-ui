@@ -44,6 +44,9 @@ export const useInfiniteScrolling = <
   const [searchTermTaskName, setSearchTermTaskName] = useState<string>('');
   const [searchTermTaskInstance, setSearchTermTaskInstance] =
     useState<string>('');
+  const [taskNameExactMatch, setTaskNameExactMatch] = useState<boolean>(false);
+  const [taskInstanceExactMatch, setTaskInstanceExactMatch] =
+    useState<boolean>(false);
   const limit = 10;
 
   const prevFilterRef = useRef<FilterBy>();
@@ -51,6 +54,8 @@ export const useInfiniteScrolling = <
   const prevSortAscRef = useRef<boolean>();
   const prevSearchTermTaskNameRef = useRef<string>();
   const prevSearchTermTaskInstanceRef = useRef<string>();
+  const prevSearchTermTaskNameExactMatchRef = useRef<boolean>();
+  const prevSearchTermTaskInstanceExactMatchRef = useRef<boolean>();
 
   const queryClient = useQueryClient();
 
@@ -66,6 +71,8 @@ export const useInfiniteScrolling = <
       ...(taskInstance ? [taskInstance] : []),
       searchTermTaskName,
       searchTermTaskInstance,
+      taskNameExactMatch,
+      taskInstanceExactMatch,
     ],
     [
       baseQueryKey,
@@ -76,6 +83,8 @@ export const useInfiniteScrolling = <
       taskInstance,
       searchTermTaskName,
       searchTermTaskInstance,
+      taskNameExactMatch,
+      taskInstanceExactMatch,
     ],
   );
 
@@ -88,6 +97,11 @@ export const useInfiniteScrolling = <
         prevSearchTermTaskNameRef.current !== searchTermTaskName;
       const hasSearchTermTaskInstanceChanged =
         prevSearchTermTaskInstanceRef.current !== searchTermTaskInstance;
+      const hasSearchTermTaskNameExactMatchChanged =
+        prevSearchTermTaskNameExactMatchRef.current !== taskNameExactMatch;
+      const hasSearchTermTaskInstanceExactMatchChanged =
+        prevSearchTermTaskInstanceExactMatchRef.current !==
+        taskInstanceExactMatch;
 
       const shouldRefresh =
         pageParam === 0 ||
@@ -95,14 +109,18 @@ export const useInfiniteScrolling = <
         hasSortChanged ||
         hasSortAscChanged ||
         hasSearchTermTaskNameChanged ||
-        hasSearchTermTaskInstanceChanged;
+        hasSearchTermTaskInstanceChanged ||
+        hasSearchTermTaskNameExactMatchChanged ||
+        hasSearchTermTaskInstanceExactMatchChanged;
 
       if (
         hasFilterChanged ||
         hasSortChanged ||
         hasSortAscChanged ||
         hasSearchTermTaskNameChanged ||
-        hasSearchTermTaskInstanceChanged
+        hasSearchTermTaskInstanceChanged ||
+        hasSearchTermTaskNameExactMatchChanged ||
+        hasSearchTermTaskInstanceExactMatchChanged
       ) {
         queryClient.removeQueries(queryKey);
       }
@@ -112,6 +130,8 @@ export const useInfiniteScrolling = <
       prevSortAscRef.current = sortAsc;
       prevSearchTermTaskNameRef.current = searchTermTaskName;
       prevSearchTermTaskInstanceRef.current = searchTermTaskInstance;
+      prevSearchTermTaskNameExactMatchRef.current = taskNameExactMatch;
+      prevSearchTermTaskInstanceExactMatchRef.current = taskInstanceExactMatch;
 
       const params = {
         filter: currentFilter,
@@ -124,6 +144,8 @@ export const useInfiniteScrolling = <
         refresh: shouldRefresh,
         searchTermTaskName,
         searchTermTaskInstance,
+        taskNameExactMatch,
+        taskInstanceExactMatch,
         size: limit,
         ...(taskName ? { taskName } : {}),
         ...(taskInstance ? { taskId: taskInstance } : {}),
@@ -142,6 +164,8 @@ export const useInfiniteScrolling = <
       queryClient,
       queryKey,
       fetchDataFunction,
+      taskNameExactMatch,
+      taskInstanceExactMatch,
         startTime, endTime
     ],
   );
@@ -183,5 +207,9 @@ export const useInfiniteScrolling = <
     setSearchTermTaskInstance,
     isDetailsView: !!taskName,
     isFetched,
+    taskNameExactMatch,
+    setTaskNameExactMatch,
+    taskInstanceExactMatch,
+    setTaskInstanceExactMatch,
   };
 };

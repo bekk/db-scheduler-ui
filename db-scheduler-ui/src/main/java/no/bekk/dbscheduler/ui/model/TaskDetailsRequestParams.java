@@ -26,13 +26,16 @@ public class TaskDetailsRequestParams extends TaskRequestParams {
       Integer size,
       TaskSort sorting,
       Boolean asc,
-      String searchTerm,
+      String searchTermTaskName,
+      String searchTermTaskInstance,
+      Boolean taskNameExactMatch,
+        Boolean taskInstanceExactMatch,
       Instant startTime,
       Instant endTime,
       String taskName,
       String taskId,
       Boolean refresh) {
-    super(filter, pageNumber, size, sorting, asc, searchTerm, startTime, endTime, refresh);
+    super(filter, pageNumber, size, sorting, asc, searchTermTaskName, searchTermTaskInstance,taskNameExactMatch,taskInstanceExactMatch,startTime, endTime, refresh);
     this.taskId = taskId;
     this.taskName = taskName;
   }
