@@ -13,10 +13,22 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * **Uses SpringBoot** to launch a UI
 * **Re-run or Run** your task directly from the User Interface
 * **Sort task** on Task Name or Execution Time
+* **Search for Task** on name and task id 
 * **View only Tasks that are Scheduled, Running or Failed.**
-* **View the history of all Tasks**
 * **Delete Tasks** 
-* **Polling** every 2 seconds.
+* **Polling** on Refetch button
+* **View a log of all Tasks**
+ 
+DB-scheduler-UI is an extention of DB scheduler. It is built to give a visulasation of the work done by Db scheduler. The UI can also display history if you are using the extention db-scheduler-log, https://github.com/rocketbase-io/db-scheduler-log. 
+
+In the UI you can Run scheduled Task now or Re-run tasks that have Failed, scheduler.reschedule(taskInstance, Instant.now());
+You can delete task form the scheuler, scheduler.cancel(taskInstance);
+The UI can display data contained in the task, or you can chose to turn this of. 
+The UI will show what task have faild how many times and when the next execution time will bee. 
+If you have manny task whit the same name, thes will bee shon as a group that can be extende to see all inctances. 
+
+If you have the log extrention the UI will display a History tab that show all task that hav run, bothe succsesfull and failed. They can be sorted on time, filterd on failed/succeeded, or searched on task name, task instance and time intevall.
+Failed task will when presed show the stacktrace of the exseption. 
 
 <img alt="Screenshot" src="Screenshot.png" width=700/>
 
