@@ -17,18 +17,15 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * **View only Tasks that are Scheduled, Running or Failed.**
 * **Delete Tasks** 
 * **Polling** on Refetch button
-* **View a log of all Tasks**
+* **View a log of all Tasks** if you have db-scheduler-log
  
-DB-scheduler-UI is an extention of DB scheduler. It is built to give a visulasation of the work done by Db scheduler. The UI can also display history if you are using the extention db-scheduler-log, https://github.com/rocketbase-io/db-scheduler-log. 
+DB-scheduler-UI is an extension of DB scheduler. It is built to give a visualization of the work done by DB scheduler. The UI can also display history if you are using the extension db-scheduler-log, https://github.com/rocketbase-io/db-scheduler-log.
 
-In the UI you can Run scheduled Task now or Re-run tasks that have Failed, scheduler.reschedule(taskInstance, Instant.now());
-You can delete task form the scheuler, scheduler.cancel(taskInstance);
-The UI can display data contained in the task, or you can chose to turn this of. 
-The UI will show what task have faild how many times and when the next execution time will bee. 
-If you have manny task whit the same name, thes will bee shon as a group that can be extende to see all inctances. 
 
-If you have the log extrention the UI will display a History tab that show all task that hav run, bothe succsesfull and failed. They can be sorted on time, filterd on failed/succeeded, or searched on task name, task instance and time intevall.
-Failed task will when presed show the stacktrace of the exseption. 
+In the UI you can Run scheduled Task now or Re-run tasks that have Failed, scheduler.reschedule(taskInstance, Instant.now()); You can delete task form the scheduler, scheduler.cancel(taskInstance); The UI can display data contained in the task, or you can chose to turn this of. The UI will show what task have failed how many times and when the next execution time will be. If you have manny task with the same name, this will be shown as a group that can be extended to see all instances.
+
+
+If you have the log extension the UI will display a History tab that shows all tasks that have run, both successful and failed. They can be sorted on time, filtered on failed/succeeded, or searched on task name, task instance and time interval. Failed task will when pressed show the stack trace of the exception.
 
 <img alt="Screenshot" src="Screenshot.png" width=700/>
 
@@ -72,8 +69,25 @@ The db-scheduler-ui backend is connected to the schedule-client. The backend fet
 they are sorted and filtered in the backend before it is displayed in the frontend app. 
 As the backend connects to scheduler-client it is possible to run, re-run and delete task form the database in the application.
 
+**To try it out you can branch the project and run the example-app.**
+1. Install dependencies: npm install
+2. Run the app: npm run dev
+3. Run the backend DemoApplication.java
+4. Open the app: http://localhost:51373
+
+
 The URL connects to db-scheduler/**
 
 
 ## Configuration
-None
+In application.propertis
+If you have the extension db-scheduler-log you can turn on history. 
+```
+db-scheduler-ui.history=true
+```
+If you don't want to display data in the UI. Default is that Datashowing is on. 
+```
+db-scheduler-ui.task-data=false
+```
+
+
