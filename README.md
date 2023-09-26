@@ -30,13 +30,17 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 ### Prerequisites
 
 * An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
-* Minimum Java 11 and SpringBoot 2.7
-* db-scheduler-log version 0.7.0
 * Minimum db-scheduler version 12.5
+* Minimum Java 11 and SpringBoot 2.7
+* Optional (if you want task history): db-scheduler-log version 0.7.0
+
 
 ## Getting started
 
-1. Add maven dependency
+Read the [db-scheduler](https://github.com/kagkarlsson/db-scheduler) readme and follow the getting started guide.
+You do not need to add db-scheduler as a dependency, it
+
+1. Add the spring boot starter maven dependency
 ```xml
 <dependency>
     <groupId>no.bekk.db-scheduler-ui</groupId>
@@ -44,6 +48,9 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
     <version>0.0.1</version>
 </dependency>
 ```
+
+## Task history
+
 ```xml
 <dependency>
     <groupId>io.rocketbase.extension</groupId>
@@ -55,6 +62,11 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 
 ## How it works
 
+We currently require that you use spring boot to run your application.
+Rest controllers providing DB-Scheduler tasks will be injected when you add db-scheduler-ui-starter as a dependency. 
+The frontend is a built React app that can be reached by going to `<your-app-url>/db-scheduler`
+
+
 Db-scheduler-UI adds a library that have a frontend application to show all Task in db-scheduler. 
 The db-scheduler-ui backend is connected to the schedule-client. The backend fetches all executions, and 
 they are sorted and filtered in the backend before it is displayed in the frontend app. 
@@ -65,3 +77,10 @@ The URL connects to db-scheduler/**
 
 ## Configuration
 None
+
+
+## Contributing
+
+Feel free to create pull requests if there are features or improvements you want to add. 
+PR's need to be approved by one of the maintainers. To publish a new version, create a release in Github and tag it with a SemVer version.
+A new release will then be released to maven central by a github action using JReleaser.
