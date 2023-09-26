@@ -15,9 +15,9 @@ package no.bekk.dbscheduler.uistarter.autoconfigure;
 
 import com.github.kagkarlsson.scheduler.Scheduler;
 import javax.sql.DataSource;
+import no.bekk.dbscheduler.ui.controller.UIController;
 import no.bekk.dbscheduler.ui.controller.LogController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
-import no.bekk.dbscheduler.ui.controller.UIController;
 import no.bekk.dbscheduler.ui.service.LogLogic;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
 import no.bekk.dbscheduler.ui.util.Caching;
@@ -35,7 +35,11 @@ public class UiApiAutoConfiguration {
 
 
   @Value("${db-scheduler-ui.taskdata:true}")
-  public boolean showData;
+  public boolean showTaskData;
+
+  @Value("${db-scheduler-ui.history:false}")
+  private boolean showHistory;
+
   public UiApiAutoConfiguration() {
     logger.info("UiApiAutoConfiguration created");
   }
@@ -50,7 +54,7 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   public TaskLogic taskLogic(Scheduler scheduler, Caching caching) {
-    return new TaskLogic(scheduler, caching, showData);
+    return new TaskLogic(scheduler, caching, showTaskData);
   }
 
   @Bean
@@ -61,7 +65,7 @@ public class UiApiAutoConfiguration {
           havingValue = "true",
           matchIfMissing = false)
   public LogLogic logLogic(DataSource dataSource) {
-    return new LogLogic(dataSource, showData);
+    return new LogLogic(dataSource, showTaskData);
   }
 
   @Bean
@@ -84,6 +88,7 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   public UIController uiController() {
-    return new UIController();
+    return new UIController(showTaskData, showHistory);
   }
 }
+
