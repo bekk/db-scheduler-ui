@@ -12,74 +12,84 @@
  * limitations under the License.
  */
 import {
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogOverlay,
-    Box,
-    Button,
-    IconButton,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuList,
-  } from '@chakra-ui/react';
-  import deleteTask from 'src/services/deleteTask';
-  import React from 'react';
-  import { DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-  import { IoEllipsisVerticalIcon } from '../assets/icons';
-  import { useNavigate } from 'react-router-dom';
-  
-  interface TaskProps {
-    taskName: string;
-    taskInstance: string;
-    style?: React.CSSProperties;
-  }
-  
-  export const DotButton: React.FC<TaskProps> = ({
-    taskName,
-    taskInstance,
-    style,
-  }) => {
-<AlertDialog
-        isOpen={isOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={onClose}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Delete
-            </AlertDialogHeader>
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Button,
+} from '@chakra-ui/react';
+import React from 'react';
+import runTaskGroup from 'src/services/runTaskGroup';
+import colors from 'src/styles/colors';
 
-            <AlertDialogBody>
-              Are you sure you want to delete, {taskName} Task-ID:{taskInstance}
-            </AlertDialogBody>
+interface TaskProps {
+  onlyFailed: boolean;
+  taskName: string;
+  style?: React.CSSProperties;
+  isOpen: boolean;
+  setIsopen: React.Dispatch<React.SetStateAction<string>>;
+  runFunction: (name: string, onlyFailed: boolean) => void;
+}
 
-            <AlertDialogFooter>
-              <Button
-                ref={cancelRef}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onClose();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  deleteTask(taskInstance, taskName);
-                  onClose();
-                }}
-                ml={3}
-              >
-                Delete
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+export const RunAllAlert: React.FC<TaskProps> = ({
+  onlyFailed,
+  taskName,
+  isOpen,
+  setIsopen,
+}) => {
+  const cancelRef = React.useRef(null);
+  return (
+    <AlertDialog
+      isOpen={isOpen}
+      leastDestructiveRef={cancelRef}
+      onClose={() => setIsopen('')}
+    >
+      <AlertDialogOverlay>
+        <AlertDialogContent>
+          <AlertDialogHeader fontSize="lg" fontWeight="bold">
+            {onlyFailed ? 'Rerun All Failed' : 'Run All'}
+          </AlertDialogHeader>
+
+          <AlertDialogBody>
+            Are you sure you want to{' '}
+            {onlyFailed ? 'rerun all failed' : 'run all'} tasks with taskname:{' '}
+            {taskName}. This will include the ones outside of your current
+            filters and search.
+          </AlertDialogBody>
+
+          <AlertDialogFooter>
+            <Button
+              onClick={() => {
+                setIsopen('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              bgColor={onlyFailed ? colors.running[300] : colors.running[100]}
+              _hover={{
+                backgroundColor: onlyFailed
+                  ? colors.running[200]
+                  : colors.running[100],
+              }}
+              _active={{
+                backgroundColor: onlyFailed
+                  ? colors.running[200]
+                  : colors.running[300],
+              }}
+              textColor={onlyFailed ? colors.primary[100] : colors.running[500]}
+              onClick={() => {
+                runTaskGroup(taskName, onlyFailed);
+              }}
+              ml={3}
+            >
+              {onlyFailed ? 'Rerun All' : 'Run All'}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialogOverlay>
+    </AlertDialog>
+  );
+};
