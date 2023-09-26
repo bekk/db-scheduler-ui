@@ -33,13 +33,15 @@ import org.springframework.stereotype.Service;
 public class LogLogic {
 
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
+  private static boolean showData;
   private static final int DEFAULT_LIMIT = 500;
   @Autowired private Caching caching;
 
+
   @Autowired
-  public LogLogic(DataSource dataSource) {
+  public LogLogic(DataSource dataSource, boolean showData) {
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    this.showData = showData;
   }
 
   public GetLogsResponse getLogs(TaskDetailsRequestParams requestParams) {
@@ -168,11 +170,16 @@ public class LogLogic {
 
     @Override
     public LogModel mapRow(ResultSet rs, int rowNum) throws SQLException {
+      byte[] taskData = null;
+      if(showData){
+        taskData = rs.getBytes("task_data");
+      }
+
       return new LogModel(
           rs.getLong("id"),
           rs.getString("task_name"),
           rs.getString("task_instance"),
-          rs.getBytes("task_data"),
+              taskData,
           rs.getTimestamp("time_started").toInstant(),
           rs.getTimestamp("time_finished").toInstant(),
           rs.getBoolean("succeeded"),

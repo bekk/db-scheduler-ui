@@ -23,14 +23,19 @@ import no.bekk.dbscheduler.ui.service.TaskLogic;
 import no.bekk.dbscheduler.ui.util.Caching;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
 public class UiApiAutoConfiguration {
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
 
+
+  @Value("${db-scheduler-ui.taskdata:true}")
+  public boolean showData;
   public UiApiAutoConfiguration() {
     logger.info("UiApiAutoConfiguration created");
   }
@@ -41,16 +46,22 @@ public class UiApiAutoConfiguration {
     return new Caching();
   }
 
+
   @Bean
   @ConditionalOnMissingBean
   public TaskLogic taskLogic(Scheduler scheduler, Caching caching) {
-    return new TaskLogic(scheduler, caching);
+    return new TaskLogic(scheduler, caching, showData);
   }
 
   @Bean
   @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+          prefix = "db-scheduler-ui",
+          name = "history",
+          havingValue = "true",
+          matchIfMissing = false)
   public LogLogic logLogic(DataSource dataSource) {
-    return new LogLogic(dataSource);
+    return new LogLogic(dataSource, showData);
   }
 
   @Bean
@@ -61,6 +72,11 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+          prefix = "db-scheduler-ui",
+          name = "history",
+          havingValue = "true",
+          matchIfMissing = false)
   public LogController logController(LogLogic logLogic) {
     return new LogController(logLogic);
   }
