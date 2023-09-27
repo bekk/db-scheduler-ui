@@ -2,6 +2,10 @@
 **/target/
 *.class
 
+# Compiled frontend files
+**/static/
+**/dist
+
 # Log file
 *.log
 
