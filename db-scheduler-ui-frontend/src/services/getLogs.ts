@@ -30,8 +30,10 @@ export const getLogs = async (
   params.pageNumber && queryParams.append('pageNumber', params.pageNumber.toString());
   params.limit && queryParams.append('size', params.limit.toString());
   params.sorting && queryParams.append('sorting', params.sorting.toUpperCase());
-  params.asc && queryParams.append('asc', params.asc.toString());
-  params.refresh && queryParams.append('refresh', params.refresh.toString());
+  params.asc!==undefined && queryParams.append('asc', params.asc.toString());
+  params.startTime && queryParams.append('startTime', params.startTime.toISOString());
+  params.endTime && queryParams.append('endTime', params.endTime.toISOString());
+  params.refresh!==undefined && queryParams.append('refresh', params.refresh.toString());
   params.searchTerm && queryParams.append('searchTerm', params.searchTerm.trim());
   params.taskName && queryParams.append('taskName', params.taskName);
   params.taskId && queryParams.append('taskId', params.taskId);
