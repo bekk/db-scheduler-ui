@@ -74,6 +74,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
                   _hover={{ backgroundColor: colors.running['200'] }}
                   _active={{ backgroundColor: colors.running['100'] }}
                   ml={5}
+                  minW={'6em'}
                   onClick={() => {
                     setIsOpen('scheduled');
                   }}
@@ -87,6 +88,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
                   _hover={{ backgroundColor: colors.running['400'] }}
                   _active={{ backgroundColor: colors.running['300'] }}
                   mx={5}
+                  minW={'10em'}
                   onClick={() => {
                     setIsOpen('failed');
                   }}
@@ -98,7 +100,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
                   isOpen={!!isOpen}
                   setIsopen={setIsOpen}
                   onlyFailed={isOpen === 'failed'}
-                  runFunction={() => {}}
+                  refetch={refetch ?? (() => {})}
                 />
               </>
             )}
@@ -113,7 +115,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
           />
         </Box>
       </Box>
-      <Box height={'100%'}>
+      <Box justifyContent={'space-between'}>
         <FilterBox
           currentFilter={currentFilter}
           setCurrentFilter={setCurrentFilter}

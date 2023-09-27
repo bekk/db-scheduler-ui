@@ -94,8 +94,8 @@ interface IconButtonProps {
   hoverTextColor: string | undefined;
   activeBgColor: string;
   activeTextColor: string | undefined;
-  leftIcon?: React.ReactSVGElement;
-  rightIcon?: React.ReactSVGElement;
+  leftIcon?: React.ReactElement;
+  rightIcon?: React.ReactElement;
   text: string;
 }
 

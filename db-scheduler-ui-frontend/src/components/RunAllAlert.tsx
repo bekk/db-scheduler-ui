@@ -30,7 +30,7 @@ interface TaskProps {
   style?: React.CSSProperties;
   isOpen: boolean;
   setIsopen: React.Dispatch<React.SetStateAction<string>>;
-  runFunction: (name: string, onlyFailed: boolean) => void;
+  refetch: () => void;
 }
 
 export const RunAllAlert: React.FC<TaskProps> = ({
@@ -38,8 +38,10 @@ export const RunAllAlert: React.FC<TaskProps> = ({
   taskName,
   isOpen,
   setIsopen,
+  refetch,
 }) => {
   const cancelRef = React.useRef(null);
+  console.log(onlyFailed);
   return (
     <AlertDialog
       isOpen={isOpen}
@@ -53,9 +55,9 @@ export const RunAllAlert: React.FC<TaskProps> = ({
           </AlertDialogHeader>
 
           <AlertDialogBody>
-            Are you sure you want to{' '}
-            {onlyFailed ? 'rerun all failed' : 'run all'} tasks with taskname:{' '}
-            {taskName}. This will include the ones outside of your current
+            Are you sure you want to
+            {onlyFailed ? ' rerun all failed' : ' run all'} tasks with taskname:
+            {' ' + taskName}. This will include the ones outside of your current
             filters and search.
           </AlertDialogBody>
 
@@ -81,7 +83,10 @@ export const RunAllAlert: React.FC<TaskProps> = ({
               }}
               textColor={onlyFailed ? colors.primary[100] : colors.running[500]}
               onClick={() => {
-                runTaskGroup(taskName, onlyFailed);
+                runTaskGroup(taskName, onlyFailed).then(() => {
+                  refetch();
+                });
+                setIsopen('');
               }}
               ml={3}
             >
