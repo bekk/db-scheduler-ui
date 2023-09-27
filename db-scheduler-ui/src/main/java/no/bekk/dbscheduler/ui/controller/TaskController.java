@@ -52,6 +52,11 @@ public class TaskController {
     taskLogic.runTaskNow(id, name);
   }
 
+  @PostMapping("/rerunGroup")
+  public void runAllNow(@RequestParam String name, @RequestParam boolean onlyFailed) {
+    taskLogic.runTaskGroupNow(name, onlyFailed);
+  }
+
   @PostMapping("/delete")
   public void deleteTaskNow(@RequestParam String id, @RequestParam String name) {
     taskLogic.deleteTask(id, name);

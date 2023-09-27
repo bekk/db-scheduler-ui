@@ -47,14 +47,32 @@ public class TaskLogic {
     Optional<ScheduledExecution<Object>> scheduledExecutionOpt =
         scheduler.getScheduledExecution(TaskInstanceId.of(taskName, taskId));
 
-    if (scheduledExecutionOpt.isPresent()) {
-      TaskInstanceId taskInstance = scheduledExecutionOpt.get().getTaskInstance();
-      scheduler.reschedule(taskInstance, Instant.now());
+    if (scheduledExecutionOpt.isPresent() && !scheduledExecutionOpt.get().isPicked()) {
+      scheduler.reschedule(scheduledExecutionOpt.get().getTaskInstance(), Instant.now());
     } else {
       throw new ResponseStatusException(
           HttpStatus.NOT_FOUND,
           "No ScheduledExecution found for taskName: " + taskName + ", taskId: " + taskId);
     }
+  }
+
+  public void runTaskGroupNow(String taskName, boolean onlyFailed) {
+    caching
+        .getExecutionsFromCacheOrDB(false, scheduler)
+        .forEach(
+            (execution) -> {
+              if ((!onlyFailed || execution.getConsecutiveFailures() > 0)
+                  && taskName.equals(execution.getTaskInstance().getTaskName())) {
+                try {
+                  runTaskNow(
+                      execution.getTaskInstance().getId(),
+                      execution.getTaskInstance().getTaskName());
+                } catch (ResponseStatusException e) {
+                  System.out.println("Failed to run task: " + e.getMessage());
+                }
+              }
+              ;
+            });
   }
 
   public void deleteTask(String taskId, String taskName) {
