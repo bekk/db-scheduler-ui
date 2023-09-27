@@ -16,7 +16,6 @@ import React from 'react';
 import { LogoIcon } from 'src/assets/icons/Logo';
 import colors from 'src/styles/colors';
 import { useNavigate } from 'react-router-dom';
-//import noe from '../../public/config.json';
 
 interface TopBarProps {
   title: string;
@@ -85,7 +84,6 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
               Scheduled
             </Button>
             <Button
-              //display={!noe.showHistory ? 'none' : 'unset'}
               _hover={{
                 bgColor: colors.primary['100'],
                 borderColor: colors.dbBlue,
