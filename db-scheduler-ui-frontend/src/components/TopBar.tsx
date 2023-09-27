@@ -27,11 +27,15 @@ const CONFIG: string =
 
 export const TopBar: React.FC<TopBarProps> = ({ title }) => {
   const navigate = useNavigate();
-  fetch(CONFIG)
-    .then((r) => r.json())
-    .then((data) => {
-      console.log('hello ' + data);
-    });
+  const [showHistory, setShowHistory] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch(CONFIG)
+      .then((r) => r.json())
+      .then((data) => {
+        setShowHistory(data.showHistory);
+      });
+  }, []);
 
   return (
     <Box
@@ -53,56 +57,60 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
         {title}
       </Text>
       <Box>
-        <Button
-          _hover={{
-            bgColor: colors.primary['100'],
-            borderColor: colors.dbBlue,
-            color: colors.primary['400'],
-          }}
-          _active={{
-            borderColor: colors.primary['200'],
-            color: colors.primary['300'],
-          }}
-          bgColor={colors.primary['100']}
-          color={colors.dbBlue}
-          borderBottom="2px"
-          borderRadius={'0'}
-          borderColor={
-            !window.location.toString().includes('db-scheduler/history/')
-              ? colors.dbBlue
-              : colors.primary['300']
-          }
-          onClick={() => navigate('/')}
-          aria-label={'Home button'}
-          marginRight={12}
-        >
-          Scheduled
-        </Button>
-        <Button
-          //display={!noe.showHistory ? 'none' : 'unset'}
-          _hover={{
-            bgColor: colors.primary['100'],
-            borderColor: colors.dbBlue,
-            color: colors.primary['400'],
-          }}
-          _active={{
-            borderColor: colors.running['200'],
-            color: colors.primary['300'],
-          }}
-          bgColor={colors.primary['100']}
-          color={colors.dbBlue}
-          borderBottom="2px"
-          borderRadius={'0'}
-          borderColor={
-            window.location.toString().includes('history')
-              ? colors.dbBlue
-              : colors.primary['300']
-          }
-          onClick={() => navigate(`/history/all`)}
-          aria-label={'History button'}
-        >
-          History
-        </Button>
+        {showHistory && (
+          <>
+            <Button
+              _hover={{
+                bgColor: colors.primary['100'],
+                borderColor: colors.dbBlue,
+                color: colors.primary['400'],
+              }}
+              _active={{
+                borderColor: colors.primary['200'],
+                color: colors.primary['300'],
+              }}
+              bgColor={colors.primary['100']}
+              color={colors.dbBlue}
+              borderBottom="2px"
+              borderRadius={'0'}
+              borderColor={
+                !window.location.toString().includes('db-scheduler/history/')
+                  ? colors.dbBlue
+                  : colors.primary['300']
+              }
+              onClick={() => navigate('/')}
+              aria-label={'Home button'}
+              marginRight={12}
+            >
+              Scheduled
+            </Button>
+            <Button
+              //display={!noe.showHistory ? 'none' : 'unset'}
+              _hover={{
+                bgColor: colors.primary['100'],
+                borderColor: colors.dbBlue,
+                color: colors.primary['400'],
+              }}
+              _active={{
+                borderColor: colors.running['200'],
+                color: colors.primary['300'],
+              }}
+              bgColor={colors.primary['100']}
+              color={colors.dbBlue}
+              borderBottom="2px"
+              borderRadius={'0'}
+              borderColor={
+                window.location.toString().includes('history')
+                  ? colors.dbBlue
+                  : colors.primary['300']
+              }
+              onClick={() => navigate(`/history/all`)}
+              aria-label={'History button'}
+            >
+              History
+            </Button>
+          </>
+        )}
       </Box>
     </Box>
   );
