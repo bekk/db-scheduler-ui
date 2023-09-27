@@ -90,13 +90,13 @@ public class TaskLogic {
   }
 
   public GetTasksResponse getAllTasks(TaskRequestParams params) {
-/*    List<TaskModel> tasks =
-        TaskMapper.mapAllExecutionsToTaskModel(
-            caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler));*/
+    /*    List<TaskModel> tasks =
+    TaskMapper.mapAllExecutionsToTaskModel(
+        caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler));*/
     List<ScheduledExecution<Object>> executions =
-            caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler);
+        caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler);
 
-   List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions);
+    List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions);
 
     tasks =
         QueryUtils.searchByTaskName(

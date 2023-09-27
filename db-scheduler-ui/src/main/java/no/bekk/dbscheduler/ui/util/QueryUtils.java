@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import no.bekk.dbscheduler.ui.model.TaskModel;
@@ -114,26 +112,26 @@ public class QueryUtils {
     return tasks.stream()
         .filter(
             task -> {
-                String lowerCaseTerm = searchTerm.toLowerCase();
+              String lowerCaseTerm = searchTerm.toLowerCase();
 
-                boolean isTermPresent;
-                if (isTaskNameSearch) {
-                  isTermPresent =
-                      isExactMatch
-                          ? task.getTaskName().equalsIgnoreCase(lowerCaseTerm)
-                          : task.getTaskName().toLowerCase().contains(lowerCaseTerm);
-                } else {
-                  isTermPresent =
-                      task.getTaskInstance().stream()
-                          .anyMatch(
-                              instance ->
-                                  instance != null
-                                      && (isExactMatch
-                                          ? instance.equalsIgnoreCase(lowerCaseTerm)
-                                          : instance.toLowerCase().contains(lowerCaseTerm)));
-                }
+              boolean isTermPresent;
+              if (isTaskNameSearch) {
+                isTermPresent =
+                    isExactMatch
+                        ? task.getTaskName().equalsIgnoreCase(lowerCaseTerm)
+                        : task.getTaskName().toLowerCase().contains(lowerCaseTerm);
+              } else {
+                isTermPresent =
+                    task.getTaskInstance().stream()
+                        .anyMatch(
+                            instance ->
+                                instance != null
+                                    && (isExactMatch
+                                        ? instance.equalsIgnoreCase(lowerCaseTerm)
+                                        : instance.toLowerCase().contains(lowerCaseTerm)));
+              }
 
-                return isTermPresent;
+              return isTermPresent;
             })
         .collect(Collectors.toList());
   }
@@ -142,18 +140,14 @@ public class QueryUtils {
       String searchTerm, Map<String, Object> params, boolean isTaskName, boolean isExactMatch) {
     StringBuilder conditions = new StringBuilder();
     List<String> termConditions = new ArrayList<>();
-        String termKey = "searchTerm"  + (isTaskName ? "TaskName" : "TaskInstance");
-        params.put(termKey, isExactMatch ? searchTerm : "%" + searchTerm + "%");
-        String condition =
-            isTaskName
-                ? "LOWER(task_name) " + (isExactMatch ? "=" : "LIKE") + " LOWER(:" + termKey + ")"
-                : "LOWER(task_instance) "
-                    + (isExactMatch ? "=" : "LIKE")
-                    + " LOWER(:"
-                    + termKey
-                    + ")";
-        termConditions.add(condition);
+    String termKey = "searchTerm" + (isTaskName ? "TaskName" : "TaskInstance");
+    params.put(termKey, isExactMatch ? searchTerm : "%" + searchTerm + "%");
+    String condition =
+        isTaskName
+            ? "LOWER(task_name) " + (isExactMatch ? "=" : "LIKE") + " LOWER(:" + termKey + ")"
+            : "LOWER(task_instance) " + (isExactMatch ? "=" : "LIKE") + " LOWER(:" + termKey + ")";
+    termConditions.add(condition);
 
-      return conditions.append(String.join(" AND ", termConditions)).toString();
-    }
+    return conditions.append(String.join(" AND ", termConditions)).toString();
+  }
 }
