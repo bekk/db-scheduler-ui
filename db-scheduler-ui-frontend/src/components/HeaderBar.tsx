@@ -38,7 +38,6 @@ interface HeaderBarProps {
   taskName: string;
   taskInstance: string;
   currentFilter: FilterBy;
-  searchTerm: string;
   startTime?: Date;
   endTime?: Date;
   asc?: boolean;
@@ -58,7 +57,6 @@ interface HeaderBarProps {
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
   currentFilter,
-  searchTerm,
   startTime,
   endTime,
   asc,
@@ -201,8 +199,8 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             pollKey={history ? POLL_LOGS_QUERY_KEY : POLL_TASKS_QUERY_KEY}
             refetch={refetch}
             params={{
-                searchTermTaskName,
-                searchTermTaskInstance,
+              searchTermTaskName,
+              searchTermTaskInstance,
               filter: currentFilter,
               startTime,
               endTime,

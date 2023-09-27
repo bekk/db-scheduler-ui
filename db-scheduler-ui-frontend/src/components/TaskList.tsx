@@ -64,7 +64,6 @@ const TaskList: React.FC = () => {
         taskName={taskName || ''}
         taskInstance={''}
         currentFilter={currentFilter}
-        searchTerm={searchTerm}
         asc={sortAsc}
         setCurrentFilter={setCurrentFilter}
         setSearchTermTaskName={setSearchTermTaskName}
