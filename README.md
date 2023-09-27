@@ -2,8 +2,6 @@
 ![build status](https://github.com/bekk/db-scheduler-ui/workflows/Build/badge.svg)
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-
-Demo version.\
 A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 
 
@@ -16,18 +14,28 @@ A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * **Search for Task** on name and task id 
 * **View only Tasks that are Scheduled, Running or Failed.**
 * **Delete Tasks** 
-* **Polling** on Refetch button
+* **Polling** on Refresh button
 * **View a log of all Tasks** if you have db-scheduler-log
  
-DB-scheduler-UI is an extension of DB scheduler. It is built to give a visualization of the work done by DB scheduler. The UI can also display history if you are using the extension db-scheduler-log, https://github.com/rocketbase-io/db-scheduler-log.
+DB-scheduler-UI is an extension of DB scheduler. 
+It is built to give a visualization of the work done by DB scheduler. 
+The UI can also display history if you are using the extension [db-scheduler-log](https://www.google.com/url?sa=i&url=https%3A%2F%2Fvectorportal.com%2Fno%2Fvector%2Fstrikking%2F35151&psig=AOvVaw3fCj7Z8BcYKAnS7_W48-4H&ust=1695901802129000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCOjb0dXcyoEDFQAAAAAdAAAAABAE).
 
 
-In the UI you can Run scheduled Task now or Re-run tasks that have Failed, scheduler.reschedule(taskInstance, Instant.now()); You can delete task form the scheduler, scheduler.cancel(taskInstance); The UI can display data contained in the task, or you can chose to turn this of. The UI will show what task have failed how many times and when the next execution time will be. If you have manny task with the same name, this will be shown as a group that can be extended to see all instances.
+In the UI you can Run scheduled Task now or Re-run tasks that have Failed, ```scheduler.reschedule(taskInstance, Instant.now());``` 
+You can delete task form the scheduler, ```scheduler.cancel(taskInstance);``` The UI can display data contained in the task, or you can chose to turn this of. The UI will show what task have failed how many times and when the next execution time will be. If you have manny task with the same name, this will be shown as a group that can be extended to see all instances.
 
 
-If you have the log extension the UI will display a History tab that shows all tasks that have run, both successful and failed. They can be sorted on time, filtered on failed/succeeded, or searched on task name, task instance and time interval. Failed task will when pressed show the stack trace of the exception.
+If you have the log extension the UI will display a History tab that shows all tasks that have run, both successful and failed. 
+They can be sorted on time, filtered on failed/succeeded, or searched on task name, task instance and time interval. Failed task will when pressed show the stack trace of the exception.
 
-<img alt="Screenshot" src="Screenshot.png" width=700/>
+<img alt="Screenshot" src="Screenshot_Frontpage.png" width=800/>
+---
+<img alt="Screenshot" src="Screenshot_Group.png" width=800/>
+---
+<img alt="Screenshot" src="Screenshot_History.png" width=800/>
+---
+
 
 ## Table of contents
 
@@ -43,21 +51,21 @@ If you have the log extension the UI will display a History tab that shows all t
 * db-scheduler-log version 0.7.0
 * Minimum db-scheduler version 12.5
 
-## Getting started
+## Getting started!
 
 1. Add maven dependency
 ```xml
 <dependency>
     <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-starter</artifactId>
-    <version>0.0.1</version>
+    <version>$version</version>
 </dependency>
 ```
 ```xml
 <dependency>
     <groupId>io.rocketbase.extension</groupId>
     <artifactId>db-scheduler-log-spring-boot-starter</artifactId>
-    <version>0.7.0</version>
+    <version>$version</version>
 </dependency>
 ```
 
@@ -80,7 +88,7 @@ The URL connects to db-scheduler/**
 
 
 ## Configuration
-In application.propertis
+In application.properties
 If you have the extension db-scheduler-log you can turn on history. 
 ```
 db-scheduler-ui.history=true
