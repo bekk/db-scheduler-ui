@@ -41,7 +41,6 @@ export const RunAllAlert: React.FC<TaskProps> = ({
   refetch,
 }) => {
   const cancelRef = React.useRef(null);
-  console.log(onlyFailed);
   return (
     <AlertDialog
       isOpen={isOpen}
