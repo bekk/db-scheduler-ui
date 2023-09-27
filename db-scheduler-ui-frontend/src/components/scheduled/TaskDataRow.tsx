@@ -11,12 +11,20 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// Screen size breakpoints
-const breakpoints = {
-  sm: '480px',
-  md: '768px',
-  lg: '992px',
-  xl: '1200px',
-};
+import { Box } from '@chakra-ui/react';
+import React from 'react';
+import JsonViewer from 'src/components/common/JsonViewer';
 
-export default breakpoints;
+export const TaskDataRow: React.FC<{ taskData: (object | null)[] }> = ({
+  taskData,
+}) => {
+  return (
+    <>
+      {taskData[0] !== null && (
+        <Box display={'flex'} flexDirection={'row'}>
+          <JsonViewer data={taskData}></JsonViewer>
+        </Box>
+      )}
+    </>
+  );
+};

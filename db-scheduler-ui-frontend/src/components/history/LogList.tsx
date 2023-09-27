@@ -16,11 +16,11 @@ import React, { useEffect } from 'react';
 import { LogCard } from 'src/components/history/LogCard';
 import { useLocation } from 'react-router-dom';
 import colors from 'src/styles/colors';
-import { HeaderBar } from '../HeaderBar';
+import { HeaderBar } from '../common/HeaderBar';
 import { ALL_LOG_QUERY_KEY, getLogs } from 'src/services/getLogs';
 import { useInfiniteScrolling } from 'src/hooks/useInfiniteTaskScrolling';
-import { DateTimeInput } from 'src/components/history/DateTimeInput';
-import { SortButton } from 'src/components/SortButton';
+import { DateTimeInput } from 'src/components/input/DateTimeInput';
+import { SortButton } from 'src/components/input/SortButton';
 import { SortBy } from 'src/models/QueryParams';
 import { LogResponse } from 'src/models/TasksResponse';
 

@@ -22,8 +22,8 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { FilterBy } from 'src/models/QueryParams';
-import { FilterBox } from './FilterBox';
-import { RefreshButton } from 'src/components/RefreshButton';
+import { FilterBox } from '../input/FilterBox';
+import { RefreshButton } from 'src/components/input/RefreshButton';
 import { QueryObserverResult, InfiniteData } from '@tanstack/react-query';
 import { InfiniteScrollResponse } from 'src/models/TasksResponse';
 import { Log } from 'src/models/Log';

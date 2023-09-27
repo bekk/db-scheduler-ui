@@ -29,7 +29,7 @@ import {
 import deleteTask from 'src/services/deleteTask';
 import React from 'react';
 import { DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-import { IoEllipsisVerticalIcon } from '../assets/icons';
+import { IoEllipsisVerticalIcon } from '../../assets/icons';
 import { useNavigate } from 'react-router-dom';
 
 interface TaskProps {

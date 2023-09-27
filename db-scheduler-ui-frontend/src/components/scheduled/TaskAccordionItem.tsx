@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 import { AccordionPanel, Box, VStack } from '@chakra-ui/react';
-import { TaskDataRow } from 'src/components/TaskDataRow';
+import { TaskDataRow } from 'src/components/scheduled/TaskDataRow';
 import React from 'react';
 import { dateFormatText } from 'src/utils/dateFormatText';
 import colors from 'src/styles/colors';

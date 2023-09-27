@@ -15,14 +15,14 @@ import React from 'react';
 import { Accordion, Box, Button, Flex } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 import { isStatus } from 'src/utils/determineStatus';
-import TaskCard from './TaskCard';
+import TaskCard from 'src/components/scheduled/TaskCard';
 import TaskGroupCard from './TaskGroupCard';
-import TitleRow from './TitleRow';
+import TitleRow from 'src/components/common/TitleRow';
 import { useInfiniteScrolling } from 'src/hooks/useInfiniteTaskScrolling';
 import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
 import { TASK_QUERY_KEY, getTasks } from 'src/services/getTasks';
 import colors from 'src/styles/colors';
-import { HeaderBar } from './HeaderBar';
+import { HeaderBar } from 'src/components/common/HeaderBar';
 import { TasksResponse } from 'src/models/TasksResponse';
 
 const TaskList: React.FC = () => {

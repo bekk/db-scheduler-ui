@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 import { Box } from '@chakra-ui/react';
-import { NumberCircle } from 'src/components/NumberCircle';
+import { NumberCircle } from 'src/components/common/NumberCircle';
 import colors from 'src/styles/colors';
 
 interface StatusBoxProps {

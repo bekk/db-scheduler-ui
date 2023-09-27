@@ -13,7 +13,7 @@
  */
 import { Button } from '@chakra-ui/react';
 import runTask from 'src/services/runTask';
-import { PlayIcon, RepeatIcon } from '../assets/icons';
+import { PlayIcon, RepeatIcon } from '../../assets/icons';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Task } from 'src/models/Task';
