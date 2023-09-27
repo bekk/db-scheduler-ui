@@ -111,13 +111,10 @@ public class QueryUtils {
       return tasks;
     }
 
-    List<String> terms = splitSearchTerm(searchTerm);
-
     return tasks.stream()
         .filter(
             task -> {
-              for (String term : terms) {
-                String lowerCaseTerm = term.toLowerCase();
+                String lowerCaseTerm = searchTerm.toLowerCase();
 
                 boolean isTermPresent;
                 if (isTaskNameSearch) {
@@ -136,11 +133,7 @@ public class QueryUtils {
                                           : instance.toLowerCase().contains(lowerCaseTerm)));
                 }
 
-                if (!isTermPresent) {
-                  return false;
-                }
-              }
-              return true;
+                return isTermPresent;
             })
         .collect(Collectors.toList());
   }
@@ -148,13 +141,9 @@ public class QueryUtils {
   public static String logSearchCondition(
       String searchTerm, Map<String, Object> params, boolean isTaskName, boolean isExactMatch) {
     StringBuilder conditions = new StringBuilder();
-    List<String> terms = splitSearchTerm(searchTerm);
-    if (terms.size() > 0) {
-      List<String> termConditions = new ArrayList<>();
-      for (int i = 0; i < terms.size(); i++) {
-        String termKey = "searchTerm" + i + (isTaskName ? "TaskName" : "TaskInstance");
-        String term = terms.get(i);
-        params.put(termKey, isExactMatch ? term : "%" + term + "%");
+    List<String> termConditions = new ArrayList<>();
+        String termKey = "searchTerm"  + (isTaskName ? "TaskName" : "TaskInstance");
+        params.put(termKey, isExactMatch ? searchTerm : "%" + searchTerm + "%");
         String condition =
             isTaskName
                 ? "LOWER(task_name) " + (isExactMatch ? "=" : "LIKE") + " LOWER(:" + termKey + ")"
@@ -164,25 +153,7 @@ public class QueryUtils {
                     + termKey
                     + ")";
         termConditions.add(condition);
-      }
+
       return conditions.append(String.join(" AND ", termConditions)).toString();
     }
-    return "";
-  }
-
-  private static List<String> splitSearchTerm(String searchTerm) {
-    List<String> terms = new ArrayList<>();
-    Pattern pattern = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
-    Matcher matcher = pattern.matcher(searchTerm);
-
-    while (matcher.find()) {
-      if (matcher.group(1) != null) {
-        terms.add(matcher.group(1));
-      } else {
-        terms.add(matcher.group());
-      }
-    }
-
-    return terms;
-  }
 }

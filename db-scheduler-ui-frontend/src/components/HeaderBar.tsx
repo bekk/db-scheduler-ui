@@ -11,7 +11,7 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Box, Checkbox, HStack, Input, Text, VStack, Button } from '@chakra-ui/react';
 import { FilterBy } from 'src/models/QueryParams';
 import { FilterBox } from './FilterBox';
@@ -27,7 +27,6 @@ import colors from 'src/styles/colors';
 import { RunAllAlert } from './RunAllAlert';
 
 interface HeaderBarProps {
-  inputPlaceholder: string;
   taskName: string;
   taskInstance: string;
   currentFilter: FilterBy;
@@ -50,7 +49,6 @@ interface HeaderBarProps {
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
-  inputPlaceholder,
   currentFilter,
   searchTerm,
   startTime,
@@ -65,6 +63,9 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   title,
   history,
   taskName,
+                                                        taskInstance,
+                                                        setTaskNameExactMatch,
+                                                        setTaskInstanceExactMatch,
 }) => {
     return(
   <Box
@@ -123,7 +124,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
           <HStack>
               <VStack align="start">
                   <Input
-                      placeholder={inputPlaceholder}
+                      placeholder={'Search for task name'}
                       defaultValue={taskName}
                       onChange={(e) => setSearchTermTaskName(e.currentTarget.value)}
                       bgColor={colors.primary['100']}
@@ -149,7 +150,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
               </VStack>
               <VStack align="start" spacing={2}>
                   <Input
-                      placeholder={inputPlaceholder}
+                      placeholder={'Search for task id'}
                       defaultValue={taskInstance}
                       onChange={(e) =>
                           setSearchTermTaskInstance(e.currentTarget.value)

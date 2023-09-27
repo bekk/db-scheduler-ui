@@ -90,9 +90,14 @@ public class TaskLogic {
   }
 
   public GetTasksResponse getAllTasks(TaskRequestParams params) {
-    List<TaskModel> tasks =
+/*    List<TaskModel> tasks =
         TaskMapper.mapAllExecutionsToTaskModel(
-            caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler));
+            caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler));*/
+    List<ScheduledExecution<Object>> executions =
+            caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler);
+
+   List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions);
+
     tasks =
         QueryUtils.searchByTaskName(
             tasks, params.getSearchTermTaskName(), params.isTaskNameExactMatch());
@@ -102,6 +107,7 @@ public class TaskLogic {
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
+    tasks = TaskMapper.groupTasks(tasks);
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
     return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());

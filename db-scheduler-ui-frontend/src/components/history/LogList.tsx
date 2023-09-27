@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 import { Accordion, Box, Button, Flex, HStack, Text } from '@chakra-ui/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { LogCard } from 'src/components/history/LogCard';
 import { useLocation } from 'react-router-dom';
 import colors from 'src/styles/colors';
@@ -60,13 +60,17 @@ export const LogList: React.FC = () => {
       : { fetchDataFunction: getLogs, baseQueryKey: ALL_LOG_QUERY_KEY },
   );
 
+  useEffect(() => {
+    if (taskName || taskInstance) {
+      setSearchTermTaskName(taskName || '');
+      setSearchTermTaskInstance(taskInstance || '');
+    }
+  }, []);
+
   return (
     <Box>
       <HeaderBar
         title={'History' + (taskName ? ' for ' + taskName : '')}
-        inputPlaceholder={`search for ${
-          taskName ? '' : 'task name or '
-        }task id`}
         taskName={taskName}
         taskInstance={taskInstance}
         currentFilter={currentFilter}

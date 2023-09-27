@@ -109,8 +109,6 @@ public class LogLogic {
 
     queryBuilder.limit(DEFAULT_LIMIT);
 
-    System.out.println(queryBuilder.getQuery());
-
     return namedParameterJdbcTemplate.query(
         queryBuilder.getQuery(), queryBuilder.getParameters(), new LogModelRowMapper());
   }
