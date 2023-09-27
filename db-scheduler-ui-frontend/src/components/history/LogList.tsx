@@ -39,14 +39,16 @@ export const LogList: React.FC = () => {
     setCurrentSort,
     sortAsc,
     setSortAsc,
-      startTime,
-      setStartTime,
-      endTime,
-      setEndTime,
+    startTime,
+    setStartTime,
+    endTime,
+    setEndTime,
     setSearchTermTaskName,
     setSearchTermTaskInstance,
     searchTermTaskName,
     searchTermTaskInstance,
+    taskInstanceExactMatch,
+    taskNameExactMatch,
     setTaskNameExactMatch,
     setTaskInstanceExactMatch,
   } = useInfiniteScrolling<LogResponse>(
@@ -71,20 +73,24 @@ export const LogList: React.FC = () => {
     <Box>
       <HeaderBar
         title={'History' + (taskName ? ' for ' + taskName : '')}
-        taskName={taskName}
-        taskInstance={taskInstance}
-        currentFilter={currentFilter}
+        params={{
+          filter: currentFilter,
+          asc: sortAsc,
+          startTime: startTime ?? undefined,
+          endTime: endTime ?? undefined,
+          taskName,
+          taskId: taskInstance,
+          searchTermTaskName,
+          searchTermTaskInstance,
+          taskInstanceExactMatch,
+          taskNameExactMatch,
+        }}
         setCurrentFilter={setCurrentFilter}
         setSearchTermTaskName={setSearchTermTaskName}
         setSearchTermTaskInstance={setSearchTermTaskInstance}
-        asc={sortAsc}
-        startTime={startTime ?? undefined}
-        endTime={endTime ?? undefined}
         refetch={refetch}
         setTaskNameExactMatch={setTaskNameExactMatch}
         setTaskInstanceExactMatch={setTaskInstanceExactMatch}
-        searchTermTaskName={searchTermTaskName}
-        searchTermTaskInstance={searchTermTaskInstance}
         history
       />
       <Box mb={7}>

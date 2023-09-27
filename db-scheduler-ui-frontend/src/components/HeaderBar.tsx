@@ -33,19 +33,13 @@ import { POLL_TASKS_QUERY_KEY, pollTasks } from 'src/services/pollTasks';
 import { PlayIcon, RepeatIcon } from 'src/assets/icons';
 import colors from 'src/styles/colors';
 import { RunAllAlert } from './RunAllAlert';
+import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 
 interface HeaderBarProps {
-  taskName: string;
-  taskInstance: string;
-  currentFilter: FilterBy;
-  startTime?: Date;
-  endTime?: Date;
-  asc?: boolean;
+  params: TaskDetailsRequestParams;
   setCurrentFilter: (filter: FilterBy) => void;
   setSearchTermTaskName: (searchTerm: string) => void;
   setSearchTermTaskInstance: (searchTerm: string) => void;
-  searchTermTaskName: string;
-  searchTermTaskInstance: string;
   refetch?: () => Promise<
     QueryObserverResult<InfiniteData<InfiniteScrollResponse<Task | Log>>>
   >;
@@ -56,24 +50,18 @@ interface HeaderBarProps {
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
-  currentFilter,
-  startTime,
-  endTime,
-  asc,
   setCurrentFilter,
   setSearchTermTaskName,
   setSearchTermTaskInstance,
-  searchTermTaskName,
-  searchTermTaskInstance,
   refetch,
   title,
   history,
-  taskName,
-  taskInstance,
   setTaskNameExactMatch,
   setTaskInstanceExactMatch,
+  params,
 }) => {
   const [isOpen, setIsOpen] = React.useState('');
+  const { taskName, taskId: taskInstance, filter: currentFilter } = params;
 
   return (
     <Box
@@ -198,14 +186,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             pollFunction={history ? pollLogs : pollTasks}
             pollKey={history ? POLL_LOGS_QUERY_KEY : POLL_TASKS_QUERY_KEY}
             refetch={refetch}
-            params={{
-              searchTermTaskName,
-              searchTermTaskInstance,
-              filter: currentFilter,
-              startTime,
-              endTime,
-              asc,
-            }}
+            params={params}
           />
         </Box>
       </Box>
