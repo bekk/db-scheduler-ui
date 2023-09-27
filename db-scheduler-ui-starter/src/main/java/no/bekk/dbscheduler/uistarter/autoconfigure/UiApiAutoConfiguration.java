@@ -29,7 +29,6 @@ import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
 public class UiApiAutoConfiguration {
-
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
 
   public UiApiAutoConfiguration() {

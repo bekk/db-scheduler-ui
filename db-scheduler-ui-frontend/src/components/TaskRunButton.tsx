@@ -29,112 +29,72 @@ interface TaskRunButtonProps extends Task {
 export const TaskRunButton: React.FC<TaskRunButtonProps> = (props) => {
   const { taskInstance, taskName, pickedBy, style, refetch } = props;
   const navigate = useNavigate();
-  const buttonProps = {
-    style,
-    onClick: (event: React.MouseEvent) => {
-      event.stopPropagation();
-      !isStatus('Group', props)
-        ? runTask(taskInstance[0], taskName).then(() => refetch())
-        : navigate(`/${taskName}`, {
-            state: { taskName: taskName },
-          });
-    },
-    bgColor: isStatus('Group', props)
-      ? 'transparent'
-      : isStatus('Failed', props)
-      ? colors.running['300']
-      : colors.running['100'],
-    textColor: isStatus('Group', props)
-      ? colors.primary['600']
-      : isStatus('Failed', props)
-      ? colors.primary['100']
-      : colors.running['500'],
-    hoverBgColor: !isStatus('Group', props)
-      ? isStatus('Failed', props)
-        ? colors.running['400']
-        : colors.running['200']
-      : 'transparent',
-    hoverTextColor: isStatus('Group', props)
-      ? colors.primary['400']
-      : undefined,
-    activeBgColor: isStatus('Group', props)
-      ? colors.primary['100']
-      : isStatus('Failed', props)
-      ? colors.running['300']
-      : colors.running['100'],
-    activeTextColor: isStatus('Group', props)
-      ? colors.primary['500']
-      : undefined,
-    text: isStatus('Group', props)
-      ? 'Show all'
-      : isStatus('Failed', props)
-      ? 'Rerun'
-      : 'Run',
-    leftIcon: isStatus('Group', props) ? undefined : isStatus(
-        'Failed',
-        props,
-      ) ? (
-      <RepeatIcon boxSize={6} />
-    ) : (
-      <PlayIcon boxSize={4} />
-    ),
-    rightIcon: isStatus('Group', props) ? (
-      <ArrowRightIcon boxSize={3} />
-    ) : undefined,
-  };
-
-  return <>{!pickedBy[0] && <IconButton {...buttonProps} />}</>;
-};
-interface IconButtonProps {
-  style?: React.CSSProperties;
-  onClick: (event: React.MouseEvent) => void;
-  bgColor: string;
-  textColor: string;
-  hoverBgColor: string;
-  hoverTextColor: string | undefined;
-  activeBgColor: string;
-  activeTextColor: string | undefined;
-  leftIcon?: React.ReactElement;
-  rightIcon?: React.ReactElement;
-  text: string;
-}
-
-export const IconButton: React.FC<IconButtonProps> = (props) => {
-  const {
-    style,
-    onClick,
-    bgColor,
-    textColor,
-    hoverBgColor,
-    hoverTextColor,
-    activeBgColor,
-    activeTextColor,
-    leftIcon,
-    rightIcon,
-    text,
-  } = props;
-
   return (
-    <Button
-      style={style}
-      onClick={onClick}
-      iconSpacing={2}
-      width={100}
-      bgColor={bgColor}
-      textColor={textColor}
-      _hover={{
-        bgColor: hoverBgColor,
-        textColor: hoverTextColor,
-      }}
-      _active={{
-        bgColor: activeBgColor,
-        textColor: activeTextColor,
-      }}
-      fontWeight="normal"
-      rightIcon={rightIcon}
-      leftIcon={leftIcon}
-    >
-      {text}
-    </Button>
+    <>
+      {!pickedBy[0] && (
+        <Button
+          style={style}
+          onClick={(event) => {
+            event.stopPropagation();
+            !isStatus('Group', props)
+              ? runTask(taskInstance[0], taskName).then(() => refetch())
+              : navigate(`/${taskName}`, {
+                  state: { taskName: taskName },
+                });
+          }}
+          iconSpacing={2}
+          width={100}
+          bgColor={
+            isStatus('Group', props)
+              ? 'transparent'
+              : isStatus('Failed', props)
+              ? colors.running['300']
+              : colors.running['100']
+          }
+          textColor={
+            isStatus('Group', props)
+              ? colors.primary['600']
+              : isStatus('Failed', props)
+              ? colors.primary['100']
+              : colors.running['500']
+          }
+          _hover={{
+            bgColor: !isStatus('Group', props)
+              ? isStatus('Failed', props)
+                ? colors.running['400']
+                : colors.running['200']
+              : 'transparent',
+            textColor: isStatus('Group', props) && colors.primary['400'],
+          }}
+          _active={{
+            bgColor: isStatus('Group', props)
+              ? colors.primary['100']
+              : isStatus('Failed', props)
+              ? colors.running['300']
+              : colors.running['100'],
+            textColor: isStatus('Group', props) && colors.primary['500'],
+          }}
+          fontWeight="normal"
+          rightIcon={
+            isStatus('Group', props) ? (
+              <ArrowRightIcon boxSize={3} />
+            ) : undefined
+          }
+          leftIcon={
+            isStatus('Group', props) ? undefined : isStatus('Failed', props) ? (
+              <RepeatIcon boxSize={6} />
+            ) : (
+              <PlayIcon boxSize={4} />
+            )
+          }
+        >
+          {isStatus('Group', props)
+            ? 'Show all'
+            : isStatus('Failed', props)
+            ? 'Rerun'
+            : 'Run'}
+        </Button>
+      )}
+    </>
   );
 };

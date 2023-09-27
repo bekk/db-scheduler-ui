@@ -50,7 +50,6 @@ public class TaskLogic {
     if (scheduledExecutionOpt.isPresent() && !scheduledExecutionOpt.get().isPicked()) {
       scheduler.reschedule(scheduledExecutionOpt.get().getTaskInstance(), Instant.now());
     } else {
-      System.out.println("\n\n\n\n\n\n\n\nTHROW NOT FOUND\n\n\n\n\n\n\n\n");
       throw new ResponseStatusException(
           HttpStatus.NOT_FOUND,
           "No ScheduledExecution found for taskName: " + taskName + ", taskId: " + taskId);

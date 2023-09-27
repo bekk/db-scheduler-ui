@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @CrossOrigin
 @RequestMapping("/db-scheduler")
 public class UIController {
-
   @RequestMapping("/**")
   public String forwardToIndex() {
     return "forward:/db-scheduler-ui/index.html";
