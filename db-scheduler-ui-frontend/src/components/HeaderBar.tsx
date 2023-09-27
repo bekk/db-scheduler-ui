@@ -12,7 +12,15 @@
  * limitations under the License.
  */
 import React from 'react';
-import { Box, Button, Input, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Checkbox,
+  HStack,
+  Input,
+  Text,
+  VStack,
+  Button,
+} from '@chakra-ui/react';
 import { FilterBy } from 'src/models/QueryParams';
 import { FilterBox } from './FilterBox';
 import { RefreshButton } from 'src/components/RefreshButton';
@@ -27,35 +35,43 @@ import colors from 'src/styles/colors';
 import { RunAllAlert } from './RunAllAlert';
 
 interface HeaderBarProps {
-  inputPlaceholder: string;
   taskName: string;
+  taskInstance: string;
   currentFilter: FilterBy;
-  searchTerm: string;
   startTime?: Date;
   endTime?: Date;
   asc?: boolean;
   setCurrentFilter: (filter: FilterBy) => void;
-  setSearchTerm: (searchTerm: string) => void;
+  setSearchTermTaskName: (searchTerm: string) => void;
+  setSearchTermTaskInstance: (searchTerm: string) => void;
+  searchTermTaskName: string;
+  searchTermTaskInstance: string;
   refetch?: () => Promise<
     QueryObserverResult<InfiniteData<InfiniteScrollResponse<Task | Log>>>
   >;
   title: string;
   history?: boolean;
+  setTaskNameExactMatch: (exactMatch: boolean) => void;
+  setTaskInstanceExactMatch: (exactMatch: boolean) => void;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
-  inputPlaceholder,
   currentFilter,
-  searchTerm,
   startTime,
   endTime,
   asc,
   setCurrentFilter,
-  setSearchTerm,
+  setSearchTermTaskName,
+  setSearchTermTaskInstance,
+  searchTermTaskName,
+  searchTermTaskInstance,
   refetch,
   title,
   history,
   taskName,
+  taskInstance,
+  setTaskNameExactMatch,
+  setTaskInstanceExactMatch,
 }) => {
   const [isOpen, setIsOpen] = React.useState('');
 
@@ -69,7 +85,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
     >
       <Box display={'flex'} alignItems={'center'} flex={1}>
         <Box>
-          <Box display={'flex'} alignItems={'center'}>
+          <Box>
             <Text ml={1} fontSize={'3xl'} fontWeight={'semibold'}>
               {title}
             </Text>
@@ -113,14 +129,62 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
               </>
             )}
           </Box>
-          <Input
-            placeholder={inputPlaceholder}
-            onChange={(e) => setSearchTerm(e.currentTarget.value)}
-            bgColor={colors.primary['100']}
-            w={'30vmax'}
-            mt={7}
-            ml={1}
-          />
+          <HStack>
+            <VStack align="start">
+              <Input
+                placeholder={'Search for task name'}
+                defaultValue={taskName}
+                onChange={(e) => setSearchTermTaskName(e.currentTarget.value)}
+                bgColor={colors.primary['100']}
+                w={'20vmax'}
+                mt={7}
+                ml={1}
+              />
+              <Checkbox
+                ml={1}
+                onChange={(e) => setTaskNameExactMatch(e.target.checked)}
+                sx={{
+                  '.chakra-checkbox__control': {
+                    bg: colors.primary['100'],
+                    _checked: {
+                      bg: colors.primary['500'],
+                      borderColor: colors.primary['500'],
+                    },
+                  },
+                }}
+              >
+                Exact match
+              </Checkbox>
+            </VStack>
+            <VStack align="start" spacing={2}>
+              <Input
+                placeholder={'Search for task id'}
+                defaultValue={taskInstance}
+                onChange={(e) =>
+                  setSearchTermTaskInstance(e.currentTarget.value)
+                }
+                bgColor={colors.primary['100']}
+                w={'20vmax'}
+                mt={7}
+                ml={1}
+              />
+              <Checkbox
+                ml={1}
+                onChange={(e) => setTaskInstanceExactMatch(e.target.checked)}
+                sx={{
+                  '.chakra-checkbox__control': {
+                    bg: colors.primary['100'],
+                    _checked: {
+                      bg: colors.primary['500'],
+                      borderColor: colors.primary['500'],
+                    },
+                  },
+                }}
+              >
+                Exact match
+              </Checkbox>
+            </VStack>
+          </HStack>
         </Box>
       </Box>
       <Box height={'100%'}>
@@ -135,7 +199,8 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             pollKey={history ? POLL_LOGS_QUERY_KEY : POLL_TASKS_QUERY_KEY}
             refetch={refetch}
             params={{
-              searchTerm,
+              searchTermTaskName,
+              searchTermTaskInstance,
               filter: currentFilter,
               startTime,
               endTime,

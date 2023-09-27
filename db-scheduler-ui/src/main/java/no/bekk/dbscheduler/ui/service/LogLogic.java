@@ -87,11 +87,24 @@ public class LogLogic {
         && requestParams.getFilter() != TaskRequestParams.TaskFilter.ALL) {
       queryBuilder.andCondition(new FilterCondition(requestParams.getFilter()));
     }
-    if (requestParams.getSearchTerm() != null) {
+    if (requestParams.getSearchTermTaskName() != null) {
       queryBuilder.andCondition(
-          new SearchCondition(requestParams.getSearchTerm(), new HashMap<>()));
+          new SearchCondition(
+              requestParams.getSearchTermTaskName(),
+              new HashMap<>(),
+              true,
+              requestParams.isTaskNameExactMatch()));
     }
-    queryBuilder.limit(500);
+
+    if (requestParams.getSearchTermTaskInstance() != null) {
+      queryBuilder.andCondition(
+          new SearchCondition(
+              requestParams.getSearchTermTaskInstance(),
+              new HashMap<>(),
+              false,
+              requestParams.isTaskInstanceExactMatch()));
+    }
+
     queryBuilder.orderBy(requestParams.isAsc() ? "time_finished desc" : "time_finished asc");
 
     queryBuilder.limit(DEFAULT_LIMIT);
@@ -126,14 +139,21 @@ public class LogLogic {
     private final String searchTerm;
     private final Map<String, Object> params;
 
-    public SearchCondition(String searchTerm, Map<String, Object> params) {
+    private final boolean isTaskName;
+
+    private final boolean isExactMatch;
+
+    public SearchCondition(
+        String searchTerm, Map<String, Object> params, boolean isTaskName, boolean isExactMatch) {
       this.searchTerm = searchTerm;
       this.params = params;
+      this.isTaskName = isTaskName;
+      this.isExactMatch = isExactMatch;
     }
 
     @Override
     public String getQueryPart() {
-      return QueryUtils.logSearchCondition(searchTerm, params);
+      return QueryUtils.logSearchCondition(searchTerm, params, isTaskName, isExactMatch);
     }
 
     @Override

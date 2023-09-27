@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 import { Accordion, Box, Button, Flex, HStack, Text } from '@chakra-ui/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { LogCard } from 'src/components/history/LogCard';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import colors from 'src/styles/colors';
 import { HeaderBar } from '../HeaderBar';
 import { ALL_LOG_QUERY_KEY, getLogs } from 'src/services/getLogs';
@@ -25,7 +25,8 @@ import { SortBy } from 'src/models/QueryParams';
 import { LogResponse } from 'src/models/TasksResponse';
 
 export const LogList: React.FC = () => {
-  const { taskName, taskInstance } = useParams();
+  const location = useLocation();
+  const { taskName, taskInstance } = location.state || {};
   const {
     data,
     fetchNextPage,
@@ -38,12 +39,16 @@ export const LogList: React.FC = () => {
     setCurrentSort,
     sortAsc,
     setSortAsc,
-    startTime,
-    setStartTime,
-    endTime,
-    setEndTime,
-    searchTerm,
-    setSearchTerm,
+      startTime,
+      setStartTime,
+      endTime,
+      setEndTime,
+    setSearchTermTaskName,
+    setSearchTermTaskInstance,
+    searchTermTaskName,
+    searchTermTaskInstance,
+    setTaskNameExactMatch,
+    setTaskInstanceExactMatch,
   } = useInfiniteScrolling<LogResponse>(
     taskName
       ? {
@@ -55,25 +60,34 @@ export const LogList: React.FC = () => {
       : { fetchDataFunction: getLogs, baseQueryKey: ALL_LOG_QUERY_KEY },
   );
 
+  useEffect(() => {
+    if (taskName || taskInstance) {
+      setSearchTermTaskName(taskName || '');
+      setSearchTermTaskInstance(taskInstance || '');
+    }
+  }, []);
+
   return (
     <Box>
       <HeaderBar
         title={'History' + (taskName ? ' for ' + taskName : '')}
-        inputPlaceholder={`search for ${
-          taskName ? '' : 'task name or '
-        }task id`}
-        taskName={taskName || ''}
+        taskName={taskName}
+        taskInstance={taskInstance}
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}
-        searchTerm={searchTerm}
+        setSearchTermTaskName={setSearchTermTaskName}
+        setSearchTermTaskInstance={setSearchTermTaskInstance}
         asc={sortAsc}
         startTime={startTime ?? undefined}
         endTime={endTime ?? undefined}
-        setSearchTerm={setSearchTerm}
         refetch={refetch}
+        setTaskNameExactMatch={setTaskNameExactMatch}
+        setTaskInstanceExactMatch={setTaskInstanceExactMatch}
+        searchTermTaskName={searchTermTaskName}
+        searchTermTaskInstance={searchTermTaskInstance}
         history
       />
-      <Box mb={14}>
+      <Box mb={7}>
         <Flex alignItems={'center'}>
           <DateTimeInput
             selectedDate={startTime}

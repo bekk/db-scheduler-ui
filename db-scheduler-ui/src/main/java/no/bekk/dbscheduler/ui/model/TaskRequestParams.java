@@ -23,7 +23,13 @@ public class TaskRequestParams {
   private final TaskSort sorting;
   private final boolean asc;
   private boolean refresh;
-  private final String searchTerm;
+  private final String searchTermTaskName;
+
+  private final String searchTermTaskInstance;
+
+  private final boolean taskNameExactMatch;
+
+  private final boolean taskInstanceExactMatch;
   private final Instant startTime;
   private final Instant endTime;
 
@@ -33,7 +39,10 @@ public class TaskRequestParams {
       Integer size,
       TaskSort sorting,
       Boolean asc,
-      String searchTerm,
+      String searchTermTaskName,
+      String searchTermTaskInstance,
+      Boolean taskNameExactMatch,
+      Boolean taskInstanceExactMatch,
       Instant startTime,
       Instant endTime,
       Boolean refresh) {
@@ -42,7 +51,10 @@ public class TaskRequestParams {
     this.size = size != null ? size : 10;
     this.sorting = sorting != null ? sorting : TaskSort.DEFAULT;
     this.asc = asc != null ? asc : true;
-    this.searchTerm = searchTerm;
+    this.searchTermTaskName = searchTermTaskName;
+    this.searchTermTaskInstance = searchTermTaskInstance;
+    this.taskNameExactMatch = taskNameExactMatch != null ? taskNameExactMatch : false;
+    this.taskInstanceExactMatch = taskInstanceExactMatch != null ? taskInstanceExactMatch : false;
     this.startTime = startTime != null ? startTime : Instant.MIN;
     this.endTime = endTime != null ? endTime : Instant.MAX;
     this.refresh = refresh != null ? refresh : true;
@@ -72,8 +84,20 @@ public class TaskRequestParams {
     return refresh;
   }
 
-  public String getSearchTerm() {
-    return searchTerm;
+  public String getSearchTermTaskName() {
+    return searchTermTaskName;
+  }
+
+  public String getSearchTermTaskInstance() {
+    return searchTermTaskInstance;
+  }
+
+  public boolean isTaskNameExactMatch() {
+    return taskNameExactMatch;
+  }
+
+  public boolean isTaskInstanceExactMatch() {
+    return taskInstanceExactMatch;
   }
 
   public void setRefresh(boolean refresh) {

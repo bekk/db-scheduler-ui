@@ -41,8 +41,12 @@ const TaskList: React.FC = () => {
     setCurrentSort,
     sortAsc,
     setSortAsc,
-    searchTerm,
-    setSearchTerm,
+    searchTermTaskName,
+    searchTermTaskInstance,
+    setSearchTermTaskName,
+    setSearchTermTaskInstance,
+    setTaskNameExactMatch,
+    setTaskInstanceExactMatch,
   } = useInfiniteScrolling<TasksResponse>(
     isDetailsView
       ? {
@@ -57,15 +61,17 @@ const TaskList: React.FC = () => {
     <Box>
       <HeaderBar
         title={isDetailsView ? taskName : 'All Tasks'}
-        inputPlaceholder={`search for ${
-          isDetailsView ? '' : 'name or '
-        }task id`}
         taskName={taskName || ''}
+        taskInstance={''}
         currentFilter={currentFilter}
-        searchTerm={searchTerm}
         asc={sortAsc}
         setCurrentFilter={setCurrentFilter}
-        setSearchTerm={setSearchTerm}
+        setSearchTermTaskName={setSearchTermTaskName}
+        setSearchTermTaskInstance={setSearchTermTaskInstance}
+        setTaskNameExactMatch={setTaskNameExactMatch}
+        setTaskInstanceExactMatch={setTaskInstanceExactMatch}
+        searchTermTaskName={searchTermTaskName}
+        searchTermTaskInstance={searchTermTaskInstance}
         refetch={refetch}
       />
 
