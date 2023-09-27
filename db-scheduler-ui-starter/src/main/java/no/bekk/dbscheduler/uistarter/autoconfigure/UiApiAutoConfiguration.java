@@ -15,9 +15,9 @@ package no.bekk.dbscheduler.uistarter.autoconfigure;
 
 import com.github.kagkarlsson.scheduler.Scheduler;
 import javax.sql.DataSource;
-import no.bekk.dbscheduler.ui.controller.UIController;
 import no.bekk.dbscheduler.ui.controller.LogController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
+import no.bekk.dbscheduler.ui.controller.UIController;
 import no.bekk.dbscheduler.ui.service.LogLogic;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
 import no.bekk.dbscheduler.ui.util.Caching;
@@ -32,7 +32,6 @@ import org.springframework.context.annotation.Bean;
 @AutoConfiguration
 public class UiApiAutoConfiguration {
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
-
 
   @Value("${db-scheduler-ui.taskdata:true}")
   public boolean showTaskData;
@@ -50,7 +49,6 @@ public class UiApiAutoConfiguration {
     return new Caching();
   }
 
-
   @Bean
   @ConditionalOnMissingBean
   public TaskLogic taskLogic(Scheduler scheduler, Caching caching) {
@@ -60,10 +58,10 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   @ConditionalOnProperty(
-          prefix = "db-scheduler-ui",
-          name = "history",
-          havingValue = "true",
-          matchIfMissing = false)
+      prefix = "db-scheduler-ui",
+      name = "history",
+      havingValue = "true",
+      matchIfMissing = false)
   public LogLogic logLogic(DataSource dataSource) {
     return new LogLogic(dataSource, showTaskData);
   }
@@ -77,10 +75,10 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   @ConditionalOnProperty(
-          prefix = "db-scheduler-ui",
-          name = "history",
-          havingValue = "true",
-          matchIfMissing = false)
+      prefix = "db-scheduler-ui",
+      name = "history",
+      havingValue = "true",
+      matchIfMissing = false)
   public LogController logController(LogLogic logLogic) {
     return new LogController(logLogic);
   }
@@ -91,4 +89,3 @@ public class UiApiAutoConfiguration {
     return new UIController(showTaskData, showHistory);
   }
 }
-

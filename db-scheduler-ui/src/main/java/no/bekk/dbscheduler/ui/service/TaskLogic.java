@@ -83,8 +83,15 @@ public class TaskLogic {
                 QueryUtils.search(tasks, params.getSearchTerm()), params.getFilter()),
             params.getSorting(),
             params.isAsc());
-    if(!showData){List<Object> list = new ArrayList<>(){{add(null);}};
-      tasks.forEach(e -> e.setTaskData(list));}
+    if (!showData) {
+      List<Object> list =
+          new ArrayList<>() {
+            {
+              add(null);
+            }
+          };
+      tasks.forEach(e -> e.setTaskData(list));
+    }
 
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
@@ -122,8 +129,15 @@ public class TaskLogic {
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
-    if(!showData){List<Object> list = new ArrayList<>(){{add(null);}};
-      tasks.forEach(e -> e.setTaskData(list));}
+    if (!showData) {
+      List<Object> list =
+          new ArrayList<>() {
+            {
+              add(null);
+            }
+          };
+      tasks.forEach(e -> e.setTaskData(list));
+    }
 
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());

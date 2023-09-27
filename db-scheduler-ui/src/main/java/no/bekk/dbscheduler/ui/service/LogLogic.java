@@ -37,7 +37,6 @@ public class LogLogic {
   private static final int DEFAULT_LIMIT = 500;
   @Autowired private Caching caching;
 
-
   @Autowired
   public LogLogic(DataSource dataSource, boolean showData) {
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
@@ -171,7 +170,7 @@ public class LogLogic {
     @Override
     public LogModel mapRow(ResultSet rs, int rowNum) throws SQLException {
       byte[] taskData = null;
-      if(showData){
+      if (showData) {
         taskData = rs.getBytes("task_data");
       }
 
@@ -179,7 +178,7 @@ public class LogLogic {
           rs.getLong("id"),
           rs.getString("task_name"),
           rs.getString("task_instance"),
-              taskData,
+          taskData,
           rs.getTimestamp("time_started").toInstant(),
           rs.getTimestamp("time_finished").toInstant(),
           rs.getBoolean("succeeded"),
