@@ -34,7 +34,6 @@ public class UIController {
 
     ObjectMapper objectMapper = new ObjectMapper();
     File file = new File("db-scheduler-ui/src/main/resources/static/db-scheduler-ui/config.json");
-    System.out.println(file.getPath());
     try {
       objectMapper.writeValue(file, jsonMap);
     } catch (IOException e) {

@@ -84,13 +84,7 @@ public class TaskLogic {
             params.getSorting(),
             params.isAsc());
     if (!showData) {
-      List<Object> list =
-          new ArrayList<>() {
-            {
-              add(null);
-            }
-          };
-      tasks.forEach(e -> e.setTaskData(list));
+      tasks.forEach(e -> e.setTaskData(List.of()));
     }
 
     List<TaskModel> pagedTasks =
