@@ -42,6 +42,7 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
   pollKey,
   params,
 }) => {
+  console.log(params);
   const { data, refetch: repoll } = useQuery(
     [
       pollKey,

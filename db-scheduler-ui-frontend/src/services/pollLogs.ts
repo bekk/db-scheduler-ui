@@ -32,6 +32,7 @@ export const pollLogs = async (params: TaskDetailsRequestParams): Promise<PollRe
   params.startTime && queryParams.append('startTime', params.startTime.toISOString());
   params.endTime && queryParams.append('endTime', params.endTime.toISOString());
   params.refresh && queryParams.append('refresh', params.refresh.toString());
+  console.log(params)
 
   const response = await fetch(`${API_BASE_URL}/logs/poll?${queryParams}`, {
     method: 'GET',

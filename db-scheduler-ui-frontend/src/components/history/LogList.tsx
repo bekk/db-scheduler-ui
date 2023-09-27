@@ -66,6 +66,8 @@ export const LogList: React.FC = () => {
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}
         searchTerm={searchTerm}
+        startTime={startTime ?? undefined}
+        endTime={endTime ?? undefined}
         setSearchTerm={setSearchTerm}
         refetch={refetch}
         history
