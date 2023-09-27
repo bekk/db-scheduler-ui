@@ -32,9 +32,6 @@ public class LogController {
 
   @GetMapping("/all")
   public GetLogsResponse getAllLogs(TaskDetailsRequestParams params) {
-
-    System.out.println("INITIAL REQUEST");
-    System.out.println(params.isAsc());
     return logLogic.getLogs(params);
   }
 

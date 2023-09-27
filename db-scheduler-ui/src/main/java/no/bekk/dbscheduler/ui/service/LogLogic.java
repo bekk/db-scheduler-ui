@@ -92,7 +92,6 @@ public class LogLogic {
           new SearchCondition(requestParams.getSearchTerm(), new HashMap<>()));
     }
     queryBuilder.limit(500);
-    System.out.println(requestParams.isAsc());
     queryBuilder.orderBy(requestParams.isAsc() ? "time_finished desc" : "time_finished asc");
 
     queryBuilder.limit(DEFAULT_LIMIT);

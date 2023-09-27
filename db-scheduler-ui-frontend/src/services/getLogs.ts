@@ -37,7 +37,6 @@ export const getLogs = async (
   params.searchTerm && queryParams.append('searchTerm', params.searchTerm.trim());
   params.taskName && queryParams.append('taskName', params.taskName);
   params.taskId && queryParams.append('taskId', params.taskId);
-  console.log(params.asc)
 
   const response = await fetch(`${API_BASE_URL}/logs/all?${queryParams}`, {
     method: 'GET',
