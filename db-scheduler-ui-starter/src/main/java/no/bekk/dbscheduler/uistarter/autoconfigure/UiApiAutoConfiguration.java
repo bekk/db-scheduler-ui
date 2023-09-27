@@ -23,13 +23,21 @@ import no.bekk.dbscheduler.ui.service.TaskLogic;
 import no.bekk.dbscheduler.ui.util.Caching;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
 public class UiApiAutoConfiguration {
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
+
+  @Value("${db-scheduler-ui.taskdata:true}")
+  public boolean showTaskData;
+
+  @Value("${db-scheduler-ui.history:false}")
+  private boolean showHistory;
 
   public UiApiAutoConfiguration() {
     logger.info("UiApiAutoConfiguration created");
@@ -44,13 +52,18 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   public TaskLogic taskLogic(Scheduler scheduler, Caching caching) {
-    return new TaskLogic(scheduler, caching);
+    return new TaskLogic(scheduler, caching, showTaskData);
   }
 
   @Bean
   @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "history",
+      havingValue = "true",
+      matchIfMissing = false)
   public LogLogic logLogic(DataSource dataSource) {
-    return new LogLogic(dataSource);
+    return new LogLogic(dataSource, showTaskData);
   }
 
   @Bean
@@ -61,6 +74,11 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "history",
+      havingValue = "true",
+      matchIfMissing = false)
   public LogController logController(LogLogic logLogic) {
     return new LogController(logLogic);
   }
@@ -68,6 +86,6 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   public UIController uiController() {
-    return new UIController();
+    return new UIController(showTaskData, showHistory);
   }
 }

@@ -35,12 +35,14 @@ public class TaskLogic {
 
   private final Scheduler scheduler;
   private final Caching caching;
+  private final boolean showData;
 
   @Autowired
-  public TaskLogic(Scheduler scheduler, Caching caching) {
+  public TaskLogic(Scheduler scheduler, Caching caching, boolean showData) {
     this.scheduler = scheduler;
     this.scheduler.start();
     this.caching = caching;
+    this.showData = showData;
   }
 
   public void runTaskNow(String taskId, String taskName) {
@@ -90,9 +92,6 @@ public class TaskLogic {
   }
 
   public GetTasksResponse getAllTasks(TaskRequestParams params) {
-    /*    List<TaskModel> tasks =
-    TaskMapper.mapAllExecutionsToTaskModel(
-        caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler));*/
     List<ScheduledExecution<Object>> executions =
         caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler);
 
@@ -107,6 +106,9 @@ public class TaskLogic {
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
+    if (!showData) {
+      tasks.forEach(e -> e.setTaskData(List.of()));
+    }
     tasks = TaskMapper.groupTasks(tasks);
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
@@ -149,6 +151,16 @@ public class TaskLogic {
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
+    if (!showData) {
+      List<Object> list =
+          new ArrayList<>() {
+            {
+              add(null);
+            }
+          };
+      tasks.forEach(e -> e.setTaskData(list));
+    }
+
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
     return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
