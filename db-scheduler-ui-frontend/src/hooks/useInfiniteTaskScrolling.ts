@@ -35,6 +35,8 @@ export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
   const [sortAsc, setSortAsc] = useState<boolean>(true);
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const limit = 10;
 
@@ -50,10 +52,12 @@ export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log
     currentFilter,
     currentSort,
     sortAsc,
+    ...(startTime ? [ startTime ] : []),
+    ...(endTime ? [ endTime ] : []),
     ...(taskName ? [taskName] : []),
     ...(taskInstance ? [taskInstance] : []),
     searchTerm,
-  ], [baseQueryKey, currentFilter, currentSort, sortAsc, taskName,taskInstance, searchTerm]);
+  ], [baseQueryKey, currentFilter, currentSort, sortAsc, startTime, endTime, taskName,taskInstance, searchTerm]);
   
 
   const fetchItems = useCallback(
@@ -80,6 +84,8 @@ export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log
         limit: limit,
         sorting: currentSort,
         asc: sortAsc,
+        ...(startTime ? { startTime } : {}),
+        ...(endTime ? { endTime } : {}),
         refresh: shouldRefresh,
         searchTerm,
         size: limit,
@@ -89,7 +95,7 @@ export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log
 
       return fetchDataFunction(params);
     },
-    [currentFilter, currentSort, sortAsc, searchTerm, taskName, taskInstance, queryClient, queryKey, fetchDataFunction],
+    [currentFilter, currentSort, sortAsc, startTime, endTime, searchTerm, taskName, taskInstance, queryClient, queryKey, fetchDataFunction],
   );
 
 
@@ -114,6 +120,10 @@ export const useInfiniteScrolling = <T extends InfiniteScrollResponse<Task | Log
     setCurrentSort,
     sortAsc,
     setSortAsc,
+    startTime,
+    setStartTime,
+    endTime,
+    setEndTime,
     searchTerm,
     setSearchTerm,
     isDetailsView: !!taskName,

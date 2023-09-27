@@ -26,8 +26,6 @@ import { LogResponse } from 'src/models/TasksResponse';
 
 export const LogList: React.FC = () => {
   const { taskName, taskInstance } = useParams();
-  const [startTime, setStartTime] = React.useState<Date | null>(null);
-  const [endTime, setEndTime] = React.useState<Date | null>(null);
   const {
     data,
     fetchNextPage,
@@ -40,6 +38,10 @@ export const LogList: React.FC = () => {
     setCurrentSort,
     sortAsc,
     setSortAsc,
+    startTime,
+    setStartTime,
+    endTime,
+    setEndTime,
     searchTerm,
     setSearchTerm,
   } = useInfiniteScrolling<LogResponse>(

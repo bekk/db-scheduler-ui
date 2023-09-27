@@ -31,6 +31,8 @@ export const getLogs = async (
   params.limit && queryParams.append('size', params.limit.toString());
   params.sorting && queryParams.append('sorting', params.sorting.toUpperCase());
   params.asc && queryParams.append('asc', params.asc.toString());
+  params.startTime && queryParams.append('startTime', params.startTime.toISOString());
+  params.endTime && queryParams.append('endTime', params.endTime.toISOString());
   params.refresh && queryParams.append('refresh', params.refresh.toString());
   params.searchTerm && queryParams.append('searchTerm', params.searchTerm.trim());
   params.taskName && queryParams.append('taskName', params.taskName);
