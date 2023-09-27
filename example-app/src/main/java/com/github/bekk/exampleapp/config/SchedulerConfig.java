@@ -16,10 +16,16 @@ package com.github.bekk.exampleapp.config;
 import com.github.kagkarlsson.scheduler.serializer.JavaSerializer;
 import io.rocketbase.extension.jdbc.JdbcLogRepository;
 import io.rocketbase.extension.jdbc.Snowflake;
+
+import javax.servlet.Filter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 
 @Configuration
 public class SchedulerConfig {
@@ -35,4 +41,29 @@ public class SchedulerConfig {
     return new JdbcLogRepository(
         dataSource, new JavaSerializer(), JdbcLogRepository.DEFAULT_TABLE_NAME, new Snowflake());
   }
+  /**
+  @Bean
+  public FilterRegistrationBean<Filter> authFilter() {
+    FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
+
+    registrationBean.setFilter(
+            (servletRequest, servletResponse, filterChain) -> {
+              if (authenticated((HttpServletRequest) servletRequest)) {
+                filterChain.doFilter(servletRequest, servletResponse);
+              } else {
+                HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+                httpResponse.setStatus(401);
+                httpResponse.setHeader("WWW-Authenticate", "Basic realm=\"Db-scheduler UI Admin\"");
+              }
+            });
+    registrationBean.addUrlPatterns("/db-scheduler/*");
+    registrationBean.setOrder(1);
+
+    return registrationBean;
+  }
+
+  private boolean authenticated(HttpServletRequest httpResponse) {
+    String auth = httpResponse.getHeader("Authorization");
+    return auth.equals("testpassword");
+  }*/
 }
