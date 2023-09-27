@@ -1,8 +1,0 @@
-{
-  "folding": {
-    "*": {
-      "beginRegex": "/\\*\\s*Copyright \\(C\\) Bekk",
-      "endRegex": "\\*/"
-    }
-  }
-}
