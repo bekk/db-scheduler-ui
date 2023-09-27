@@ -27,6 +27,7 @@ import { LogResponse } from 'src/models/TasksResponse';
 export const LogList: React.FC = () => {
   const location = useLocation();
   const { taskName, taskInstance } = location.state || {};
+
   const {
     data,
     fetchNextPage,
@@ -67,7 +68,12 @@ export const LogList: React.FC = () => {
       setSearchTermTaskName(taskName || '');
       setSearchTermTaskInstance(taskInstance || '');
     }
-  }, []);
+  }, [
+    setSearchTermTaskInstance,
+    setSearchTermTaskName,
+    taskInstance,
+    taskName,
+  ]);
 
   return (
     <Box>
