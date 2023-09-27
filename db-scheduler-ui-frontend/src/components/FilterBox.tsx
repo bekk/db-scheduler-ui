@@ -37,7 +37,7 @@ export const FilterBox: React.FC<{
     <Box
       display={'flex'}
       mb={2}
-      mt={2}
+      mt={0}
       flex={1}
       justifyContent={'end'}
       alignSelf={'start'}

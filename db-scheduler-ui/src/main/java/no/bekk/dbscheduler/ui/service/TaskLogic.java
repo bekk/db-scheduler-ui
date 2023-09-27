@@ -49,14 +49,32 @@ public class TaskLogic {
     Optional<ScheduledExecution<Object>> scheduledExecutionOpt =
         scheduler.getScheduledExecution(TaskInstanceId.of(taskName, taskId));
 
-    if (scheduledExecutionOpt.isPresent()) {
-      TaskInstanceId taskInstance = scheduledExecutionOpt.get().getTaskInstance();
-      scheduler.reschedule(taskInstance, Instant.now());
+    if (scheduledExecutionOpt.isPresent() && !scheduledExecutionOpt.get().isPicked()) {
+      scheduler.reschedule(scheduledExecutionOpt.get().getTaskInstance(), Instant.now());
     } else {
       throw new ResponseStatusException(
           HttpStatus.NOT_FOUND,
           "No ScheduledExecution found for taskName: " + taskName + ", taskId: " + taskId);
     }
+  }
+
+  public void runTaskGroupNow(String taskName, boolean onlyFailed) {
+    caching
+        .getExecutionsFromCacheOrDB(false, scheduler)
+        .forEach(
+            (execution) -> {
+              if ((!onlyFailed || execution.getConsecutiveFailures() > 0)
+                  && taskName.equals(execution.getTaskInstance().getTaskName())) {
+                try {
+                  runTaskNow(
+                      execution.getTaskInstance().getId(),
+                      execution.getTaskInstance().getTaskName());
+                } catch (ResponseStatusException e) {
+                  System.out.println("Failed to run task: " + e.getMessage());
+                }
+              }
+              ;
+            });
   }
 
   public void deleteTask(String taskId, String taskName) {
@@ -74,19 +92,24 @@ public class TaskLogic {
   }
 
   public GetTasksResponse getAllTasks(TaskRequestParams params) {
-    List<TaskModel> tasks =
-        TaskMapper.mapAllExecutionsToTaskModel(
-            caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler));
+    List<ScheduledExecution<Object>> executions =
+        caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler);
+
+    List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions);
+
+    tasks =
+        QueryUtils.searchByTaskName(
+            tasks, params.getSearchTermTaskName(), params.isTaskNameExactMatch());
+    tasks =
+        QueryUtils.searchByTaskInstance(
+            tasks, params.getSearchTermTaskInstance(), params.isTaskInstanceExactMatch());
     tasks =
         QueryUtils.sortTasks(
-            QueryUtils.filterTasks(
-                QueryUtils.search(tasks, params.getSearchTerm()), params.getFilter()),
-            params.getSorting(),
-            params.isAsc());
+            QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
     if (!showData) {
       tasks.forEach(e -> e.setTaskData(List.of()));
     }
-
+    tasks = TaskMapper.groupTasks(tasks);
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
     return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
@@ -119,7 +142,12 @@ public class TaskLogic {
               + ", taskId: "
               + params.getTaskId());
     }
-    tasks = QueryUtils.search(tasks, params.getSearchTerm());
+    tasks =
+        QueryUtils.searchByTaskName(
+            tasks, params.getSearchTermTaskName(), params.isTaskNameExactMatch());
+    tasks =
+        QueryUtils.searchByTaskInstance(
+            tasks, params.getSearchTermTaskInstance(), params.isTaskInstanceExactMatch());
     tasks =
         QueryUtils.sortTasks(
             QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());

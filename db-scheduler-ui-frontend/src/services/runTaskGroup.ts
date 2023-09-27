@@ -11,25 +11,21 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { FilterBy, SortBy } from './QueryParams';
+const API_BASE_URL: string =
+  (import.meta.env.VITE_API_BASE_URL as string) ??
+  window.location.origin + '/db-scheduler-api';
 
-export interface TaskRequestParams {
-  filter: FilterBy;
-  pageNumber?: number;
-  limit?: number;
-  size?: number;
-  sorting?: SortBy;
-  asc?: boolean;
-  searchTermTaskName?: string;
-  searchTermTaskInstance?: string;
-  startTime?: Date;
-  endTime?: Date;
-  refresh?: boolean;
-  taskNameExactMatch?: boolean;
-  taskInstanceExactMatch?: boolean;
-}
+const runTaskGroup = async (name: string, onlyFailed: boolean) => {
+  const response = await fetch(
+    `${API_BASE_URL}/tasks/rerunGroup?name=${name}&onlyFailed=${onlyFailed}`,
+    {
+      method: 'POST',
+    },
+  );
 
-export interface TaskDetailsRequestParams extends TaskRequestParams {
-  taskName?: string;
-  taskId?: string;
-}
+  if (!response.ok) {
+    throw new Error(`Error executing task. Status: ${response.statusText}`);
+  }
+};
+
+export default runTaskGroup;
