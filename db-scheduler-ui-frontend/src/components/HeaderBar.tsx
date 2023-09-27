@@ -12,7 +12,15 @@
  * limitations under the License.
  */
 import React from 'react';
-import { Box, Checkbox, HStack, Input, Text, VStack, Button } from '@chakra-ui/react';
+import {
+  Box,
+  Checkbox,
+  HStack,
+  Input,
+  Text,
+  VStack,
+  Button,
+} from '@chakra-ui/react';
 import { FilterBy } from 'src/models/QueryParams';
 import { FilterBox } from './FilterBox';
 import { RefreshButton } from 'src/components/RefreshButton';
@@ -63,119 +71,121 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   title,
   history,
   taskName,
-                                                        taskInstance,
-                                                        setTaskNameExactMatch,
-                                                        setTaskInstanceExactMatch,
+  taskInstance,
+  setTaskNameExactMatch,
+  setTaskInstanceExactMatch,
 }) => {
-    return(
-  <Box
-    display={'flex'}
-    mb={7}
-    alignItems={'center'}
-    justifyContent={'space-between'}
-    w={'100%'}
-  >
-    <Box display={'flex'} alignItems={'center'} flex={1}>
-      <Box>
-      <Box>
-        <Text ml={1} fontSize={'3xl'} fontWeight={'semibold'}>
-          {title}
-        </Text>
-          {taskName && (
+  const [isOpen, setIsOpen] = React.useState('');
+
+  return (
+    <Box
+      display={'flex'}
+      mb={7}
+      alignItems={'center'}
+      justifyContent={'space-between'}
+      w={'100%'}
+    >
+      <Box display={'flex'} alignItems={'center'} flex={1}>
+        <Box>
+          <Box>
+            <Text ml={1} fontSize={'3xl'} fontWeight={'semibold'}>
+              {title}
+            </Text>
+            {taskName && (
               <>
-                  <Button
-                      leftIcon={<PlayIcon />}
-                      bgColor={colors.running['100']}
-                      textColor={colors.running['500']}
-                      _hover={{ backgroundColor: colors.running['200'] }}
-                      _active={{ backgroundColor: colors.running['100'] }}
-                      ml={5}
-                      minW={'6em'}
-                      onClick={() => {
-                          setIsOpen('scheduled');
-                      }}
-                  >
-                      Run all
-                  </Button>
-                  <Button
-                      leftIcon={<RepeatIcon boxSize={6} />}
-                      bgColor={colors.running['300']}
-                      textColor={colors.primary['100']}
-                      _hover={{ backgroundColor: colors.running['400'] }}
-                      _active={{ backgroundColor: colors.running['300'] }}
-                      mx={5}
-                      minW={'10em'}
-                      onClick={() => {
-                          setIsOpen('failed');
-                      }}
-                  >
-                      Rerun all failed
-                  </Button>
-                  <RunAllAlert
-                      taskName={taskName}
-                      isOpen={!!isOpen}
-                      setIsopen={setIsOpen}
-                      onlyFailed={isOpen === 'failed'}
-                      refetch={refetch ?? (() => {})}
-                  />
+                <Button
+                  leftIcon={<PlayIcon />}
+                  bgColor={colors.running['100']}
+                  textColor={colors.running['500']}
+                  _hover={{ backgroundColor: colors.running['200'] }}
+                  _active={{ backgroundColor: colors.running['100'] }}
+                  ml={5}
+                  minW={'6em'}
+                  onClick={() => {
+                    setIsOpen('scheduled');
+                  }}
+                >
+                  Run all
+                </Button>
+                <Button
+                  leftIcon={<RepeatIcon boxSize={6} />}
+                  bgColor={colors.running['300']}
+                  textColor={colors.primary['100']}
+                  _hover={{ backgroundColor: colors.running['400'] }}
+                  _active={{ backgroundColor: colors.running['300'] }}
+                  mx={5}
+                  minW={'10em'}
+                  onClick={() => {
+                    setIsOpen('failed');
+                  }}
+                >
+                  Rerun all failed
+                </Button>
+                <RunAllAlert
+                  taskName={taskName}
+                  isOpen={!!isOpen}
+                  setIsopen={setIsOpen}
+                  onlyFailed={isOpen === 'failed'}
+                  refetch={refetch ?? (() => {})}
+                />
               </>
-          )}
-      </Box>
+            )}
+          </Box>
           <HStack>
-              <VStack align="start">
-                  <Input
-                      placeholder={'Search for task name'}
-                      defaultValue={taskName}
-                      onChange={(e) => setSearchTermTaskName(e.currentTarget.value)}
-                      bgColor={colors.primary['100']}
-                      w={'20vmax'}
-                      mt={7}
-                      ml={1}
-                  />
-                  <Checkbox
-                      ml={1}
-                      onChange={(e) => setTaskNameExactMatch(e.target.checked)}
-                      sx={{
-                          '.chakra-checkbox__control': {
-                              bg: colors.primary['100'],
-                              _checked: {
-                                  bg: colors.primary['500'],
-                                  borderColor: colors.primary['500'],
-                              },
-                          },
-                      }}
-                  >
-                      Exact match
-                  </Checkbox>
-              </VStack>
-              <VStack align="start" spacing={2}>
-                  <Input
-                      placeholder={'Search for task id'}
-                      defaultValue={taskInstance}
-                      onChange={(e) =>
-                          setSearchTermTaskInstance(e.currentTarget.value)
-                      }
-                      bgColor={colors.primary['100']}
-                      w={'20vmax'}
-                      mt={7}
-                      ml={1}
-                  />
-                  <Checkbox
-                      ml={1}
-                      onChange={(e) => setTaskInstanceExactMatch(e.target.checked)}
-                      sx={{
-                          '.chakra-checkbox__control': {
-                              bg: colors.primary['100'],
-                              _checked: {
-                                  bg: colors.primary['500'],
-                                  borderColor: colors.primary['500'],
-                              },
-                          },
-                      }}
-                  >
-                      Exact match
-                  </Checkbox>
-              </VStack>
+            <VStack align="start">
+              <Input
+                placeholder={'Search for task name'}
+                defaultValue={taskName}
+                onChange={(e) => setSearchTermTaskName(e.currentTarget.value)}
+                bgColor={colors.primary['100']}
+                w={'20vmax'}
+                mt={7}
+                ml={1}
+              />
+              <Checkbox
+                ml={1}
+                onChange={(e) => setTaskNameExactMatch(e.target.checked)}
+                sx={{
+                  '.chakra-checkbox__control': {
+                    bg: colors.primary['100'],
+                    _checked: {
+                      bg: colors.primary['500'],
+                      borderColor: colors.primary['500'],
+                    },
+                  },
+                }}
+              >
+                Exact match
+              </Checkbox>
+            </VStack>
+            <VStack align="start" spacing={2}>
+              <Input
+                placeholder={'Search for task id'}
+                defaultValue={taskInstance}
+                onChange={(e) =>
+                  setSearchTermTaskInstance(e.currentTarget.value)
+                }
+                bgColor={colors.primary['100']}
+                w={'20vmax'}
+                mt={7}
+                ml={1}
+              />
+              <Checkbox
+                ml={1}
+                onChange={(e) => setTaskInstanceExactMatch(e.target.checked)}
+                sx={{
+                  '.chakra-checkbox__control': {
+                    bg: colors.primary['100'],
+                    _checked: {
+                      bg: colors.primary['500'],
+                      borderColor: colors.primary['500'],
+                    },
+                  },
+                }}
+              >
+                Exact match
+              </Checkbox>
+            </VStack>
           </HStack>
         </Box>
       </Box>
