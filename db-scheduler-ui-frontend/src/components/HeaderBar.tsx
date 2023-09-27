@@ -30,6 +30,7 @@ interface HeaderBarProps {
   searchTerm: string;
   startTime?: Date;
   endTime?: Date;
+  asc?: boolean;
   setCurrentFilter: (filter: FilterBy) => void;
   setSearchTerm: (searchTerm: string) => void;
   refetch?: () => Promise<
@@ -45,6 +46,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   searchTerm,
   startTime,
   endTime,
+  asc,
   setCurrentFilter,
   setSearchTerm,
   refetch,
@@ -89,6 +91,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             filter: currentFilter,
             startTime,
             endTime,
+            asc,
           }}
         />
       </Box>

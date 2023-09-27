@@ -66,6 +66,7 @@ export const LogList: React.FC = () => {
         currentFilter={currentFilter}
         setCurrentFilter={setCurrentFilter}
         searchTerm={searchTerm}
+        asc={sortAsc}
         startTime={startTime ?? undefined}
         endTime={endTime ?? undefined}
         setSearchTerm={setSearchTerm}
