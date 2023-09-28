@@ -15,7 +15,9 @@ dashboard for monitoring and basic administration of tasks.
 * **Uses SpringBoot** to launch a UI
 * **View the history of all tasks** (optional)
 
-<img alt="Screenshot" src="Screenshot.png" width=700/>
+<img alt="Screenshot" src="Screenshot_Frontpage.png" width=700/>
+<img alt="Screenshot" src="Screenshot_Group.png" width=700/>
+<img alt="Screenshot" src="Screenshot_History.png" width=700/>
 
 ## Table of contents
 
