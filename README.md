@@ -65,16 +65,14 @@ You also need to set `db-scheduler-ui.history=true` in your application.properti
 
 ## How it works
 
-db-scheduler-ui is injected into your app with spring boot.
-Rest controllers providing DB-Scheduler tasks will be injected when you add db-scheduler-ui-starter as a dependency. 
-The frontend is a built React app that can be reached by going to `<your-app-url>/db-scheduler`
-
-
-Db-scheduler-UI adds a library that have a frontend application to show all task in db-scheduler. 
-The db-scheduler-ui backend is connected to the schedule-client. The backend fetches all executions, and 
-they are sorted and filtered in the backend before it is displayed in the frontend app. 
+db-scheduler-ui adds a library that have a frontend application to show all task in db-scheduler.
+The db-scheduler-ui backend is connected to the schedule-client so that it can fetch all executions. 
+The tasks are then sorted and filtered in the backend before it is displayed in the frontend app.
 As the backend connects to scheduler-client it is possible to run, re-run and delete task form the database in the application.
 
+db-scheduler-ui is injected into your app with spring boot.
+Rest controllers providing db-scheduler tasks will be injected when you add db-scheduler-ui-starter as a dependency. 
+The frontend is a built React app that can be reached by going to `<your-app-url>/db-scheduler`
 
 
 ## Configuration
