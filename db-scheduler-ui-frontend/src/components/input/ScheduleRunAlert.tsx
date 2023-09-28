@@ -57,7 +57,7 @@ export const ScheduleRunAlert: React.FC<TaskProps> = ({
             {failed ? 'Rerun Task At Time' : 'Run Task At Time'}
           </AlertDialogHeader>
 
-          <AlertDialogBody>
+          <AlertDialogBody p={4}>
             <DateTimeInput
               onChange={(e) => setTime(e)}
               selectedDate={time}
@@ -65,7 +65,7 @@ export const ScheduleRunAlert: React.FC<TaskProps> = ({
             />
           </AlertDialogBody>
 
-          <AlertDialogFooter>
+          <AlertDialogFooter justifyContent={'space-between'}>
             <Button
               onClick={() => {
                 setIsopen(false);

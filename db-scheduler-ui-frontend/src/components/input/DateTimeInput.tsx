@@ -34,8 +34,11 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
       borderColor={colors.primary[300]}
       borderWidth={1}
       backgroundColor={colors.primary[100]}
+      w="fit-content"
+      alignSelf={'center'}
     >
       <DatePicker
+        id="date-picker"
         selected={selectedDate}
         onChange={onChange}
         showTimeSelect
