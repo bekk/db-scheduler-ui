@@ -52,7 +52,11 @@ export const ScheduleRunAlert: React.FC<TaskProps> = ({
           </AlertDialogHeader>
 
           <AlertDialogBody>
-            <DateTimeInput onChange={(e) => setTime(e)} selectedDate={time} />
+            <DateTimeInput
+              onChange={(e) => setTime(e)}
+              selectedDate={time}
+              forceFutureTime
+            />
           </AlertDialogBody>
 
           <AlertDialogFooter>

@@ -19,13 +19,13 @@ import colors from 'src/styles/colors';
 interface DateTimeInputProps {
   selectedDate: Date | null;
   onChange: (date: Date | null) => void;
-  onlyFuture?: boolean;
+  forceFutureTime?: boolean;
 }
 
 export const DateTimeInput: React.FC<DateTimeInputProps> = ({
   selectedDate,
   onChange,
-  onlyFuture,
+  forceFutureTime,
 }) => {
   return (
     <Box
@@ -46,12 +46,12 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
         // new code
         minTime={
           selectedDate?.toDateString() === new Date().toDateString() &&
-          onlyFuture
+          forceFutureTime
             ? new Date()
             : new Date(0, 0, 1)
         }
-        maxTime={new Date(2100, 0, 1, 23, 59, 59)}
-        minDate={new Date()}
+        maxTime={new Date(2100, 0, 1, 23, 59, 59, 999)}
+        minDate={forceFutureTime ? new Date() : new Date(0)}
         maxDate={new Date(2100, 0, 1)}
       ></DatePicker>
     </Box>
