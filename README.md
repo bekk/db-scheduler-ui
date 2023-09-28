@@ -80,8 +80,9 @@ As the backend connects to scheduler-client it is possible to run, re-run and de
 **To try it out you can branch the project and run the example-app.**
 1. Install dependencies: npm install
 2. Run the app: npm run dev
-3. Run the backend DemoApplication.java
-4. Open the app: http://localhost:51373
+3. mvn clean install
+4. Run the backend
+5. Open the app: http://localhost:51373
 
 
 The URL connects to db-scheduler/**
