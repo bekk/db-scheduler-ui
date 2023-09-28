@@ -66,8 +66,8 @@ export const useInfiniteScrolling = <
       currentSort,
       sortAsc,
       ...(startTime ? [ startTime ] : []),
-    ...(endTime ? [ endTime ] : []),
-    ...(taskName ? [taskName] : []),
+      ...(endTime ? [ endTime ] : []),
+      ...(taskName ? [taskName] : []),
       ...(taskInstance ? [taskInstance] : []),
       searchTermTaskName,
       searchTermTaskInstance,
@@ -79,7 +79,7 @@ export const useInfiniteScrolling = <
       currentFilter,
       currentSort,
       sortAsc,
-     startTime, endTime, taskName,
+      startTime, endTime, taskName,
       taskInstance,
       searchTermTaskName,
       searchTermTaskInstance,
@@ -166,7 +166,7 @@ export const useInfiniteScrolling = <
       fetchDataFunction,
       taskNameExactMatch,
       taskInstanceExactMatch,
-        startTime, endTime
+      startTime, endTime
     ],
   );
 
@@ -197,10 +197,10 @@ export const useInfiniteScrolling = <
     setCurrentSort,
     sortAsc,
     setSortAsc,
-      startTime,
-      setStartTime,
-      endTime,
-      setEndTime,
+    startTime,
+    setStartTime,
+    endTime,
+    setEndTime,
     searchTermTaskName,
     setSearchTermTaskName,
     searchTermTaskInstance,

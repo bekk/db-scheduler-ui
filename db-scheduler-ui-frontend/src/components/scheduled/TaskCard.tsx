@@ -14,10 +14,10 @@
 import React from 'react';
 
 import { AccordionItem, AccordionItemProps, Divider } from '@chakra-ui/react';
-import { Task } from '../models/Task';
+import { Task } from 'src/models/Task';
 
-import { TaskAccordionButton } from 'src/components/TaskAccordionButton';
-import { TaskAccordionItem } from 'src/components/TaskAccordionItem';
+import { TaskAccordionButton } from 'src/components/scheduled/TaskAccordionButton';
+import { TaskAccordionItem } from 'src/components/scheduled/TaskAccordionItem';
 import { isStatus } from 'src/utils/determineStatus';
 import colors from 'src/styles/colors';
 

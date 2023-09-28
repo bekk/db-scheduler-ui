@@ -22,8 +22,8 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { FilterBy } from 'src/models/QueryParams';
-import { FilterBox } from './FilterBox';
-import { RefreshButton } from 'src/components/RefreshButton';
+import { FilterBox } from '../input/FilterBox';
+import { RefreshButton } from 'src/components/input/RefreshButton';
 import { QueryObserverResult, InfiniteData } from '@tanstack/react-query';
 import { InfiniteScrollResponse } from 'src/models/TasksResponse';
 import { Log } from 'src/models/Log';
@@ -73,7 +73,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
     >
       <Box display={'flex'} alignItems={'center'} flex={1}>
         <Box>
-          <Box>
+          <Box display={'flex'}>
             <Text ml={1} fontSize={'3xl'} fontWeight={'semibold'}>
               {title}
             </Text>
@@ -175,7 +175,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
           </HStack>
         </Box>
       </Box>
-      <Box height={'100%'}>
+      <Box alignSelf={'start'}>
         <FilterBox
           currentFilter={currentFilter}
           setCurrentFilter={setCurrentFilter}

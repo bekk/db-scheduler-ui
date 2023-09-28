@@ -19,14 +19,14 @@ import {
   HStack,
   Text,
 } from '@chakra-ui/react';
-import { StatusBox } from 'src/components/StatusBox';
-import { TaskRunButton } from 'src/components/TaskRunButton';
+import { StatusBox } from 'src/components/common/StatusBox';
+import { TaskRunButton } from 'src/components/input/TaskRunButton';
 import React from 'react';
-import { DotButton } from 'src/components/DotButton';
+import { DotButton } from 'src/components/input/DotButton';
 import { dateFormatText } from 'src/utils/dateFormatText';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Task } from 'src/models/Task';
-import { NumberCircleGroup } from './NumberCircleGroup';
+import { NumberCircleGroup } from 'src/components/common/NumberCircleGroup';
 import { AttachmentIcon } from '@chakra-ui/icons';
 import { determineStatus, isStatus } from 'src/utils/determineStatus';
 import colors from 'src/styles/colors';

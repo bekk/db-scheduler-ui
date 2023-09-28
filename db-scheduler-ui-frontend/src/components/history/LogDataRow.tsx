@@ -14,7 +14,7 @@
 import { Box } from '@chakra-ui/react';
 import React from 'react';
 
-import JsonViewer from 'src/components/JsonViewer';
+import JsonViewer from 'src/components/common/JsonViewer';
 
 export const LogDataRow: React.FC<{ taskData: object | null }> = ({
   taskData,

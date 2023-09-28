@@ -22,7 +22,7 @@ import {
 } from '@tanstack/react-query';
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 import { InfiniteScrollResponse } from 'src/models/TasksResponse';
-import { RefreshCircle } from './RefreshCircle';
+import { RefreshCircle } from 'src/components/common/RefreshCircle';
 import { Log } from 'src/models/Log';
 import { Task } from 'src/models/Task';
 import { PollResponse } from 'src/models/PollResponse';

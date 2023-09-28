@@ -11,10 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TopBar } from 'src/components/TopBar';
+import { TopBar } from 'src/components/common/TopBar';
 import { Box } from '@chakra-ui/react';
 import { Route, Routes } from 'react-router-dom';
-import TaskList from 'src/components/TaskList';
+import TaskList from 'src/components/scheduled/TaskList';
 import { LogList } from 'src/components/history/LogList';
 
 export const FrontPage: React.FC = () => {

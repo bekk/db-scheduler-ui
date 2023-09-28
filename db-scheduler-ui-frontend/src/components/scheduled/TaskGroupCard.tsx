@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 import React, { useRef, useState, useEffect } from 'react';
-import { Task } from '../models/Task';
+import { Task } from 'src/models/Task';
 import TaskCard from './TaskCard';
 import { Box } from '@chakra-ui/react';
 
