@@ -21,7 +21,7 @@ const runTask = async (id: string, name: string, scheduleTime?:Date) => {
 
   queryParams.append('id', id);
   queryParams.append('name', name);
-  scheduleTime&&queryParams.append('endTime', scheduleTime.toISOString());
+  scheduleTime&&queryParams.append('scheduleTime', scheduleTime.toISOString());
 
   const response = await fetch(
     `${API_BASE_URL}/tasks/rerun?${queryParams}`,

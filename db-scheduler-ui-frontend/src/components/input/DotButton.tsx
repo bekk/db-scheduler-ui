@@ -37,12 +37,14 @@ interface TaskProps {
   taskName: string;
   taskInstance: string;
   style?: React.CSSProperties;
+  refetch?: () => void;
 }
 
 export const DotButton: React.FC<TaskProps> = ({
   taskName,
   taskInstance,
   style,
+  refetch,
 }) => {
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [scheduleOpen, setScheduleOpen] = React.useState(false);
@@ -102,7 +104,9 @@ export const DotButton: React.FC<TaskProps> = ({
         failed={true}
         isOpen={scheduleOpen}
         setIsopen={setScheduleOpen}
+        taskId={taskInstance}
         taskName={taskName}
+        refetch={refetch ?? (() => {})}
       />
       <AlertDialog
         isOpen={deleteOpen}

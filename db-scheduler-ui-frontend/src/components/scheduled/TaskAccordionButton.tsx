@@ -139,6 +139,7 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
                       ? 'visible'
                       : 'hidden',
                 }}
+                refetch={refetch}
               />
             </Box>
             <AccordionIcon

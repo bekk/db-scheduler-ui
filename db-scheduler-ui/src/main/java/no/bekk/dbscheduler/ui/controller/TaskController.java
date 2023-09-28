@@ -21,6 +21,8 @@ import no.bekk.dbscheduler.ui.service.TaskLogic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/db-scheduler-api/tasks")
@@ -48,8 +50,8 @@ public class TaskController {
   }
 
   @PostMapping("/rerun")
-  public void runNow(@RequestParam String id, @RequestParam String name) {
-    taskLogic.runTaskNow(id, name);
+  public void runNow(@RequestParam String id, @RequestParam String name, @RequestParam Instant scheduleTime) {
+    taskLogic.runTaskNow(id, name, scheduleTime);
   }
 
   @PostMapping("/rerunGroup")

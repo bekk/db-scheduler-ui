@@ -23,18 +23,24 @@ import {
 import React from 'react';
 import colors from 'src/styles/colors';
 import { DateTimeInput } from './DateTimeInput';
+import runTask from 'src/services/runTask';
 
 interface TaskProps {
   failed: boolean;
   taskName: string;
+  taskId: string;
   isOpen: boolean;
   setIsopen: React.Dispatch<React.SetStateAction<boolean>>;
+  refetch: () => void;
 }
 
 export const ScheduleRunAlert: React.FC<TaskProps> = ({
   failed,
   isOpen,
+  taskId,
+  taskName,
   setIsopen,
+  refetch,
 }) => {
   const cancelRef = React.useRef(null);
   const [time, setTime] = React.useState<Date | null>(new Date());
@@ -81,11 +87,15 @@ export const ScheduleRunAlert: React.FC<TaskProps> = ({
               }}
               textColor={failed ? colors.primary[100] : colors.running[500]}
               onClick={() => {
+                time &&
+                  runTask(taskId, taskName, time).then(() => {
+                    refetch();
+                  });
                 setIsopen(false);
               }}
               ml={3}
             >
-              {failed ? 'Rerun All' : 'Run All'}
+              {failed ? 'Schedule Rerun' : 'Schedule Run'}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
