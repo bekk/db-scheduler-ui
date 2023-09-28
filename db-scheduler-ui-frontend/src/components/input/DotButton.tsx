@@ -29,8 +29,9 @@ import {
 import deleteTask from 'src/services/deleteTask';
 import React from 'react';
 import { DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-import { IoEllipsisVerticalIcon } from '../../assets/icons';
+import { IoEllipsisVerticalIcon, PlayIcon } from '../../assets/icons';
 import { useNavigate } from 'react-router-dom';
+import { ScheduleRunAlert } from './ScheduleRunAlert';
 
 interface TaskProps {
   taskName: string;
@@ -43,9 +44,10 @@ export const DotButton: React.FC<TaskProps> = ({
   taskInstance,
   style,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [scheduleOpen, setScheduleOpen] = React.useState(false);
   const navigate = useNavigate();
-  const onClose = () => setIsOpen(false);
+  const onClose = () => setDeleteOpen(false);
   const cancelRef = React.useRef(null);
   return (
     <Box style={style}>
@@ -64,6 +66,18 @@ export const DotButton: React.FC<TaskProps> = ({
             rounded={6}
             minBlockSize={10}
             onClick={(event) => {
+              event.stopPropagation();
+              setScheduleOpen(true);
+            }}
+            icon={<PlayIcon boxSize={4} />}
+            // Call it schedule execution time instead?
+          >
+            Run task at time
+          </MenuItem>
+          <MenuItem
+            rounded={6}
+            minBlockSize={10}
+            onClick={(event) => {
               navigate(`/history/all`, { state: { taskName, taskInstance } });
               event.stopPropagation();
             }}
@@ -76,7 +90,7 @@ export const DotButton: React.FC<TaskProps> = ({
             minBlockSize={10}
             onClick={(event) => {
               event.stopPropagation();
-              setIsOpen(true);
+              setDeleteOpen(true);
             }}
             icon={<DeleteIcon boxSize={4} />}
           >
@@ -84,8 +98,14 @@ export const DotButton: React.FC<TaskProps> = ({
           </MenuItem>
         </MenuList>
       </Menu>
+      <ScheduleRunAlert
+        failed={true}
+        isOpen={scheduleOpen}
+        setIsopen={setScheduleOpen}
+        taskName={taskName}
+      />
       <AlertDialog
-        isOpen={isOpen}
+        isOpen={deleteOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
       >

@@ -19,11 +19,13 @@ import colors from 'src/styles/colors';
 interface DateTimeInputProps {
   selectedDate: Date | null;
   onChange: (date: Date | null) => void;
+  onlyFuture?: boolean;
 }
 
 export const DateTimeInput: React.FC<DateTimeInputProps> = ({
   selectedDate,
   onChange,
+  onlyFuture,
 }) => {
   return (
     <Box
@@ -41,6 +43,16 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
         dateFormat={'yyyy-MM-dd HH:mm'}
         placeholderText={'YYYY-MM-DD HH:mm'}
         useWeekdaysShort
+        // new code
+        minTime={
+          selectedDate?.toDateString() === new Date().toDateString() &&
+          onlyFuture
+            ? new Date()
+            : new Date(0, 0, 1)
+        }
+        maxTime={new Date(2100, 0, 1, 23, 59, 59)}
+        minDate={new Date()}
+        maxDate={new Date(2100, 0, 1)}
       ></DatePicker>
     </Box>
   );
