@@ -16,8 +16,10 @@ import { Box } from '@chakra-ui/react';
 import { Route, Routes } from 'react-router-dom';
 import TaskList from 'src/components/scheduled/TaskList';
 import { LogList } from 'src/components/history/LogList';
+import { getShowHistory } from 'src/utils/config';
 
 export const FrontPage: React.FC = () => {
+  const showHistory = getShowHistory();
   return (
     <>
       <TopBar title={'DB Scheduler UI'} />
@@ -30,7 +32,9 @@ export const FrontPage: React.FC = () => {
             path="/history/:taskName/:taskInstance"
             element={<LogList />}
           ></Route>
-          <Route path="/history/all" element={<LogList />}></Route>
+          {showHistory && (
+            <Route path="/history/all" element={<LogList />}></Route>
+          )}
         </Routes>
       </Box>
     </>

@@ -10,7 +10,7 @@
 
     <name>db-scheduler-ui: Parent</name>
     <description>Provides a UI for db-scheduler</description>
-    <url>https://github.com/bekk/db-scheduler-ui</url> 
+    <url>https://github.com/bekk/db-scheduler-ui</url>
     <inceptionYear>2023</inceptionYear>
 
     <properties>
@@ -300,6 +300,34 @@
                             <arguments>
                                 <argument>-p</argument>
                                 <argument>db-scheduler-ui/src/main/resources/static</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-template-folder</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>mkdir</executable>
+                            <arguments>
+                                <argument>-p</argument>
+                                <argument>db-scheduler-ui/src/main/resources/templates/db-scheduler-ui</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-index-file</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>mv</executable>
+                            <arguments>
+                                <argument>db-scheduler-ui-frontend/dist/db-scheduler-ui/index.html</argument>
+                                <argument>db-scheduler-ui/src/main/resources/templates/db-scheduler-ui/</argument>
                             </arguments>
                         </configuration>
                     </execution>
