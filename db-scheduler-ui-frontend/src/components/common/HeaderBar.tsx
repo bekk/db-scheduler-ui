@@ -32,7 +32,7 @@ import { POLL_LOGS_QUERY_KEY, pollLogs } from 'src/services/pollLogs';
 import { POLL_TASKS_QUERY_KEY, pollTasks } from 'src/services/pollTasks';
 import { PlayIcon, RepeatIcon } from 'src/assets/icons';
 import colors from 'src/styles/colors';
-import { RunAllAlert } from '../scheduled/RunAllAlert';
+import { RunAllAlert } from 'src/components/scheduled/RunAllAlert';
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 import { useParams } from 'react-router-dom';
 

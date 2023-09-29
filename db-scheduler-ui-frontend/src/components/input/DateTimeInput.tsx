@@ -35,10 +35,8 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
       borderWidth={1}
       backgroundColor={colors.primary[100]}
       w="fit-content"
-      alignSelf={'center'}
     >
       <DatePicker
-        id="date-picker"
         selected={selectedDate}
         onChange={onChange}
         showTimeSelect
@@ -46,7 +44,6 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
         dateFormat={'yyyy-MM-dd HH:mm'}
         placeholderText={'YYYY-MM-DD HH:mm'}
         useWeekdaysShort
-        // new code
         minTime={
           selectedDate?.toDateString() === new Date().toDateString() &&
           forceFutureTime
