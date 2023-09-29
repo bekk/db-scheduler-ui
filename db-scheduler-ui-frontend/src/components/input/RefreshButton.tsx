@@ -13,7 +13,7 @@
  */
 import { Box, Button } from '@chakra-ui/react';
 import { RepeatIcon } from '@chakra-ui/icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import colors from 'src/styles/colors';
 import {
   InfiniteData,
@@ -73,9 +73,6 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
       }),
   );
 
-  useEffect(() => {
-    repoll();
-  });
 
   return (
     <Box position="relative" display="inline-block">
