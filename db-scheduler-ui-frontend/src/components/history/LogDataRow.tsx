@@ -20,12 +20,12 @@ export const LogDataRow: React.FC<{ taskData: object | null }> = ({
   taskData,
 }) => {
   return (
-    <>
+    <Box ml={'16px'}>
       {taskData !== null && (
         <Box display={'flex'} flexDirection={'column'}>
           <JsonViewer data={taskData} />
         </Box>
       )}
-    </>
+    </Box>
   );
 };
