@@ -33,7 +33,7 @@ public class UIController {
     jsonMap.put("showHistory", showHistory);
 
     ObjectMapper objectMapper = new ObjectMapper();
-    File file = new File("db-scheduler-ui/src/main/resources/static/db-scheduler-ui/config.json");
+    File file = new File("../../main/resources/static/db-scheduler-ui/config.json");
     try {
       objectMapper.writeValue(file, jsonMap);
     } catch (IOException e) {
