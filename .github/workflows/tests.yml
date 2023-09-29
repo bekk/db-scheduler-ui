@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   tests:
-    name: Run tests with spring boot version compability check
+    name: Run tests with spring boot version compatibility check
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -14,11 +14,27 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Node.js dependencies
+        run: |
+          cd db-scheduler-ui-frontend
+          npm install
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: run tests
+      - name: Run tests
         run: mvn -B -Dspring-boot.version=${{ matrix.spring-boot }} clean test --file pom.xml
