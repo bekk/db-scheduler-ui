@@ -6,6 +6,7 @@
 Demo version.\
 A UI extension of [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 
+Changed something
 
 ## Features
 
