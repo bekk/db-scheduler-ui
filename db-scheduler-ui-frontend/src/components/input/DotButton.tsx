@@ -72,9 +72,8 @@ export const DotButton: React.FC<TaskProps> = ({
               setScheduleOpen(true);
             }}
             icon={<PlayIcon boxSize={4} />}
-            // Call it schedule execution time instead?
           >
-            Run task at time
+            Schedule execution time
           </MenuItem>
           <MenuItem
             rounded={6}
