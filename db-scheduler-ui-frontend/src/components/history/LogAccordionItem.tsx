@@ -34,12 +34,20 @@ export const LogAccordionItem: React.FC<LogAccordionItemProps> = ({
         w={'100%'}
         borderRadius={4}
       >
-        <Text ml={'16px'} fontWeight={'semibold'} fontSize={'xl'}>
+        <Text
+          ml={'16px'}
+          textDecoration={'underline'}
+          color={colors.primary['500']}
+        >
           Stacktrace
         </Text>
         <pre style={{ marginLeft: '16px', marginTop: '8px' }}>{stackTrace}</pre>
         <Divider color={colors.primary['300']} />
-        <Text ml={'16px'} fontWeight={'semibold'} fontSize={'xl'}>
+        <Text
+          ml={'16px'}
+          textDecoration={'underline'}
+          color={colors.primary['500']}
+        >
           Taskdata
         </Text>
         <LogDataRow taskData={taskData} />
