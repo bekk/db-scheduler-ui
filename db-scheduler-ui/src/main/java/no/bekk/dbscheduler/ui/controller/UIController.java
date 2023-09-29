@@ -13,13 +13,11 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -27,22 +25,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/db-scheduler")
 public class UIController {
 
-  public UIController(boolean showTaskData, boolean showHistory) {
-    Map<String, Object> jsonMap = new HashMap<>();
-    jsonMap.put("showTaskData", showTaskData);
-    jsonMap.put("showHistory", showHistory);
+  @Value("${db-scheduler-ui.history:false}")
+  private boolean showHistory;
 
-    ObjectMapper objectMapper = new ObjectMapper();
-    File file = new File("db-scheduler-ui/src/main/resources/static/db-scheduler-ui/config.json");
-    try {
-      objectMapper.writeValue(file, jsonMap);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  public UIController() {}
+
+  @GetMapping
+  public String index(Model model) {
+    model.addAttribute("showHistory", showHistory);
+    return "db-scheduler-ui/index";
   }
 
   @RequestMapping("/**")
-  public String forwardToIndex() {
-    return "forward:/db-scheduler-ui/index.html";
+  public String forwardToIndex(Model model) {
+    return index(model);
   }
 }
