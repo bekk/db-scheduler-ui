@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,14 +29,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/db-scheduler")
 public class UIController {
 
-  public UIController(boolean showTaskData, boolean showHistory) {
+  public UIController(boolean showTaskData, boolean showHistory, ResourceLoader resourceLoader) {
     Map<String, Object> jsonMap = new HashMap<>();
     jsonMap.put("showTaskData", showTaskData);
     jsonMap.put("showHistory", showHistory);
 
     ObjectMapper objectMapper = new ObjectMapper();
-    File file = new File("../../main/resources/static/db-scheduler-ui/config.json");
+    Resource resource = resourceLoader.getResource("classpath:static/db-scheduler-ui/config.json");
     try {
+      File file = resource.getFile();
       objectMapper.writeValue(file, jsonMap);
     } catch (IOException e) {
       e.printStackTrace();
