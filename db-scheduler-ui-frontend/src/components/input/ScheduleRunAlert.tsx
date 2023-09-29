@@ -95,7 +95,7 @@ export const ScheduleRunAlert: React.FC<TaskProps> = ({
               }}
               ml={3}
             >
-              {failed ? 'Schedule Rerun' : 'Schedule Run'}
+              {failed ? 'Update Rerun Time' : 'Update Run Time'}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

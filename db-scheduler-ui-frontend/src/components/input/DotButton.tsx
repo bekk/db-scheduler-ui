@@ -28,8 +28,8 @@ import {
 } from '@chakra-ui/react';
 import deleteTask from 'src/services/deleteTask';
 import React from 'react';
-import { DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-import { IoEllipsisVerticalIcon, PlayIcon } from '../../assets/icons';
+import { CalendarIcon, DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
+import { IoEllipsisVerticalIcon } from '../../assets/icons';
 import { useNavigate } from 'react-router-dom';
 import { ScheduleRunAlert } from './ScheduleRunAlert';
 
@@ -71,9 +71,9 @@ export const DotButton: React.FC<TaskProps> = ({
               event.stopPropagation();
               setScheduleOpen(true);
             }}
-            icon={<PlayIcon boxSize={4} />}
+            icon={<CalendarIcon boxSize={4} />}
           >
-            Schedule execution time
+            Update execution time
           </MenuItem>
           <MenuItem
             rounded={6}
