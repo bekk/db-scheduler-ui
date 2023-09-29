@@ -37,10 +37,15 @@ jobs:
           gpg-passphrase: JRELEASER_GPG_PASSPHRASE
 
       - name: remove v in tag
-        run: echo "VERSION=${{ github.event.release.tag_name#v }}" >> $GITHUB_ENV
+        run: |
+          TAG=${{ github.event.release.tag_name }}
+          echo "VERSION=${TAG#v}" >> $GITHUB_ENV
 
       - name: Set release version
-        run: mvn --no-transfer-progress --batch-mode versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
+        run: |
+          TAG=${{ github.event.release.tag_name }}
+          echo "VERSION=${TAG#v}" >> $GITHUB_ENV
+          mvn --no-transfer-progress --batch-mode versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
 
       - name: Stage release
         run: mvn --no-transfer-progress --batch-mode -Ppublication clean deploy -DskipTests
