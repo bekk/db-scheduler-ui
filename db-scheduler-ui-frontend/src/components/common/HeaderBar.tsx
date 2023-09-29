@@ -124,8 +124,8 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
               </>
             )}
           </Box>
-          {!isDetailsView && (
-            <HStack>
+          <HStack>
+            {!isDetailsView && (
               <VStack align="start">
                 <Input
                   placeholder={'Search for task name'}
@@ -153,37 +153,37 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
                   Exact match
                 </Checkbox>
               </VStack>
-              <VStack align="start" spacing={2}>
-                <Input
-                  placeholder={'Search for task id'}
-                  defaultValue={taskInstance}
-                  onChange={(e) =>
-                    setSearchTermTaskInstance(e.currentTarget.value)
-                  }
-                  bgColor={colors.primary['100']}
-                  w={'20vmax'}
-                  mt={7}
-                  ml={1}
-                />
-                <Checkbox
-                  ml={1}
-                  isChecked={taskInstanceExactMatch}
-                  onChange={(e) => setTaskInstanceExactMatch(e.target.checked)}
-                  sx={{
-                    '.chakra-checkbox__control': {
-                      bg: colors.primary['100'],
-                      _checked: {
-                        bg: colors.primary['500'],
-                        borderColor: colors.primary['500'],
-                      },
+            )}
+            <VStack align="start" spacing={2}>
+              <Input
+                placeholder={'Search for task id'}
+                defaultValue={taskInstance}
+                onChange={(e) =>
+                  setSearchTermTaskInstance(e.currentTarget.value)
+                }
+                bgColor={colors.primary['100']}
+                w={'20vmax'}
+                mt={7}
+                ml={1}
+              />
+              <Checkbox
+                ml={1}
+                isChecked={taskInstanceExactMatch}
+                onChange={(e) => setTaskInstanceExactMatch(e.target.checked)}
+                sx={{
+                  '.chakra-checkbox__control': {
+                    bg: colors.primary['100'],
+                    _checked: {
+                      bg: colors.primary['500'],
+                      borderColor: colors.primary['500'],
                     },
-                  }}
-                >
-                  Exact match
-                </Checkbox>
-              </VStack>
-            </HStack>
-          )}
+                  },
+                }}
+              >
+                Exact match
+              </Checkbox>
+            </VStack>
+          </HStack>
         </Box>
       </Box>
       <Box alignSelf={'start'}>

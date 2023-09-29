@@ -49,8 +49,6 @@ const TaskList: React.FC = () => {
     taskNameExactMatch,
     setTaskNameExactMatch,
     setTaskInstanceExactMatch,
-    taskNameExactMatch,
-    taskInstanceExactMatch,
   } = useInfiniteScrolling<TasksResponse>(
     isDetailsView
       ? {
@@ -79,8 +77,6 @@ const TaskList: React.FC = () => {
         setSearchTermTaskInstance={setSearchTermTaskInstance}
         setTaskNameExactMatch={setTaskNameExactMatch}
         setTaskInstanceExactMatch={setTaskInstanceExactMatch}
-        searchTermTaskName={searchTermTaskName}
-        searchTermTaskInstance={searchTermTaskInstance}
         taskNameExactMatch={taskNameExactMatch}
         taskInstanceExactMatch={taskInstanceExactMatch}
         refetch={refetch}
