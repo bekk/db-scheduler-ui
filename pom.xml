@@ -262,16 +262,6 @@
                 <inherited>false</inherited>
                 <executions>
                     <execution>
-                        <id>install node and npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <configuration>
-                            <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
-                            <nodeVersion>v20.6.1</nodeVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>npm install</id>
                         <goals>
                             <goal>npm</goal>
@@ -279,6 +269,7 @@
                         <configuration>
                             <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
                             <arguments>install</arguments>
+                            <nodeExecutable>/usr/local/bin/node</nodeExecutable> <!-- Point this to your global node executable -->
                         </configuration>
                     </execution>
                     <execution>
