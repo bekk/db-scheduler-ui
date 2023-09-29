@@ -13,6 +13,7 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
+import java.time.Instant;
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
 import no.bekk.dbscheduler.ui.model.PollResponse;
 import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
@@ -48,8 +49,9 @@ public class TaskController {
   }
 
   @PostMapping("/rerun")
-  public void runNow(@RequestParam String id, @RequestParam String name) {
-    taskLogic.runTaskNow(id, name);
+  public void runNow(
+      @RequestParam String id, @RequestParam String name, @RequestParam Instant scheduleTime) {
+    taskLogic.runTaskNow(id, name, scheduleTime);
   }
 
   @PostMapping("/rerunGroup")

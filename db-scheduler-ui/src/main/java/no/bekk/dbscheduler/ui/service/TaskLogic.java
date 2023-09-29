@@ -45,12 +45,14 @@ public class TaskLogic {
     this.showData = showData;
   }
 
-  public void runTaskNow(String taskId, String taskName) {
+  public void runTaskNow(String taskId, String taskName, Instant scheduleTime) {
     Optional<ScheduledExecution<Object>> scheduledExecutionOpt =
         scheduler.getScheduledExecution(TaskInstanceId.of(taskName, taskId));
 
     if (scheduledExecutionOpt.isPresent() && !scheduledExecutionOpt.get().isPicked()) {
-      scheduler.reschedule(scheduledExecutionOpt.get().getTaskInstance(), Instant.now());
+      scheduler.reschedule(
+          scheduledExecutionOpt.get().getTaskInstance(),
+          scheduleTime != null ? scheduleTime : Instant.now());
     } else {
       throw new ResponseStatusException(
           HttpStatus.NOT_FOUND,
@@ -68,7 +70,8 @@ public class TaskLogic {
                 try {
                   runTaskNow(
                       execution.getTaskInstance().getId(),
-                      execution.getTaskInstance().getTaskName());
+                      execution.getTaskInstance().getTaskName(),
+                      Instant.now());
                 } catch (ResponseStatusException e) {
                   System.out.println("Failed to run task: " + e.getMessage());
                 }

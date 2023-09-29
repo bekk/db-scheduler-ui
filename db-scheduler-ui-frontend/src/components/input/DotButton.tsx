@@ -28,24 +28,28 @@ import {
 } from '@chakra-ui/react';
 import deleteTask from 'src/services/deleteTask';
 import React from 'react';
-import { DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
+import { CalendarIcon, DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { IoEllipsisVerticalIcon } from '../../assets/icons';
 import { useNavigate } from 'react-router-dom';
+import { ScheduleRunAlert } from './ScheduleRunAlert';
 
 interface TaskProps {
   taskName: string;
   taskInstance: string;
   style?: React.CSSProperties;
+  refetch?: () => void;
 }
 
 export const DotButton: React.FC<TaskProps> = ({
   taskName,
   taskInstance,
   style,
+  refetch,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [scheduleOpen, setScheduleOpen] = React.useState(false);
   const navigate = useNavigate();
-  const onClose = () => setIsOpen(false);
+  const onClose = () => setDeleteOpen(false);
   const cancelRef = React.useRef(null);
   return (
     <Box style={style}>
@@ -64,6 +68,17 @@ export const DotButton: React.FC<TaskProps> = ({
             rounded={6}
             minBlockSize={10}
             onClick={(event) => {
+              event.stopPropagation();
+              setScheduleOpen(true);
+            }}
+            icon={<CalendarIcon boxSize={4} />}
+          >
+            Update execution time
+          </MenuItem>
+          <MenuItem
+            rounded={6}
+            minBlockSize={10}
+            onClick={(event) => {
               navigate(`/history/all`, { state: { taskName, taskInstance } });
               event.stopPropagation();
             }}
@@ -76,7 +91,7 @@ export const DotButton: React.FC<TaskProps> = ({
             minBlockSize={10}
             onClick={(event) => {
               event.stopPropagation();
-              setIsOpen(true);
+              setDeleteOpen(true);
             }}
             icon={<DeleteIcon boxSize={4} />}
           >
@@ -84,8 +99,16 @@ export const DotButton: React.FC<TaskProps> = ({
           </MenuItem>
         </MenuList>
       </Menu>
+      <ScheduleRunAlert
+        failed={true}
+        isOpen={scheduleOpen}
+        setIsopen={setScheduleOpen}
+        taskId={taskInstance}
+        taskName={taskName}
+        refetch={refetch ?? (() => {})}
+      />
       <AlertDialog
-        isOpen={isOpen}
+        isOpen={deleteOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
       >
