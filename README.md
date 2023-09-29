@@ -106,11 +106,11 @@ Please use the prettier config when making frontend changes
 Prerequisites:
 * Maven
 * JDK11
+* Node
 * npm
 
 There are two ways to run the frontend locally.
 1. running `npm run dev` inside the db-scheduler-ui-frontend folder
-2. Build the frontend by running `npm run build` and then copy the files into the resources folder in db-scheduler-ui. 
-Run this from root folder: `cp -r db-scheduler-ui-frontend/dist/. db-scheduler-ui/src/main/resources/static/`
+2. running `mvn install` will build the frontend and copy the output to the resources folder in the `db-scheduler-ui` module. The frontend will then be available at the same port as the example app.
 
 To run the backend run `mvn clean install` and then run the example app.
