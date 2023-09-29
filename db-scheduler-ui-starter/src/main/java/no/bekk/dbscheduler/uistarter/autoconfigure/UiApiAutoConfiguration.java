@@ -89,6 +89,6 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   public UIController uiController() {
-    return new UIController(showTaskData, showHistory, resourceLoader);
+    return new UIController(showTaskData, showHistory);
   }
 }

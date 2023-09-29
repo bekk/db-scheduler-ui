@@ -15,11 +15,11 @@ package no.bekk.dbscheduler.ui.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,17 +29,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/db-scheduler")
 public class UIController {
 
-  public UIController(boolean showTaskData, boolean showHistory, ResourceLoader resourceLoader) {
+  public UIController(boolean showTaskData, boolean showHistory) {
     Map<String, Object> jsonMap = new HashMap<>();
-    System.out.println(showHistory);
     jsonMap.put("showTaskData", showTaskData);
     jsonMap.put("showHistory", showHistory);
+    System.out.println(showHistory);
 
     ObjectMapper objectMapper = new ObjectMapper();
-    Resource resource = resourceLoader.getResource("classpath:/static/db-scheduler-ui/config.json");
+
+    // Define the directory and file name
+    URL resourceUrl = getClass().getResource("/static/");
+    String path = resourceUrl.getPath();
+    System.out.println(resourceUrl);
+    String directoryPath = resourceUrl+"db-scheduler-ui";
+    String fileName = "config.json";
+    System.out.println(directoryPath + "/" + fileName);
+    // Create the directory if it doesn't exist
+    new File(directoryPath).mkdirs();
+
+    // Create the file
+    File file = new File(directoryPath + "/" + fileName);
     try {
-      File file = resource.getFile();
-      objectMapper.writeValue(file, jsonMap);
+      boolean fileCreated = file.createNewFile();
+      System.out.println("File created: " + fileCreated);
+
+      if (fileCreated) {
+        try (FileWriter fileWriter = new FileWriter(file)) {
+          objectMapper.writeValue(fileWriter, jsonMap);
+        }
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
