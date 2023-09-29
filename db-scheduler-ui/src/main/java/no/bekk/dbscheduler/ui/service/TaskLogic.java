@@ -104,13 +104,13 @@ public class TaskLogic {
     tasks =
         QueryUtils.searchByTaskInstance(
             tasks, params.getSearchTermTaskInstance(), params.isTaskInstanceExactMatch());
-    tasks =
-        QueryUtils.sortTasks(
-            QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
     if (!showData) {
       tasks.forEach(e -> e.setTaskData(List.of()));
     }
     tasks = TaskMapper.groupTasks(tasks);
+    tasks =
+        QueryUtils.sortTasks(
+            QueryUtils.filterTasks(tasks, params.getFilter()), params.getSorting(), params.isAsc());
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
     return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());

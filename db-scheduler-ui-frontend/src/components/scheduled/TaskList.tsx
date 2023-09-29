@@ -77,6 +77,8 @@ const TaskList: React.FC = () => {
         setSearchTermTaskInstance={setSearchTermTaskInstance}
         setTaskNameExactMatch={setTaskNameExactMatch}
         setTaskInstanceExactMatch={setTaskInstanceExactMatch}
+        taskNameExactMatch={taskNameExactMatch}
+        taskInstanceExactMatch={taskInstanceExactMatch}
         refetch={refetch}
       />
 

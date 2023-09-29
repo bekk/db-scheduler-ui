@@ -10,7 +10,7 @@
 
     <name>db-scheduler-ui: Parent</name>
     <description>Provides a UI for db-scheduler</description>
-    <url>https://github.com/bekk/db-scheduler-ui</url>
+    <url>https://github.com/bekk/db-scheduler-ui</url> 
     <inceptionYear>2023</inceptionYear>
 
     <properties>
@@ -185,15 +185,6 @@
                         <arg>loopback</arg>
                     </gpgArguments>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jreleaser</groupId>
@@ -265,49 +256,39 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.14.0</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>install node and npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <configuration>
-                            <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
-                            <nodeVersion>v20.6.1</nodeVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm install</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
-                            <arguments>install</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm run build</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
-                            <arguments>run build</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <inherited>false</inherited>
                 <executions>
+                    <execution>
+                        <id>npm-install</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>install</argument>
+                            </arguments>
+                            <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm-build</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>run</argument>
+                                <argument>build</argument>
+                            </arguments>
+                            <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>create-static-folder</id>
                         <phase>generate-resources</phase>

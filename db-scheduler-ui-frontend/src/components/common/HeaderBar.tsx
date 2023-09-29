@@ -34,6 +34,7 @@ import { PlayIcon, RepeatIcon } from 'src/assets/icons';
 import colors from 'src/styles/colors';
 import { RunAllAlert } from '../scheduled/RunAllAlert';
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
+import { useParams } from 'react-router-dom';
 
 interface HeaderBarProps {
   params: TaskDetailsRequestParams;
@@ -47,6 +48,8 @@ interface HeaderBarProps {
   history?: boolean;
   setTaskNameExactMatch: (exactMatch: boolean) => void;
   setTaskInstanceExactMatch: (exactMatch: boolean) => void;
+  taskNameExactMatch: boolean;
+  taskInstanceExactMatch: boolean;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
@@ -58,8 +61,12 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   history,
   setTaskNameExactMatch,
   setTaskInstanceExactMatch,
+  taskNameExactMatch,
+  taskInstanceExactMatch,
   params,
 }) => {
+  const { taskName: urlTaskName } = useParams<{ taskName?: string }>();
+  const isDetailsView = !!urlTaskName;
   const [isOpen, setIsOpen] = React.useState('');
   const { taskName, taskId: taskInstance, filter: currentFilter } = params;
 
@@ -77,7 +84,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             <Text ml={1} fontSize={'3xl'} fontWeight={'semibold'}>
               {title}
             </Text>
-            {taskName && (
+            {taskName && isDetailsView && (
               <>
                 <Button
                   leftIcon={<PlayIcon />}
@@ -118,32 +125,35 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             )}
           </Box>
           <HStack>
-            <VStack align="start">
-              <Input
-                placeholder={'Search for task name'}
-                defaultValue={taskName}
-                onChange={(e) => setSearchTermTaskName(e.currentTarget.value)}
-                bgColor={colors.primary['100']}
-                w={'20vmax'}
-                mt={7}
-                ml={1}
-              />
-              <Checkbox
-                ml={1}
-                onChange={(e) => setTaskNameExactMatch(e.target.checked)}
-                sx={{
-                  '.chakra-checkbox__control': {
-                    bg: colors.primary['100'],
-                    _checked: {
-                      bg: colors.primary['500'],
-                      borderColor: colors.primary['500'],
+            {!isDetailsView && (
+              <VStack align="start">
+                <Input
+                  placeholder={'Search for task name'}
+                  defaultValue={taskName}
+                  onChange={(e) => setSearchTermTaskName(e.currentTarget.value)}
+                  bgColor={colors.primary['100']}
+                  w={'20vmax'}
+                  mt={7}
+                  ml={1}
+                />
+                <Checkbox
+                  ml={1}
+                  isChecked={taskNameExactMatch}
+                  onChange={(e) => setTaskNameExactMatch(e.target.checked)}
+                  sx={{
+                    '.chakra-checkbox__control': {
+                      bg: colors.primary['100'],
+                      _checked: {
+                        bg: colors.primary['500'],
+                        borderColor: colors.primary['500'],
+                      },
                     },
-                  },
-                }}
-              >
-                Exact match
-              </Checkbox>
-            </VStack>
+                  }}
+                >
+                  Exact match
+                </Checkbox>
+              </VStack>
+            )}
             <VStack align="start" spacing={2}>
               <Input
                 placeholder={'Search for task id'}
@@ -158,6 +168,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
               />
               <Checkbox
                 ml={1}
+                isChecked={taskInstanceExactMatch}
                 onChange={(e) => setTaskInstanceExactMatch(e.target.checked)}
                 sx={{
                   '.chakra-checkbox__control': {
