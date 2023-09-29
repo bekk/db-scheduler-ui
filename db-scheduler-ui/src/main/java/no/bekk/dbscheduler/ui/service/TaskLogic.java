@@ -51,7 +51,9 @@ public class TaskLogic {
         scheduler.getScheduledExecution(TaskInstanceId.of(taskName, taskId));
 
     if (scheduledExecutionOpt.isPresent() && !scheduledExecutionOpt.get().isPicked()) {
-      scheduler.reschedule(scheduledExecutionOpt.get().getTaskInstance(), scheduleTime!=null?scheduleTime:Instant.now());
+      scheduler.reschedule(
+          scheduledExecutionOpt.get().getTaskInstance(),
+          scheduleTime != null ? scheduleTime : Instant.now());
     } else {
       throw new ResponseStatusException(
           HttpStatus.NOT_FOUND,
@@ -69,7 +71,8 @@ public class TaskLogic {
                 try {
                   runTaskNow(
                       execution.getTaskInstance().getId(),
-                      execution.getTaskInstance().getTaskName(), Instant.now());
+                      execution.getTaskInstance().getTaskName(),
+                      Instant.now());
                 } catch (ResponseStatusException e) {
                   System.out.println("Failed to run task: " + e.getMessage());
                 }

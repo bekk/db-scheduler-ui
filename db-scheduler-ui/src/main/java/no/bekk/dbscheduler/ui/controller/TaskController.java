@@ -13,6 +13,7 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
+import java.time.Instant;
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
 import no.bekk.dbscheduler.ui.model.PollResponse;
 import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
@@ -20,8 +21,6 @@ import no.bekk.dbscheduler.ui.model.TaskRequestParams;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Instant;
 
 @RestController
 @CrossOrigin
@@ -50,7 +49,8 @@ public class TaskController {
   }
 
   @PostMapping("/rerun")
-  public void runNow(@RequestParam String id, @RequestParam String name, @RequestParam Instant scheduleTime) {
+  public void runNow(
+      @RequestParam String id, @RequestParam String name, @RequestParam Instant scheduleTime) {
     taskLogic.runTaskNow(id, name, scheduleTime);
   }
 
