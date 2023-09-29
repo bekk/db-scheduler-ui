@@ -46,7 +46,6 @@ public class TaskLogic {
   }
 
   public void runTaskNow(String taskId, String taskName, Instant scheduleTime) {
-    System.out.println(scheduleTime);
     Optional<ScheduledExecution<Object>> scheduledExecutionOpt =
         scheduler.getScheduledExecution(TaskInstanceId.of(taskName, taskId));
 
