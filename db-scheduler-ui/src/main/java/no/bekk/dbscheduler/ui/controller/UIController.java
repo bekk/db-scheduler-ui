@@ -31,11 +31,12 @@ public class UIController {
 
   public UIController(boolean showTaskData, boolean showHistory, ResourceLoader resourceLoader) {
     Map<String, Object> jsonMap = new HashMap<>();
+    System.out.println(showHistory);
     jsonMap.put("showTaskData", showTaskData);
     jsonMap.put("showHistory", showHistory);
 
     ObjectMapper objectMapper = new ObjectMapper();
-    Resource resource = resourceLoader.getResource("classpath:static/db-scheduler-ui/config.json");
+    Resource resource = resourceLoader.getResource("classpath:/static/db-scheduler-ui/config.json");
     try {
       File file = resource.getFile();
       objectMapper.writeValue(file, jsonMap);
