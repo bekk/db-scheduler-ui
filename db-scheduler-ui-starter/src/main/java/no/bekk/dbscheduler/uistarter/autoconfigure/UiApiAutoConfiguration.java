@@ -39,9 +39,6 @@ public class UiApiAutoConfiguration {
   @Value("${db-scheduler-ui.taskdata:true}")
   public boolean showTaskData;
 
-  @Value("${db-scheduler-ui.history:false}")
-  private boolean showHistory;
-
   public UiApiAutoConfiguration() {
     logger.info("UiApiAutoConfiguration created");
   }
@@ -89,6 +86,6 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   public UIController uiController() {
-    return new UIController(showTaskData, showHistory);
+    return new UIController();
   }
 }

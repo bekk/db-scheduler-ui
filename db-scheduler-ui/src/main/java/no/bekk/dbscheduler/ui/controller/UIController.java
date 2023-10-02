@@ -13,15 +13,11 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -29,42 +25,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/db-scheduler")
 public class UIController {
 
-  public UIController(boolean showTaskData, boolean showHistory) {
-    Map<String, Object> jsonMap = new HashMap<>();
-    jsonMap.put("showTaskData", showTaskData);
-    jsonMap.put("showHistory", showHistory);
-    System.out.println(showHistory);
+  @Value("${db-scheduler-ui.history:false}")
+  private boolean showHistory;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+  public UIController() {}
 
-    // Define the directory and file name
-    URL resourceUrl = getClass().getResource("/static/");
-    String path = resourceUrl.getPath();
-    System.out.println(resourceUrl);
-    String directoryPath = resourceUrl+"db-scheduler-ui";
-    String fileName = "config.json";
-    System.out.println(directoryPath + "/" + fileName);
-    // Create the directory if it doesn't exist
-    new File(directoryPath).mkdirs();
-
-    // Create the file
-    File file = new File(directoryPath + "/" + fileName);
-    try {
-      boolean fileCreated = file.createNewFile();
-      System.out.println("File created: " + fileCreated);
-
-      if (fileCreated) {
-        try (FileWriter fileWriter = new FileWriter(file)) {
-          objectMapper.writeValue(fileWriter, jsonMap);
-        }
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  @GetMapping
+  public String index(Model model) {
+    model.addAttribute("showHistory", showHistory);
+    return "db-scheduler-ui/index";
   }
 
   @RequestMapping("/**")
-  public String forwardToIndex() {
-    return "forward:/db-scheduler-ui/index.html";
+  public String forwardToIndex(Model model) {
+    return index(model);
   }
 }
