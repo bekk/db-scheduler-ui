@@ -24,6 +24,7 @@ import { TASK_QUERY_KEY, getTasks } from 'src/services/getTasks';
 import colors from 'src/styles/colors';
 import { HeaderBar } from 'src/components/common/HeaderBar';
 import { TasksResponse } from 'src/models/TasksResponse';
+import { pollTasks, POLL_TASKS_QUERY_KEY } from 'src/services/pollTasks';
 
 const TaskList: React.FC = () => {
   const { taskName } = useParams<{ taskName?: string }>();
@@ -31,6 +32,7 @@ const TaskList: React.FC = () => {
 
   const {
     data,
+    pollData,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -55,8 +57,15 @@ const TaskList: React.FC = () => {
           fetchDataFunction: getTask,
           taskName: taskName,
           baseQueryKey: TASK_DETAILS_QUERY_KEY,
+          pollFunction: pollTasks,
+          pollQueryKey: POLL_TASKS_QUERY_KEY,
         }
-      : { fetchDataFunction: getTasks, baseQueryKey: TASK_QUERY_KEY },
+      : {
+          fetchDataFunction: getTasks,
+          baseQueryKey: TASK_QUERY_KEY,
+          pollFunction: pollTasks,
+          pollQueryKey: POLL_TASKS_QUERY_KEY,
+        },
   );
 
   return (
@@ -80,6 +89,7 @@ const TaskList: React.FC = () => {
         taskNameExactMatch={taskNameExactMatch}
         taskInstanceExactMatch={taskInstanceExactMatch}
         refetch={refetch}
+        pollData={pollData}
       />
 
       <TitleRow

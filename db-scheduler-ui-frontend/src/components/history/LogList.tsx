@@ -23,6 +23,7 @@ import { DateTimeInput } from 'src/components/input/DateTimeInput';
 import { SortButton } from 'src/components/input/SortButton';
 import { SortBy } from 'src/models/QueryParams';
 import { LogResponse } from 'src/models/TasksResponse';
+import { POLL_LOGS_QUERY_KEY, pollLogs } from 'src/services/pollLogs';
 
 export const LogList: React.FC = () => {
   const location = useLocation();
@@ -30,6 +31,7 @@ export const LogList: React.FC = () => {
 
   const {
     data,
+    pollData,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -59,8 +61,15 @@ export const LogList: React.FC = () => {
           taskName: taskName,
           taskInstance: taskInstance,
           baseQueryKey: ALL_LOG_QUERY_KEY,
+          pollFunction: pollLogs,
+          pollQueryKey: POLL_LOGS_QUERY_KEY,
         }
-      : { fetchDataFunction: getLogs, baseQueryKey: ALL_LOG_QUERY_KEY },
+      : {
+          fetchDataFunction: getLogs,
+          baseQueryKey: ALL_LOG_QUERY_KEY,
+          pollFunction: pollLogs,
+          pollQueryKey: POLL_LOGS_QUERY_KEY,
+        },
   );
 
   useEffect(() => {
@@ -73,6 +82,8 @@ export const LogList: React.FC = () => {
   }, [
     setSearchTermTaskInstance,
     setSearchTermTaskName,
+    setTaskInstanceExactMatch,
+    setTaskNameExactMatch,
     taskInstance,
     taskName,
   ]);
@@ -102,6 +113,7 @@ export const LogList: React.FC = () => {
         taskNameExactMatch={taskNameExactMatch}
         taskInstanceExactMatch={taskInstanceExactMatch}
         history
+        pollData={pollData}
       />
       <Box mb={7}>
         <Flex alignItems={'center'}>

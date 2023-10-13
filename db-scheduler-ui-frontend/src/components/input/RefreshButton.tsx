@@ -15,11 +15,7 @@ import { Box, Button } from '@chakra-ui/react';
 import { RepeatIcon } from '@chakra-ui/icons';
 import React from 'react';
 import colors from 'src/styles/colors';
-import {
-  InfiniteData,
-  QueryObserverResult,
-  useQuery,
-} from '@tanstack/react-query';
+import { InfiniteData, QueryObserverResult } from '@tanstack/react-query';
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 import { InfiniteScrollResponse } from 'src/models/TasksResponse';
 import { RefreshCircle } from 'src/components/common/RefreshCircle';
@@ -34,51 +30,18 @@ interface RefreshButtonProps {
   pollFunction: (params: TaskDetailsRequestParams) => Promise<PollResponse>;
   pollKey: string;
   params: TaskDetailsRequestParams;
+  pollData: PollResponse | undefined;
 }
 
 export const RefreshButton: React.FC<RefreshButtonProps> = ({
   refetch,
-  pollFunction,
-  pollKey,
-  params,
+  pollData,
 }) => {
-  const { data, refetch: repoll } = useQuery(
-    [
-      pollKey,
-      params.filter,
-      params.sorting,
-      params.asc,
-      params.startTime,
-      params.endTime,
-      params.taskName,
-      params.taskId,
-      params.searchTermTaskName,
-      params.searchTermTaskInstance,
-      params.taskInstanceExactMatch,
-      params.taskNameExactMatch,
-    ],
-    () =>
-      pollFunction({
-        filter: params.filter,
-        sorting: params.sorting,
-        asc: params.asc,
-        startTime: params.startTime,
-        endTime: params.endTime,
-        taskName: params.taskName,
-        taskId: params.taskId,
-        searchTermTaskName: params.searchTermTaskName,
-        searchTermTaskInstance: params.searchTermTaskInstance,
-        taskInstanceExactMatch: params.taskInstanceExactMatch,
-        taskNameExactMatch: params.taskNameExactMatch,
-      }),
-  );
-
-
   return (
     <Box position="relative" display="inline-block">
       <Button
         onClick={() => {
-          refetch && refetch().then(() => repoll());
+          refetch && refetch();
         }}
         iconSpacing={3}
         p={4}
@@ -100,34 +63,39 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
         flexDirection="column"
       >
         <RefreshCircle
-          number={data?.newFailures ?? 0}
+          number={pollData?.newFailures ?? 0}
           color={colors.failed['200']}
-          visible={data?.newFailures !== 0 && data?.newFailures !== undefined}
+          visible={
+            pollData?.newFailures !== 0 && pollData?.newFailures !== undefined
+          }
           hoverText=" failed since refresh"
         />
-        {data?.newSucceeded ? (
+        {pollData?.newSucceeded ? (
           <RefreshCircle
-            number={data?.newSucceeded ?? 0}
+            number={pollData?.newSucceeded ?? 0}
             color={colors.success['200']}
             visible={
-              data?.newSucceeded !== 0 && data?.newSucceeded !== undefined
+              pollData?.newSucceeded !== 0 &&
+              pollData?.newSucceeded !== undefined
             }
             hoverText=" succeeded since refresh"
           />
         ) : (
           <RefreshCircle
-            number={data?.newRunning ?? 0}
+            number={pollData?.newRunning ?? 0}
             color={colors.running['300']}
-            visible={data?.newRunning !== 0 && data?.newRunning !== undefined}
+            visible={
+              pollData?.newRunning !== 0 && pollData?.newRunning !== undefined
+            }
             hoverText=" running since refresh"
           />
         )}
 
         <RefreshCircle
-          number={data?.newTasks ?? 0}
+          number={pollData?.newTasks ?? 0}
           color={colors.primary['300']}
           textColor={colors.primary['900']}
-          visible={data?.newTasks !== 0 && data?.newTasks !== undefined}
+          visible={pollData?.newTasks !== 0 && pollData?.newTasks !== undefined}
           hoverText=" added since refresh"
         />
       </Box>
