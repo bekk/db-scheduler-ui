@@ -30,7 +30,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
+@ConditionalOnProperty(value = "db-scheduler-ui.enabled", matchIfMissing = true)
 public class UiApiAutoConfiguration {
+
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
 
   @Value("${db-scheduler-ui.taskdata:true}")
