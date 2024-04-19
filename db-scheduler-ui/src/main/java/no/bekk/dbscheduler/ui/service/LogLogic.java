@@ -15,6 +15,7 @@ package no.bekk.dbscheduler.ui.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import javax.sql.DataSource;
@@ -132,7 +133,7 @@ public class LogLogic {
 
     @Override
     public void setParameters(MapSqlParameterSource p) {
-      p.addValue(varName, value);
+      p.addValue(varName, value == null ? null : Timestamp.from(value));
     }
   }
 
