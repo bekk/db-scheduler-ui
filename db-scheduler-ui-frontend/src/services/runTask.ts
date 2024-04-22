@@ -16,12 +16,16 @@ const API_BASE_URL: string =
   window.location.origin + '/db-scheduler-api';
 
 const runTask = async (id: string, name: string, scheduleTime?:Date) => {
-  
+
   const queryParams = new URLSearchParams();
 
   queryParams.append('id', id);
   queryParams.append('name', name);
-  scheduleTime&&queryParams.append('scheduleTime', scheduleTime.toISOString());
+  if (scheduleTime) {
+      queryParams.append('scheduleTime', scheduleTime.toISOString());
+  } else {
+      queryParams.append('scheduleTime', new Date().toISOString());
+  }
 
   const response = await fetch(
     `${API_BASE_URL}/tasks/rerun?${queryParams}`,
