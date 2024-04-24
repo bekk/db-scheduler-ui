@@ -14,6 +14,7 @@
 package no.bekk.dbscheduler.ui.model;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 public class TaskRequestParams {
 
@@ -55,8 +56,8 @@ public class TaskRequestParams {
     this.searchTermTaskInstance = searchTermTaskInstance;
     this.taskNameExactMatch = taskNameExactMatch != null ? taskNameExactMatch : false;
     this.taskInstanceExactMatch = taskInstanceExactMatch != null ? taskInstanceExactMatch : false;
-    this.startTime = startTime != null ? startTime : Instant.MIN;
-    this.endTime = endTime != null ? endTime : Instant.MAX;
+    this.startTime = startTime != null ? startTime : Instant.now().minus(50, ChronoUnit.DAYS);
+    this.endTime = endTime != null ? endTime : Instant.now().plus(50, ChronoUnit.DAYS);
     this.refresh = refresh != null ? refresh : true;
   }
 
