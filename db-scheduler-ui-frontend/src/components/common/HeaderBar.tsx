@@ -35,6 +35,7 @@ import colors from 'src/styles/colors';
 import { RunAllAlert } from 'src/components/scheduled/RunAllAlert';
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 import { useParams } from 'react-router-dom';
+import { PollResponse } from 'src/models/PollResponse';
 
 interface HeaderBarProps {
   params: TaskDetailsRequestParams;
@@ -50,6 +51,7 @@ interface HeaderBarProps {
   setTaskInstanceExactMatch: (exactMatch: boolean) => void;
   taskNameExactMatch: boolean;
   taskInstanceExactMatch: boolean;
+  pollData?: PollResponse;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
@@ -63,6 +65,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   setTaskInstanceExactMatch,
   taskNameExactMatch,
   taskInstanceExactMatch,
+  pollData,
   params,
 }) => {
   const { taskName: urlTaskName } = useParams<{ taskName?: string }>();
@@ -198,6 +201,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             pollKey={history ? POLL_LOGS_QUERY_KEY : POLL_TASKS_QUERY_KEY}
             refetch={refetch}
             params={params}
+            pollData={pollData}
           />
         </Box>
       </Box>

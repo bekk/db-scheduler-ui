@@ -18,12 +18,16 @@ import { FilterBy, SortBy } from 'src/models/QueryParams';
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 import { Log } from 'src/models/Log';
 import { Task } from 'src/models/Task';
+import { usePolling } from './usePolling';
+import { PollResponse } from 'src/models/PollResponse';
 
 interface UseInfiniteScrollingProps<
   T extends InfiniteScrollResponse<Task | Log>,
 > {
   fetchDataFunction: (params: TaskDetailsRequestParams) => Promise<T>;
+  pollFunction: (params: TaskDetailsRequestParams) => Promise<PollResponse>;
   baseQueryKey: string;
+  pollQueryKey: string;
   taskName?: string;
   taskInstance?: string;
 }
@@ -32,9 +36,11 @@ export const useInfiniteScrolling = <
   T extends InfiniteScrollResponse<Task | Log>,
 >({
   fetchDataFunction,
+  pollFunction,
   taskName,
   taskInstance,
   baseQueryKey,
+  pollQueryKey
 }: UseInfiniteScrollingProps<T>) => {
   const [currentFilter, setCurrentFilter] = useState<FilterBy>(FilterBy.All);
   const [currentSort, setCurrentSort] = useState<SortBy>(SortBy.Default);
@@ -58,6 +64,24 @@ export const useInfiniteScrolling = <
   const prevSearchTermTaskInstanceExactMatchRef = useRef<boolean>();
 
   const queryClient = useQueryClient();
+  const { data:pollData, repoll } = usePolling(
+    pollFunction,
+    pollQueryKey,
+    {
+      filter:currentFilter,
+      startTime:startTime??undefined,
+      endTime:endTime??undefined,
+      searchTermTaskName,
+      searchTermTaskInstance,
+      taskNameExactMatch,
+      taskInstanceExactMatch,
+      taskName,
+      taskId:taskInstance,
+      asc:sortAsc,
+      sorting:currentSort,
+      refresh:true,
+      size:limit,
+      pageNumber:0})
 
   const queryKey = useMemo(
     () => [
@@ -151,23 +175,9 @@ export const useInfiniteScrolling = <
         ...(taskInstance ? { taskId: taskInstance } : {}),
       };
 
-      return fetchDataFunction(params);
+      return fetchDataFunction(params).then((res) => {repoll(); return res;});
     },
-    [
-      currentFilter,
-      currentSort,
-      sortAsc,
-      searchTermTaskName,
-      searchTermTaskInstance,
-      taskName,
-      taskInstance,
-      queryClient,
-      queryKey,
-      fetchDataFunction,
-      taskNameExactMatch,
-      taskInstanceExactMatch,
-      startTime, endTime
-    ],
+    [currentFilter, currentSort, sortAsc, searchTermTaskName, searchTermTaskInstance, taskNameExactMatch, taskInstanceExactMatch, startTime, endTime, taskName, taskInstance, fetchDataFunction, queryClient, queryKey, repoll],
   );
 
   const {
@@ -189,6 +199,7 @@ export const useInfiniteScrolling = <
     currentFilter,
     currentSort,
     data,
+    pollData,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
