@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.bekk.db-scheduler-ui</groupId>
@@ -104,6 +104,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.10.1</version>
+                    <configuration>
+                        <parameters>true</parameters>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -148,11 +151,11 @@
                             <include>src/test/java/**/*.java</include> <!-- Check application tests code -->
                         </includes>
                         <googleJavaFormat>
-                            <version>1.16.0</version>
+                            <version>1.17.0</version>
                             <style>GOOGLE</style>
                         </googleJavaFormat>
-                        <importOrder />
-                        <removeUnusedImports />
+                        <importOrder/>
+                        <removeUnusedImports/>
                         <toggleOffOn/>
                         <trimTrailingWhitespace/>
                         <endWithNewline/>
@@ -209,9 +212,11 @@
                                     <maven-central>
                                         <active>ALWAYS</active>
                                         <url>https://oss.sonatype.org/service/local/</url>
-                                        <snapshotUrl>https://oss.sonatype.org/content/repositories/snapshots</snapshotUrl>
+                                        <snapshotUrl>
+                                            https://oss.sonatype.org/content/repositories/snapshots
+                                        </snapshotUrl>
                                         <closeRepository>true</closeRepository>
-                                        <releaseRepository>false</releaseRepository>
+                                        <releaseRepository>true</releaseRepository>
                                         <stagingRepositories>target/staging-deploy</stagingRepositories>
                                     </maven-central>
                                 </nexus2>
@@ -313,7 +318,9 @@
                             <executable>mkdir</executable>
                             <arguments>
                                 <argument>-p</argument>
-                                <argument>db-scheduler-ui/src/main/resources/templates/db-scheduler-ui</argument>
+                                <argument>
+                                    db-scheduler-ui/src/main/resources/templates/db-scheduler-ui
+                                </argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -326,8 +333,12 @@
                         <configuration>
                             <executable>mv</executable>
                             <arguments>
-                                <argument>db-scheduler-ui-frontend/dist/db-scheduler-ui/index.html</argument>
-                                <argument>db-scheduler-ui/src/main/resources/templates/db-scheduler-ui/</argument>
+                                <argument>
+                                    db-scheduler-ui-frontend/dist/db-scheduler-ui/index.html
+                                </argument>
+                                <argument>
+                                    db-scheduler-ui/src/main/resources/templates/db-scheduler-ui/
+                                </argument>
                             </arguments>
                         </configuration>
                     </execution>
