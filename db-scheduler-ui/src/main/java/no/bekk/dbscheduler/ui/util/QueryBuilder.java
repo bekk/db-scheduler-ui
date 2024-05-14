@@ -28,8 +28,6 @@ public class QueryBuilder {
 
   private Optional<String> orderBy = empty();
 
-  private Optional<Integer> limit = empty();
-
   QueryBuilder(String tableName) {
     this.tableName = tableName;
   }
@@ -48,23 +46,16 @@ public class QueryBuilder {
     return this;
   }
 
-  public QueryBuilder limit(int limit) {
-    this.limit = Optional.of(limit);
-    return this;
-  }
-
   public String getQuery() {
     StringBuilder s = new StringBuilder();
-    s.append("select * from ").append(tableName);
+    s.append("SELECT * FROM ").append(tableName);
 
     if (!andConditions.isEmpty()) {
-      s.append(" where ");
-      s.append(andConditions.stream().map(AndCondition::getQueryPart).collect(joining(" and ")));
+      s.append(" WHERE ");
+      s.append(andConditions.stream().map(AndCondition::getQueryPart).collect(joining(" AND ")));
     }
 
-    orderBy.ifPresent(o -> s.append(" order by ").append(o));
-
-    limit.ifPresent(l -> s.append(" limit ").append(l));
+    orderBy.ifPresent(o -> s.append(" ORDER BY ").append(o));
 
     return s.toString();
   }
