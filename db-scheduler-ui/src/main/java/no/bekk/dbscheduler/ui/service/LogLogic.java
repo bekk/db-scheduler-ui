@@ -13,18 +13,25 @@
  */
 package no.bekk.dbscheduler.ui.service;
 
+import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.sql.DataSource;
-import no.bekk.dbscheduler.ui.model.*;
+import lombok.RequiredArgsConstructor;
+import no.bekk.dbscheduler.ui.model.GetLogsResponse;
+import no.bekk.dbscheduler.ui.model.LogModel;
+import no.bekk.dbscheduler.ui.model.LogPollResponse;
+import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
+import no.bekk.dbscheduler.ui.model.TaskRequestParams;
 import no.bekk.dbscheduler.ui.util.AndCondition;
 import no.bekk.dbscheduler.ui.util.Caching;
 import no.bekk.dbscheduler.ui.util.QueryBuilder;
 import no.bekk.dbscheduler.ui.util.QueryUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -34,14 +41,18 @@ import org.springframework.stereotype.Service;
 public class LogLogic {
 
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-  private static boolean showData;
   private static final int DEFAULT_LIMIT = 500;
-  @Autowired private Caching caching;
+  private final Caching caching;
+  private final LogModelRowMapper logModelRowMapper;
 
-  @Autowired
-  public LogLogic(DataSource dataSource, boolean showData) {
+  public LogLogic(DataSource dataSource, Serializer serializer, Caching caching, boolean showData) {
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    this.showData = showData;
+    // currently we have no paging in the UI
+    this.namedParameterJdbcTemplate.getJdbcTemplate().setMaxRows(DEFAULT_LIMIT);
+    this.caching = caching;
+    this.logModelRowMapper =
+        new LogModelRowMapper(
+            showData, serializer == null ? Serializer.DEFAULT_JAVA_SERIALIZER : serializer);
   }
 
   public GetLogsResponse getLogs(TaskDetailsRequestParams requestParams) {
@@ -109,10 +120,8 @@ public class LogLogic {
 
     queryBuilder.orderBy(requestParams.isAsc() ? "time_finished desc" : "time_finished asc");
 
-    queryBuilder.limit(DEFAULT_LIMIT);
-
     return namedParameterJdbcTemplate.query(
-        queryBuilder.getQuery(), queryBuilder.getParameters(), new LogModelRowMapper());
+        queryBuilder.getQuery(), queryBuilder.getParameters(), logModelRowMapper);
   }
 
   private static class TimeCondition implements AndCondition {
@@ -186,13 +195,19 @@ public class LogLogic {
     }
   }
 
+  @RequiredArgsConstructor
   public static class LogModelRowMapper implements RowMapper<LogModel> {
+    private final boolean showData;
+    private final Serializer serializer;
 
     @Override
     public LogModel mapRow(ResultSet rs, int rowNum) throws SQLException {
-      byte[] taskData = null;
+      Object taskData = null;
       if (showData) {
-        taskData = rs.getBytes("task_data");
+        final byte[] bytes = rs.getBytes("task_data");
+        if (bytes != null) {
+          taskData = serializer.deserialize(Object.class, bytes);
+        }
       }
 
       return new LogModel(
