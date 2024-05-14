@@ -38,3 +38,13 @@ replay_pid*
 *.DS_Store
 /db-scheduler-ui/src/main/resources/templates/index.html
 /db-scheduler-ui/src/main/resources/templates/db-scheduler-ui/index.html
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+.dbeaver

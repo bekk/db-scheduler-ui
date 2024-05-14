@@ -14,6 +14,8 @@
 package no.bekk.dbscheduler.uistarter.autoconfigure;
 
 import com.github.kagkarlsson.scheduler.Scheduler;
+import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
+import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.LogController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
@@ -36,21 +38,21 @@ public class UiApiAutoConfiguration {
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
 
   @Value("${db-scheduler-ui.taskdata:true}")
-  public boolean showTaskData;
+  boolean showTaskData;
 
-  public UiApiAutoConfiguration() {
+  UiApiAutoConfiguration() {
     logger.info("UiApiAutoConfiguration created");
   }
 
   @Bean
   @ConditionalOnMissingBean
-  public Caching caching() {
+  Caching caching() {
     return new Caching();
   }
 
   @Bean
   @ConditionalOnMissingBean
-  public TaskLogic taskLogic(Scheduler scheduler, Caching caching) {
+  TaskLogic taskLogic(Scheduler scheduler, Caching caching) {
     return new TaskLogic(scheduler, caching, showTaskData);
   }
 
@@ -61,13 +63,17 @@ public class UiApiAutoConfiguration {
       name = "history",
       havingValue = "true",
       matchIfMissing = false)
-  public LogLogic logLogic(DataSource dataSource) {
-    return new LogLogic(dataSource, showTaskData);
+  LogLogic logLogic(DataSource dataSource, Caching caching, DbSchedulerCustomizer customizer) {
+    return new LogLogic(
+        dataSource,
+        customizer.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
+        caching,
+        showTaskData);
   }
 
   @Bean
   @ConditionalOnMissingBean
-  public TaskController taskController(TaskLogic taskLogic) {
+  TaskController taskController(TaskLogic taskLogic) {
     return new TaskController(taskLogic);
   }
 
@@ -78,13 +84,13 @@ public class UiApiAutoConfiguration {
       name = "history",
       havingValue = "true",
       matchIfMissing = false)
-  public LogController logController(LogLogic logLogic) {
+  LogController logController(LogLogic logLogic) {
     return new LogController(logLogic);
   }
 
   @Bean
   @ConditionalOnMissingBean
-  public UIController uiController() {
+  UIController uiController() {
     return new UIController();
   }
 }

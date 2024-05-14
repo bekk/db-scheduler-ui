@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-parent</artifactId>
@@ -17,8 +17,8 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.release>11</maven.compiler.release>
-        <spring-boot.version>2.7.15</spring-boot.version>
-        <db-scheduler.version>12.5.0</db-scheduler.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
+        <db-scheduler.version>14.0.0</db-scheduler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -148,17 +148,18 @@
                     <java>
                         <includes>
                             <include>src/main/java/**/*.java</include> <!-- Check application code -->
-                            <include>src/test/java/**/*.java</include> <!-- Check application tests code -->
+                            <include>src/test/java/**/*.java</include> <!-- Check application tests
+                            code -->
                         </includes>
                         <googleJavaFormat>
                             <version>1.17.0</version>
                             <style>GOOGLE</style>
                         </googleJavaFormat>
-                        <importOrder/>
-                        <removeUnusedImports/>
-                        <toggleOffOn/>
-                        <trimTrailingWhitespace/>
-                        <endWithNewline/>
+                        <importOrder />
+                        <removeUnusedImports />
+                        <toggleOffOn />
+                        <trimTrailingWhitespace />
+                        <endWithNewline />
                     </java>
                 </configuration>
             </plugin>
@@ -261,9 +262,22 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>frontend/node_modules</directory>
+                            <directory>db-scheduler-ui/src/main/resources/static</directory>
+                            <directory>db-scheduler-ui/src/main/resources/templates</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.2.0</version>
                 <inherited>false</inherited>
                 <executions>
                     <execution>
@@ -294,67 +308,49 @@
                             <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
                         </configuration>
                     </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
                     <execution>
-                        <id>create-static-folder</id>
-                        <phase>generate-resources</phase>
+                        <id>copy-files-to-backend</id>
+                        <phase>process-classes</phase>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <executable>mkdir</executable>
-                            <arguments>
-                                <argument>-p</argument>
-                                <argument>db-scheduler-ui/src/main/resources/static</argument>
-                            </arguments>
+                            <encoding>UTF-8</encoding>
+                            <outputDirectory>db-scheduler-ui/src/main/resources/static/db-scheduler-ui</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>db-scheduler-ui-frontend/dist</directory>
+                                    <excludes>
+                                        <exclude>**/*.html</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
+
                     <execution>
-                        <id>create-template-folder</id>
-                        <phase>generate-resources</phase>
+                        <id>copy-template-files</id>
+                        <phase>process-classes</phase>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <executable>mkdir</executable>
-                            <arguments>
-                                <argument>-p</argument>
-                                <argument>
-                                    db-scheduler-ui/src/main/resources/templates/db-scheduler-ui
-                                </argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-index-file</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>mv</executable>
-                            <arguments>
-                                <argument>
-                                    db-scheduler-ui-frontend/dist/db-scheduler-ui/index.html
-                                </argument>
-                                <argument>
-                                    db-scheduler-ui/src/main/resources/templates/db-scheduler-ui/
-                                </argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-frontend-files</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>cp</executable>
-                            <arguments>
-                                <argument>-r</argument>
-                                <argument>db-scheduler-ui-frontend/dist/.</argument>
-                                <argument>db-scheduler-ui/src/main/resources/static/</argument>
-                            </arguments>
+                            <encoding>UTF-8</encoding>
+                            <outputDirectory>db-scheduler-ui/src/main/resources/templates/db-scheduler-ui</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>db-scheduler-ui-frontend/dist</directory>
+                                    <includes>
+                                        <include> **/*.html</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
