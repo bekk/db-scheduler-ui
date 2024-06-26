@@ -13,8 +13,7 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
-import no.bekk.dbscheduler.ui.model.DbSchedulerUiConfig;
-import org.springframework.beans.factory.annotation.Autowired;
+import no.bekk.dbscheduler.ui.model.ConfigResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,10 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/db-scheduler-api/config")
 public class ConfigController {
 
-  @Autowired private DbSchedulerUiConfig dbSchedulerUiConfig;
+  private final boolean showHistory;
+
+  public ConfigController(boolean showHistory) {
+    this.showHistory = showHistory;
+  }
 
   @GetMapping
-  public DbSchedulerUiConfig getConfig() {
-    return dbSchedulerUiConfig;
+  public ConfigResponse getConfig() {
+    return new ConfigResponse(showHistory);
   }
 }
