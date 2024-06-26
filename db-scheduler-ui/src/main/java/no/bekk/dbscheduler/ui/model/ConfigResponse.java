@@ -20,7 +20,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class DbSchedulerUiConfig {
-
-  private boolean history;
+public class ConfigResponse {
+  private boolean showHistory;
 }

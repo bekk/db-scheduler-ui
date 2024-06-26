@@ -21,31 +21,26 @@ import no.bekk.dbscheduler.ui.controller.ConfigController;
 import no.bekk.dbscheduler.ui.controller.LogController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
 import no.bekk.dbscheduler.ui.controller.UIController;
-import no.bekk.dbscheduler.ui.model.DbSchedulerUiConfig;
 import no.bekk.dbscheduler.ui.service.LogLogic;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
 import no.bekk.dbscheduler.ui.util.Caching;
+import no.bekk.dbscheduler.uistarter.config.DbSchedulerUiProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
 @ConditionalOnProperty(value = "db-scheduler-ui.enabled", matchIfMissing = true)
+@EnableConfigurationProperties(DbSchedulerUiProperties.class)
 public class UiApiAutoConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
-
-  @Value("${db-scheduler-ui.task-data:true}")
-  boolean showTaskData;
-
-  @Value("${db-scheduler-ui.history:false}")
-  boolean showHistory;
 
   UiApiAutoConfiguration() {
     logger.info("UiApiAutoConfiguration created");
@@ -59,8 +54,8 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  TaskLogic taskLogic(Scheduler scheduler, Caching caching) {
-    return new TaskLogic(scheduler, caching, showTaskData);
+  TaskLogic taskLogic(Scheduler scheduler, Caching caching, DbSchedulerUiProperties properties) {
+    return new TaskLogic(scheduler, caching, properties.isTaskData());
   }
 
   @Bean
@@ -70,12 +65,16 @@ public class UiApiAutoConfiguration {
       name = "history",
       havingValue = "true",
       matchIfMissing = false)
-  LogLogic logLogic(DataSource dataSource, Caching caching, DbSchedulerCustomizer customizer) {
+  LogLogic logLogic(
+      DataSource dataSource,
+      Caching caching,
+      DbSchedulerCustomizer customizer,
+      DbSchedulerUiProperties properties) {
     return new LogLogic(
         dataSource,
         customizer.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
         caching,
-        showTaskData);
+        properties.isTaskData());
   }
 
   @Bean
@@ -97,12 +96,6 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  DbSchedulerUiConfig dbSchedulerUiConfig() {
-    return new DbSchedulerUiConfig(showHistory);
-  }
-
-  @Bean
-  @ConditionalOnMissingBean
   @ConditionalOnWebApplication(type = Type.SERVLET)
   UIController uiController() {
     return new UIController();
@@ -110,7 +103,7 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  ConfigController configController() {
-    return new ConfigController();
+  ConfigController configController(DbSchedulerUiProperties properties) {
+    return new ConfigController(properties.isHistory());
   }
 }
