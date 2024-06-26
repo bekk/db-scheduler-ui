@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-parent</artifactId>
@@ -14,8 +14,6 @@
     <inceptionYear>2023</inceptionYear>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.release>11</maven.compiler.release>
         <spring-boot.version>2.7.18</spring-boot.version>
         <db-scheduler.version>14.0.0</db-scheduler.version>
@@ -26,7 +24,7 @@
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -47,6 +45,10 @@
         <developer>
             <name>Vegard Rognstad Smines</name>
             <email>vegard.smines@bekk.no</email>
+        </developer>
+        <developer>
+            <name>Geir Sagberg</name>
+            <email>geir.sagberg@bekk.no</email>
         </developer>
     </developers>
 
@@ -81,7 +83,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.9.0</version>
+                <version>5.10.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -93,17 +95,17 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.10.1</version>
+                    <version>3.13.0</version>
                     <configuration>
                         <parameters>true</parameters>
                     </configuration>
@@ -111,17 +113,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jreleaser</groupId>
                     <artifactId>jreleaser-maven-plugin</artifactId>
-                    <version>1.8.0</version>
+                    <version>1.12.0</version>
                     <configuration>
                         <jreleaser>
                             <release>
@@ -143,7 +145,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.39.0</version>
+                <version>2.43.0</version>
                 <configuration>
                     <java>
                         <includes>
@@ -155,18 +157,17 @@
                             <version>1.17.0</version>
                             <style>GOOGLE</style>
                         </googleJavaFormat>
-                        <importOrder />
-                        <removeUnusedImports />
-                        <toggleOffOn />
-                        <trimTrailingWhitespace />
-                        <endWithNewline />
+                        <importOrder/>
+                        <removeUnusedImports/>
+                        <toggleOffOn/>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
                     </java>
                 </configuration>
             </plugin>
 
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -182,7 +183,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
+                <version>3.2.4</version>
                 <configuration>
                     <gpgArguments>
                         <arg>--pinentry-mode</arg>
@@ -229,7 +230,7 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>4.2</version>
+                <version>4.5</version>
                 <configuration>
                     <mapping>
                         <ts>SLASHSTAR_STYLE</ts>
@@ -277,7 +278,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <inherited>false</inherited>
                 <executions>
                     <execution>
@@ -342,12 +343,13 @@
                         </goals>
                         <configuration>
                             <encoding>UTF-8</encoding>
-                            <outputDirectory>db-scheduler-ui/src/main/resources/templates/db-scheduler-ui</outputDirectory>
+                            <outputDirectory>db-scheduler-ui/src/main/resources/templates/db-scheduler-ui
+                            </outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>db-scheduler-ui-frontend/dist</directory>
                                     <includes>
-                                        <include> **/*.html</include>
+                                        <include>**/*.html</include>
                                     </includes>
                                 </resource>
                             </resources>
