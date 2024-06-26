@@ -327,34 +327,11 @@
                             <resources>
                                 <resource>
                                     <directory>db-scheduler-ui-frontend/dist</directory>
-                                    <excludes>
-                                        <exclude>**/*.html</exclude>
-                                    </excludes>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
 
-                    <execution>
-                        <id>copy-template-files</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <encoding>UTF-8</encoding>
-                            <outputDirectory>db-scheduler-ui/src/main/resources/templates/db-scheduler-ui
-                            </outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>db-scheduler-ui-frontend/dist</directory>
-                                    <includes>
-                                        <include>**/*.html</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
         </plugins>

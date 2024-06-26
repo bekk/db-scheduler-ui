@@ -17,9 +17,11 @@ import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import javax.sql.DataSource;
+import no.bekk.dbscheduler.ui.controller.ConfigController;
 import no.bekk.dbscheduler.ui.controller.LogController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
 import no.bekk.dbscheduler.ui.controller.UIController;
+import no.bekk.dbscheduler.ui.model.DbSchedulerUiConfig;
 import no.bekk.dbscheduler.ui.service.LogLogic;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
 import no.bekk.dbscheduler.ui.util.Caching;
@@ -37,8 +39,11 @@ public class UiApiAutoConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
 
-  @Value("${db-scheduler-ui.taskdata:true}")
+  @Value("${db-scheduler-ui.task-data:true}")
   boolean showTaskData;
+
+  @Value("${db-scheduler-ui.history:false}")
+  boolean showHistory;
 
   UiApiAutoConfiguration() {
     logger.info("UiApiAutoConfiguration created");
@@ -90,7 +95,19 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
+  DbSchedulerUiConfig dbSchedulerUiConfig() {
+    return new DbSchedulerUiConfig(showHistory);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
   UIController uiController() {
     return new UIController();
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  ConfigController configController() {
+    return new ConfigController();
   }
 }

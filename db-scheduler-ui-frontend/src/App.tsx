@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 import { ChakraProvider } from '@chakra-ui/react';
-import { theme } from 'src/styles/theme';
-import { FrontPage } from './pages/FrontPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { theme } from 'src/styles/theme';
+import { FrontPage } from './pages/FrontPage';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchInterval: 2000 } },

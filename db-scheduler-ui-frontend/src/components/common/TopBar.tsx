@@ -13,19 +13,18 @@
  */
 import { Box, Button, Text } from '@chakra-ui/react';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LogoIcon } from 'src/assets/icons/Logo';
 import colors from 'src/styles/colors';
-import { useNavigate } from 'react-router-dom';
 import { getShowHistory } from 'src/utils/config';
 
 interface TopBarProps {
   title: string;
 }
 
-
 export const TopBar: React.FC<TopBarProps> = ({ title }) => {
   const navigate = useNavigate();
-  const showHistory= getShowHistory()
+  const showHistory = getShowHistory();
 
   return (
     <Box

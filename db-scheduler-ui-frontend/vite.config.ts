@@ -11,17 +11,26 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 import eslintPlugin from 'vite-plugin-eslint';
 
-const BASE_URL: string = process.env.NODE_ENV === 'production' ? 'db-scheduler-ui' : '/db-scheduler';
-
+const BASE_URL: string =
+  process.env.NODE_ENV === 'production' ? '/db-scheduler-ui' : '/db-scheduler';
 
 export default defineConfig({
   base: BASE_URL,
   server: {
     port: 51373,
+    proxy: {
+      '/db-scheduler-api': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+    },
+  },
+  build: {
+    target: 'es2022',
   },
   plugins: [react(), eslintPlugin()],
   resolve: {
