@@ -341,6 +341,7 @@
         <module>db-scheduler-ui</module>
         <module>db-scheduler-ui-starter</module>
         <module>example-app</module>
+        <module>example-app-webflux</module>
     </modules>
 
     <distributionManagement>
