@@ -13,16 +13,16 @@
  */
 import { Accordion, Box, Button, Flex, HStack, Text } from '@chakra-ui/react';
 import React, { useEffect } from 'react';
-import { LogCard } from 'src/components/history/LogCard';
 import { useLocation } from 'react-router-dom';
-import colors from 'src/styles/colors';
-import { HeaderBar } from '../common/HeaderBar';
-import { ALL_LOG_QUERY_KEY, getLogs } from 'src/services/getLogs';
-import { useInfiniteScrolling } from 'src/hooks/useInfiniteTaskScrolling';
+import { LogCard } from 'src/components/history/LogCard';
 import { DateTimeInput } from 'src/components/input/DateTimeInput';
 import { SortButton } from 'src/components/input/SortButton';
+import { useInfiniteScrolling } from 'src/hooks/useInfiniteTaskScrolling';
 import { SortBy } from 'src/models/QueryParams';
 import { LogResponse } from 'src/models/TasksResponse';
+import { ALL_LOG_QUERY_KEY, getLogs } from 'src/services/getLogs';
+import colors from 'src/styles/colors';
+import { HeaderBar } from '../common/HeaderBar';
 
 export const LogList: React.FC = () => {
   const location = useLocation();
@@ -75,6 +75,8 @@ export const LogList: React.FC = () => {
     setSearchTermTaskName,
     taskInstance,
     taskName,
+    setTaskInstanceExactMatch,
+    setTaskNameExactMatch,
   ]);
 
   return (

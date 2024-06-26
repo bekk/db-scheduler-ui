@@ -11,10 +11,11 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-declare global {
-    interface Window {
-        showHistory?: boolean,
-    }
-}
 
-export const getShowHistory = (): boolean => window.showHistory ?? false;
+const config = await fetch('/db-scheduler-api/config').then((res) =>
+  res.json(),
+);
+
+const showHistory = 'history' in config ? Boolean(config.history) : false;
+
+export const getShowHistory = (): boolean => showHistory;

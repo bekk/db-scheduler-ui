@@ -13,20 +13,22 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
-import org.springframework.stereotype.Controller;
+import no.bekk.dbscheduler.ui.model.DbSchedulerUiConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @CrossOrigin
-@RequestMapping("/db-scheduler")
-public class UIController {
+@RequestMapping("/db-scheduler-api/config")
+public class ConfigController {
 
-  public UIController() {}
+  @Autowired private DbSchedulerUiConfig dbSchedulerUiConfig;
 
-  @GetMapping("/**")
-  public String index() {
-    return "forward:/db-scheduler-ui/index.html";
+  @GetMapping
+  public DbSchedulerUiConfig getConfig() {
+    return dbSchedulerUiConfig;
   }
 }

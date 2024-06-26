@@ -11,12 +11,16 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import App from './src/App';
+package no.bekk.dbscheduler.ui.model;
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <BrowserRouter basename="db-scheduler">
-    <App />
-  </BrowserRouter>,
-);
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class DbSchedulerUiConfig {
+
+  private boolean history;
+}
