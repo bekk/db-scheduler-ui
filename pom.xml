@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-parent</artifactId>
@@ -12,14 +10,6 @@
     <description>Provides a UI for db-scheduler</description>
     <url>https://github.com/bekk/db-scheduler-ui</url>
     <inceptionYear>2023</inceptionYear>
-
-    <properties>
-        <maven.compiler.release>11</maven.compiler.release>
-        <spring-boot.version>2.7.18</spring-boot.version>
-        <db-scheduler.version>14.0.0</db-scheduler.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
 
     <licenses>
         <license>
@@ -52,25 +42,46 @@
         </developer>
     </developers>
 
+    <modules>
+        <module>db-scheduler-ui</module>
+        <module>db-scheduler-ui-starter</module>
+        <module>example-app</module>
+        <module>example-app-webflux</module>
+    </modules>
+
     <scm>
         <connection>scm:git:https://github.com/bekk/db-scheduler-ui.git</connection>
         <developerConnection>scm:git:https://github.com/bekk/db-scheduler-ui.git</developerConnection>
-        <url>https://github.com/bekk/db-scheduler-ui.git</url>
         <tag>HEAD</tag>
+        <url>https://github.com/bekk/db-scheduler-ui.git</url>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <properties>
+        <maven.compiler.release>11</maven.compiler.release>
+        <spring-boot.version>2.7.18</spring-boot.version>
+        <db-scheduler.version>14.0.0</db-scheduler.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.github.kagkarlsson</groupId>
-                <artifactId>db-scheduler</artifactId>
-                <version>${db-scheduler.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.kagkarlsson</groupId>
-                <artifactId>db-scheduler-spring-boot-starter</artifactId>
-                <version>${db-scheduler.version}</version>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.10.2</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
@@ -81,14 +92,25 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>5.10.2</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>com.github.kagkarlsson</groupId>
+                <artifactId>db-scheduler</artifactId>
+                <version>${db-scheduler.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.kagkarlsson</groupId>
+                <artifactId>db-scheduler-spring-boot-starter</artifactId>
+                <version>${db-scheduler.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <pluginManagement>
@@ -149,8 +171,10 @@
                 <configuration>
                     <java>
                         <includes>
-                            <include>src/main/java/**/*.java</include> <!-- Check application code -->
-                            <include>src/test/java/**/*.java</include> <!-- Check application tests
+                            <include>src/main/java/**/*.java</include>
+                            <!-- Check application code -->
+                            <include>src/test/java/**/*.java</include>
+                            <!-- Check application tests
                             code -->
                         </includes>
                         <googleJavaFormat>
@@ -165,9 +189,22 @@
                     </java>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>com.github.ekryd.sortpom</groupId>
+                <artifactId>sortpom-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <nrOfIndentSpace>4</nrOfIndentSpace>
+                    <createBackupFile>false</createBackupFile>
+                    <sortDependencies>scope,groupId,artifactId</sortDependencies>
+                    <expandEmptyElements>false</expandEmptyElements>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -176,9 +213,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <doclint>none</doclint>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -214,9 +248,7 @@
                                     <maven-central>
                                         <active>ALWAYS</active>
                                         <url>https://oss.sonatype.org/service/local/</url>
-                                        <snapshotUrl>
-                                            https://oss.sonatype.org/content/repositories/snapshots
-                                        </snapshotUrl>
+                                        <snapshotUrl>https://oss.sonatype.org/content/repositories/snapshots</snapshotUrl>
                                         <closeRepository>true</closeRepository>
                                         <releaseRepository>true</releaseRepository>
                                         <stagingRepositories>target/staging-deploy</stagingRepositories>
@@ -296,10 +328,10 @@
                     </execution>
                     <execution>
                         <id>npm-build</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <executable>npm</executable>
                             <arguments>
@@ -317,13 +349,13 @@
                 <executions>
                     <execution>
                         <id>copy-files-to-backend</id>
-                        <phase>process-classes</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>process-classes</phase>
                         <configuration>
                             <encoding>UTF-8</encoding>
-                            <outputDirectory>db-scheduler-ui/src/main/resources/static/db-scheduler-ui</outputDirectory>
+                            <outputDirectory>db-scheduler-ui/src/main/resources/static/db-scheduler</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>db-scheduler-ui-frontend/dist</directory>
@@ -336,24 +368,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <modules>
-        <module>db-scheduler-ui</module>
-        <module>db-scheduler-ui-starter</module>
-        <module>example-app</module>
-        <module>example-app-webflux</module>
-    </modules>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <profiles>
         <profile>
