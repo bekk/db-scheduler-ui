@@ -16,6 +16,7 @@ const config = await fetch('/db-scheduler-api/config').then((res) =>
   res.json(),
 );
 
-const showHistory = 'history' in config ? Boolean(config.history) : false;
+const showHistory =
+  'showHistory' in config ? Boolean(config.showHistory) : false;
 
 export const getShowHistory = (): boolean => showHistory;
