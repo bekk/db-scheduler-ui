@@ -16,7 +16,7 @@ import { defineConfig } from 'vite';
 import eslintPlugin from 'vite-plugin-eslint';
 
 const BASE_URL: string =
-  process.env.NODE_ENV === 'production' ? '/db-scheduler-ui' : '/db-scheduler';
+  process.env.NODE_ENV === 'production' ? '/db-scheduler' : '/';
 
 export default defineConfig({
   base: BASE_URL,

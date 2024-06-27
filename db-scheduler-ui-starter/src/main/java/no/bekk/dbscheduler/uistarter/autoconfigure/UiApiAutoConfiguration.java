@@ -19,14 +19,15 @@ import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.ConfigController;
 import no.bekk.dbscheduler.ui.controller.LogController;
+import no.bekk.dbscheduler.ui.controller.SpaFallbackMvc;
 import no.bekk.dbscheduler.ui.controller.TaskController;
-import no.bekk.dbscheduler.ui.controller.UIController;
 import no.bekk.dbscheduler.ui.service.LogLogic;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
 import no.bekk.dbscheduler.ui.util.Caching;
 import no.bekk.dbscheduler.uistarter.config.DbSchedulerUiProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -34,6 +35,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.server.RequestPredicates;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 @AutoConfiguration
 @ConditionalOnProperty(value = "db-scheduler-ui.enabled", matchIfMissing = true)
@@ -95,10 +102,20 @@ public class UiApiAutoConfiguration {
   }
 
   @Bean
-  @ConditionalOnMissingBean
   @ConditionalOnWebApplication(type = Type.SERVLET)
-  UIController uiController() {
-    return new UIController();
+  @ConditionalOnMissingBean
+  SpaFallbackMvc spaFallbackMvc() {
+    return new SpaFallbackMvc();
+  }
+
+  @Bean
+  @ConditionalOnWebApplication(type = Type.REACTIVE)
+  @ConditionalOnMissingBean
+  public RouterFunction<ServerResponse> dbSchedulerRouter(
+      @Value("classpath:/static/db-scheduler/index.html") Resource indexHtml) {
+    return RouterFunctions.route(
+        RequestPredicates.GET("/db-scheduler/**").and(request -> !request.path().contains(".")),
+        request -> ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(indexHtml));
   }
 
   @Bean
