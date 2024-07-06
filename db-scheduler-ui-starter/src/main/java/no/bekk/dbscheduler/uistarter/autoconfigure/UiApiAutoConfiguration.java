@@ -61,8 +61,10 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  TaskLogic taskLogic(Scheduler scheduler, Caching caching, DbSchedulerUiProperties properties) {
-    return new TaskLogic(scheduler, caching, properties.isTaskData());
+  TaskLogic taskLogic(Scheduler scheduler, DbSchedulerCustomizer customizer, Caching caching,
+      DbSchedulerUiProperties properties) {
+    return new TaskLogic(scheduler, customizer.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
+        caching, properties.isTaskData());
   }
 
   @Bean

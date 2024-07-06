@@ -14,6 +14,7 @@
 package no.bekk.dbscheduler.ui.util.mapper;
 
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
+import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -21,23 +22,28 @@ import java.util.stream.Collectors;
 import no.bekk.dbscheduler.ui.model.TaskModel;
 
 public class TaskMapper {
+
   public static List<TaskModel> mapScheduledExecutionsToTaskModel(
-      List<ScheduledExecution<Object>> scheduledExecutions) {
+      List<ScheduledExecution<Object>> scheduledExecutions, Serializer serializer) {
     return scheduledExecutions.stream()
         .map(
-            execution ->
-                new TaskModel(
-                    execution.getTaskInstance().getTaskName(),
-                    Collections.singletonList(execution.getTaskInstance().getId()),
-                    Collections.singletonList(execution.getData()),
-                    Collections.singletonList(execution.getExecutionTime()),
-                    List.of(execution.isPicked()),
-                    Collections.singletonList(execution.getPickedBy()),
-                    Collections.singletonList(execution.getLastSuccess()),
-                    execution.getLastFailure(),
-                    List.of(execution.getConsecutiveFailures()), // Modified here
-                    null,
-                    0))
+            execution -> {
+              byte[] serializedByteData = serializer.serialize(execution.getData());
+              Object data = serializer.deserialize(Object.class, serializedByteData);
+
+              return new TaskModel(
+                  execution.getTaskInstance().getTaskName(),
+                  Collections.singletonList(execution.getTaskInstance().getId()),
+                  Collections.singletonList(data),
+                  Collections.singletonList(execution.getExecutionTime()),
+                  List.of(execution.isPicked()),
+                  Collections.singletonList(execution.getPickedBy()),
+                  Collections.singletonList(execution.getLastSuccess()),
+                  execution.getLastFailure(),
+                  List.of(execution.getConsecutiveFailures()), // Modified here
+                  null,
+                  0);
+            })
         .collect(Collectors.toList());
   }
 
@@ -63,7 +69,7 @@ public class TaskMapper {
                       .collect(Collectors.toList()));
               taskModel.setPicked(
                   taskModels.stream()
-                      .map(TaskModel::isPicked)
+                      .map(TaskModel::getPicked)
                       .flatMap(List::stream)
                       .collect(Collectors.toList()));
               taskModel.setPickedBy(
@@ -93,12 +99,12 @@ public class TaskMapper {
   }
 
   public static List<TaskModel> mapAllExecutionsToTaskModel(
-      List<ScheduledExecution<Object>> scheduledExecutions) {
-    return groupTasks(mapScheduledExecutionsToTaskModel(scheduledExecutions));
+      List<ScheduledExecution<Object>> scheduledExecutions, Serializer serializer) {
+    return groupTasks(mapScheduledExecutionsToTaskModel(scheduledExecutions, serializer));
   }
 
   public static List<TaskModel> mapAllExecutionsToTaskModelUngrouped(
-      List<ScheduledExecution<Object>> scheduledExecutions) {
-    return mapScheduledExecutionsToTaskModel(scheduledExecutions);
+      List<ScheduledExecution<Object>> scheduledExecutions, Serializer serializer) {
+    return mapScheduledExecutionsToTaskModel(scheduledExecutions, serializer);
   }
 }

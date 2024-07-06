@@ -17,6 +17,7 @@ import static no.bekk.dbscheduler.ui.util.QueryUtils.filterExecutions;
 
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
+import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import java.time.Instant;
 import java.util.*;
@@ -34,13 +35,15 @@ import org.springframework.web.server.ResponseStatusException;
 public class TaskLogic {
 
   private final Scheduler scheduler;
+  private final Serializer serializer;
   private final Caching caching;
   private final boolean showData;
 
   @Autowired
-  public TaskLogic(Scheduler scheduler, Caching caching, boolean showData) {
+  public TaskLogic(Scheduler scheduler, Serializer serializer, Caching caching, boolean showData) {
     this.scheduler = scheduler;
     this.scheduler.start();
+    this.serializer = serializer == null ? Serializer.DEFAULT_JAVA_SERIALIZER : serializer;
     this.caching = caching;
     this.showData = showData;
   }
@@ -98,7 +101,7 @@ public class TaskLogic {
     List<ScheduledExecution<Object>> executions =
         caching.getExecutionsFromCacheOrDB(params.isRefresh(), scheduler);
 
-    List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions);
+    List<TaskModel> tasks = TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions, serializer);
 
     tasks =
         QueryUtils.searchByTaskName(
@@ -124,14 +127,14 @@ public class TaskLogic {
 
     List<TaskModel> tasks =
         params.getTaskId() != null
-            ? TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions).stream()
+            ? TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions, serializer).stream()
                 .filter(
                     task -> {
                       return task.getTaskName().equals(params.getTaskName())
                           && task.getTaskInstance().get(0).equals(params.getTaskId());
                     })
                 .collect(Collectors.toList())
-            : TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions).stream()
+            : TaskMapper.mapAllExecutionsToTaskModelUngrouped(executions, serializer).stream()
                 .filter(
                     task -> {
                       return task.getTaskName().equals(params.getTaskName());
