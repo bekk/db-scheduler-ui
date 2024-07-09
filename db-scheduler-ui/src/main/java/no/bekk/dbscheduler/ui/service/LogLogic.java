@@ -42,12 +42,19 @@ public class LogLogic {
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
   private final Caching caching;
   private final LogModelRowMapper logModelRowMapper;
+  private final String logTableName;
 
-  public LogLogic(DataSource dataSource, Serializer serializer, Caching caching, boolean showData) {
+  public LogLogic(
+      DataSource dataSource,
+      Serializer serializer,
+      Caching caching,
+      boolean showData,
+      String logTableName) {
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     // currently we have no paging in the UI
     this.namedParameterJdbcTemplate.getJdbcTemplate().setMaxRows(DEFAULT_LIMIT);
     this.caching = caching;
+    this.logTableName = logTableName;
     this.logModelRowMapper =
         new LogModelRowMapper(
             showData, serializer == null ? Serializer.DEFAULT_JAVA_SERIALIZER : serializer);
@@ -79,7 +86,7 @@ public class LogLogic {
   }
 
   public List<LogModel> getLogsDirectlyFromDB(TaskDetailsRequestParams requestParams) {
-    QueryBuilder queryBuilder = QueryBuilder.selectFromTable("scheduled_execution_logs");
+    QueryBuilder queryBuilder = QueryBuilder.selectFromTable(logTableName);
     if (requestParams.getStartTime() != null) {
       queryBuilder.andCondition(
           new TimeCondition(
