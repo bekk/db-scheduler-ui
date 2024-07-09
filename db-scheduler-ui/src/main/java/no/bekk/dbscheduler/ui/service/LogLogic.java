@@ -14,6 +14,8 @@
 package no.bekk.dbscheduler.ui.service;
 
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -43,6 +45,7 @@ public class LogLogic {
   private final Caching caching;
   private final LogModelRowMapper logModelRowMapper;
   private final String logTableName;
+  private final String databaseProductName;
 
   public LogLogic(
       DataSource dataSource,
@@ -50,6 +53,12 @@ public class LogLogic {
       Caching caching,
       boolean showData,
       String logTableName) {
+    try (Connection connection = dataSource.getConnection()) {
+      DatabaseMetaData metaData = connection.getMetaData();
+      databaseProductName = metaData.getDatabaseProductName();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     // currently we have no paging in the UI
     this.namedParameterJdbcTemplate.getJdbcTemplate().setMaxRows(DEFAULT_LIMIT);
@@ -103,7 +112,8 @@ public class LogLogic {
     }
     if (requestParams.getFilter() != null
         && requestParams.getFilter() != TaskRequestParams.TaskFilter.ALL) {
-      queryBuilder.andCondition(new FilterCondition(requestParams.getFilter()));
+      queryBuilder.andCondition(
+          new FilterCondition(requestParams.getFilter(), databaseProductName));
     }
     if (requestParams.getSearchTermTaskName() != null) {
       queryBuilder.andCondition(
@@ -200,16 +210,19 @@ public class LogLogic {
   public static class FilterCondition implements AndCondition {
 
     private final TaskRequestParams.TaskFilter filterCondition;
+    private final String databaseProductName;
 
-    public FilterCondition(TaskRequestParams.TaskFilter filterCondition) {
+    public FilterCondition(
+        TaskRequestParams.TaskFilter filterCondition, String databaseProductName) {
       this.filterCondition = filterCondition;
+      this.databaseProductName = databaseProductName;
     }
 
     @Override
     public String getQueryPart() {
       return filterCondition == TaskRequestParams.TaskFilter.SUCCEEDED
-          ? "succeeded = TRUE"
-          : "succeeded = FALSE";
+          ? databaseProductName.equals("Oracle") ? "succeeded = 1" : "succeeded = TRUE"
+          : databaseProductName.equals("Oracle") ? "succeeded = 0" : "succeeded = FALSE";
     }
 
     @Override
