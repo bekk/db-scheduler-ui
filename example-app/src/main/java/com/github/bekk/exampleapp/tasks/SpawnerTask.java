@@ -49,7 +49,7 @@ public class SpawnerTask {
                 client.schedule(
                     ONE_TIME_SPAWNER_TASK.instance(
                         "spawned " + randomUUID + " loopnr: " + i,
-                        new TaskData(123, "{data: MASSIVEDATA}")),
+                        new TaskData(123, "{data: MASSIVEDATA}", Instant.now())),
                     Instant.now().plusSeconds(60));
               }
             });

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TaskService {
+
   private final Scheduler scheduler;
 
   public TaskService(Scheduler scheduler) {
@@ -33,7 +34,8 @@ public class TaskService {
   }
 
   public void runManuallyTriggeredTasks() {
-    scheduler.schedule(ONE_TIME_TASK.instance("1", new TaskData(1, "test data")), Instant.now());
+    scheduler.schedule(
+        ONE_TIME_TASK.instance("1", new TaskData(1, "test data", Instant.now())), Instant.now());
 
     scheduler.schedule(
         CHAINED_STEP_1_TASK.instance("3", new TestObject("Ole Nordman", 1, "ole.nordman@mail.com")),

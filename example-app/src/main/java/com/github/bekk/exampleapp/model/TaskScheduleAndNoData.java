@@ -13,18 +13,31 @@
  */
 package com.github.bekk.exampleapp.model;
 
+import com.github.kagkarlsson.scheduler.task.helper.ScheduleAndData;
+import com.github.kagkarlsson.scheduler.task.schedule.CronSchedule;
 import java.io.Serializable;
-import java.time.Instant;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 
-@Setter
-@Getter
-@AllArgsConstructor
-public class TaskData implements Serializable {
+public class TaskScheduleAndNoData implements ScheduleAndData, Serializable {
 
-  private long id;
-  private String data;
-  private Instant time;
+  private static final long serialVersionUID = 1L; // recommended when using Java serialization
+
+  private final CronSchedule schedule;
+
+  private TaskScheduleAndNoData() {
+    this(null);
+  }
+
+  public TaskScheduleAndNoData(CronSchedule schedule) {
+    this.schedule = schedule;
+  }
+
+  @Override
+  public CronSchedule getSchedule() {
+    return this.schedule;
+  }
+
+  @Override
+  public Object getData() {
+    return null;
+  }
 }

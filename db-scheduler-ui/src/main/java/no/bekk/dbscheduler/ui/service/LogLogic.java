@@ -35,13 +35,11 @@ import no.bekk.dbscheduler.ui.util.QueryUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Service;
 
-@Service
 public class LogLogic {
 
-  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
   private static final int DEFAULT_LIMIT = 500;
+  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
   private final Caching caching;
   private final LogModelRowMapper logModelRowMapper;
 
@@ -124,7 +122,23 @@ public class LogLogic {
         queryBuilder.getQuery(), queryBuilder.getParameters(), logModelRowMapper);
   }
 
+  private enum Operators {
+    GREATER_THAN_OR_EQUALS(">="),
+    LESS_THAN_OR_EQUALS("<=");
+
+    private final String operator;
+
+    Operators(String operator) {
+      this.operator = operator;
+    }
+
+    public String getOperator() {
+      return operator;
+    }
+  }
+
   private static class TimeCondition implements AndCondition {
+
     private final String varName;
     private final String operator;
     private final Instant value;
@@ -147,6 +161,7 @@ public class LogLogic {
   }
 
   private static class SearchCondition implements AndCondition {
+
     private final String searchTerm;
     private final Map<String, Object> params;
 
@@ -176,6 +191,7 @@ public class LogLogic {
   }
 
   public static class FilterCondition implements AndCondition {
+
     private final TaskRequestParams.TaskFilter filterCondition;
 
     public FilterCondition(TaskRequestParams.TaskFilter filterCondition) {
@@ -197,6 +213,7 @@ public class LogLogic {
 
   @RequiredArgsConstructor
   public static class LogModelRowMapper implements RowMapper<LogModel> {
+
     private final boolean showData;
     private final Serializer serializer;
 
@@ -222,21 +239,6 @@ public class LogLogic {
           rs.getString("exception_class"),
           rs.getString("exception_message"),
           rs.getString("exception_stacktrace"));
-    }
-  }
-
-  private enum Operators {
-    GREATER_THAN_OR_EQUALS(">="),
-    LESS_THAN_OR_EQUALS("<=");
-
-    private final String operator;
-
-    Operators(String operator) {
-      this.operator = operator;
-    }
-
-    public String getOperator() {
-      return operator;
     }
   }
 }
