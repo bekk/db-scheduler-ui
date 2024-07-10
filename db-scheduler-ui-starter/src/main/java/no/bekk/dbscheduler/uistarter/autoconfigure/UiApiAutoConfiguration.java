@@ -76,12 +76,14 @@ public class UiApiAutoConfiguration {
       DataSource dataSource,
       Caching caching,
       DbSchedulerCustomizer customizer,
-      DbSchedulerUiProperties properties) {
+      DbSchedulerUiProperties properties,
+      @Value("${db-scheduler-log.table-name:scheduled_execution_logs}") String logTableName) {
     return new LogLogic(
         dataSource,
         customizer.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
         caching,
-        properties.isTaskData());
+        properties.isTaskData(),
+        logTableName);
   }
 
   @Bean

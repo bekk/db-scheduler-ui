@@ -14,6 +14,8 @@
 package no.bekk.dbscheduler.ui.service;
 
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -35,21 +37,33 @@ import no.bekk.dbscheduler.ui.util.QueryUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Service;
 
-@Service
 public class LogLogic {
 
-  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
   private static final int DEFAULT_LIMIT = 500;
+  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
   private final Caching caching;
   private final LogModelRowMapper logModelRowMapper;
+  private final String logTableName;
+  private final String databaseProductName;
 
-  public LogLogic(DataSource dataSource, Serializer serializer, Caching caching, boolean showData) {
+  public LogLogic(
+      DataSource dataSource,
+      Serializer serializer,
+      Caching caching,
+      boolean showData,
+      String logTableName) {
+    try (Connection connection = dataSource.getConnection()) {
+      DatabaseMetaData metaData = connection.getMetaData();
+      databaseProductName = metaData.getDatabaseProductName();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
     this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     // currently we have no paging in the UI
     this.namedParameterJdbcTemplate.getJdbcTemplate().setMaxRows(DEFAULT_LIMIT);
     this.caching = caching;
+    this.logTableName = logTableName;
     this.logModelRowMapper =
         new LogModelRowMapper(
             showData, serializer == null ? Serializer.DEFAULT_JAVA_SERIALIZER : serializer);
@@ -81,7 +95,7 @@ public class LogLogic {
   }
 
   public List<LogModel> getLogsDirectlyFromDB(TaskDetailsRequestParams requestParams) {
-    QueryBuilder queryBuilder = QueryBuilder.selectFromTable("scheduled_execution_logs");
+    QueryBuilder queryBuilder = QueryBuilder.selectFromTable(logTableName);
     if (requestParams.getStartTime() != null) {
       queryBuilder.andCondition(
           new TimeCondition(
@@ -98,7 +112,8 @@ public class LogLogic {
     }
     if (requestParams.getFilter() != null
         && requestParams.getFilter() != TaskRequestParams.TaskFilter.ALL) {
-      queryBuilder.andCondition(new FilterCondition(requestParams.getFilter()));
+      queryBuilder.andCondition(
+          new FilterCondition(requestParams.getFilter(), databaseProductName));
     }
     if (requestParams.getSearchTermTaskName() != null) {
       queryBuilder.andCondition(
@@ -124,7 +139,23 @@ public class LogLogic {
         queryBuilder.getQuery(), queryBuilder.getParameters(), logModelRowMapper);
   }
 
+  private enum Operators {
+    GREATER_THAN_OR_EQUALS(">="),
+    LESS_THAN_OR_EQUALS("<=");
+
+    private final String operator;
+
+    Operators(String operator) {
+      this.operator = operator;
+    }
+
+    public String getOperator() {
+      return operator;
+    }
+  }
+
   private static class TimeCondition implements AndCondition {
+
     private final String varName;
     private final String operator;
     private final Instant value;
@@ -147,6 +178,7 @@ public class LogLogic {
   }
 
   private static class SearchCondition implements AndCondition {
+
     private final String searchTerm;
     private final Map<String, Object> params;
 
@@ -176,17 +208,21 @@ public class LogLogic {
   }
 
   public static class FilterCondition implements AndCondition {
-    private final TaskRequestParams.TaskFilter filterCondition;
 
-    public FilterCondition(TaskRequestParams.TaskFilter filterCondition) {
+    private final TaskRequestParams.TaskFilter filterCondition;
+    private final String databaseProductName;
+
+    public FilterCondition(
+        TaskRequestParams.TaskFilter filterCondition, String databaseProductName) {
       this.filterCondition = filterCondition;
+      this.databaseProductName = databaseProductName;
     }
 
     @Override
     public String getQueryPart() {
       return filterCondition == TaskRequestParams.TaskFilter.SUCCEEDED
-          ? "succeeded = TRUE"
-          : "succeeded = FALSE";
+          ? databaseProductName.equals("Oracle") ? "succeeded = 1" : "succeeded = TRUE"
+          : databaseProductName.equals("Oracle") ? "succeeded = 0" : "succeeded = FALSE";
     }
 
     @Override
@@ -197,6 +233,7 @@ public class LogLogic {
 
   @RequiredArgsConstructor
   public static class LogModelRowMapper implements RowMapper<LogModel> {
+
     private final boolean showData;
     private final Serializer serializer;
 
@@ -222,21 +259,6 @@ public class LogLogic {
           rs.getString("exception_class"),
           rs.getString("exception_message"),
           rs.getString("exception_stacktrace"));
-    }
-  }
-
-  private enum Operators {
-    GREATER_THAN_OR_EQUALS(">="),
-    LESS_THAN_OR_EQUALS("<=");
-
-    private final String operator;
-
-    Operators(String operator) {
-      this.operator = operator;
-    }
-
-    public String getOperator() {
-      return operator;
     }
   }
 }

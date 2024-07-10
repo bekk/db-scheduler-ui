@@ -19,25 +19,29 @@ import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-import no.bekk.dbscheduler.ui.model.*;
+import no.bekk.dbscheduler.ui.model.GetTasksResponse;
+import no.bekk.dbscheduler.ui.model.PollResponse;
+import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
+import no.bekk.dbscheduler.ui.model.TaskModel;
+import no.bekk.dbscheduler.ui.model.TaskRequestParams;
 import no.bekk.dbscheduler.ui.util.Caching;
 import no.bekk.dbscheduler.ui.util.QueryUtils;
 import no.bekk.dbscheduler.ui.util.mapper.TaskMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-@Service
 public class TaskLogic {
 
   private final Scheduler scheduler;
   private final Caching caching;
   private final boolean showData;
 
-  @Autowired
   public TaskLogic(Scheduler scheduler, Caching caching, boolean showData) {
     this.scheduler = scheduler;
     this.scheduler.start();
@@ -76,7 +80,6 @@ public class TaskLogic {
                   System.out.println("Failed to run task: " + e.getMessage());
                 }
               }
-              ;
             });
   }
 
@@ -222,11 +225,17 @@ public class TaskLogic {
       Set<String> newRunningTaskNames,
       String taskName,
       String status) {
-    if (newTaskNames.contains(taskName) && params.getTaskName() == null) return;
+    if (newTaskNames.contains(taskName) && params.getTaskName() == null) {
+      return;
+    }
 
     newTaskNames.add(taskName);
-    if (status.charAt(0) == '1') newFailureTaskNames.add(taskName);
-    if (status.charAt(1) == '1') newRunningTaskNames.add(taskName);
+    if (status.charAt(0) == '1') {
+      newFailureTaskNames.add(taskName);
+    }
+    if (status.charAt(1) == '1') {
+      newRunningTaskNames.add(taskName);
+    }
   }
 
   private void handleStatusChange(
@@ -243,14 +252,18 @@ public class TaskLogic {
         && (!newFailureTaskNames.contains(taskName) || params.getTaskName() != null)) {
       newFailureTaskNames.add(taskName);
     }
-    if (cachedStatus.charAt(0) == '1' && status.charAt(0) == '0') stoppedFailing++;
+    if (cachedStatus.charAt(0) == '1' && status.charAt(0) == '0') {
+      stoppedFailing++;
+    }
 
     if (cachedStatus.charAt(1) == '0'
         && status.charAt(1) == '1'
         && (!newRunningTaskNames.contains(taskName) || params.getTaskName() != null)) {
       newRunningTaskNames.add(taskName);
     }
-    if (cachedStatus.charAt(1) == '1' && status.charAt(1) == '0') finishedRunning++;
+    if (cachedStatus.charAt(1) == '1' && status.charAt(1) == '0') {
+      finishedRunning++;
+    }
   }
 
   private String getStatus(ScheduledExecution<Object> task) {

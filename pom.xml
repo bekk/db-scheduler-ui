@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-parent</artifactId>
@@ -248,7 +249,8 @@
                                     <maven-central>
                                         <active>ALWAYS</active>
                                         <url>https://oss.sonatype.org/service/local/</url>
-                                        <snapshotUrl>https://oss.sonatype.org/content/repositories/snapshots</snapshotUrl>
+                                        <snapshotUrl>https://oss.sonatype.org/content/repositories/snapshots
+                                        </snapshotUrl>
                                         <closeRepository>true</closeRepository>
                                         <releaseRepository>true</releaseRepository>
                                         <stagingRepositories>target/staging-deploy</stagingRepositories>
@@ -297,6 +299,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
+                <version>3.4.0</version>
                 <configuration>
                     <filesets>
                         <fileset>

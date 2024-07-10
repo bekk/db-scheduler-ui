@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import no.bekk.dbscheduler.ui.model.TaskModel;
 
 public class TaskMapper {
+
   public static List<TaskModel> mapScheduledExecutionsToTaskModel(
       List<ScheduledExecution<Object>> scheduledExecutions) {
     return scheduledExecutions.stream()
@@ -63,7 +64,7 @@ public class TaskMapper {
                       .collect(Collectors.toList()));
               taskModel.setPicked(
                   taskModels.stream()
-                      .map(TaskModel::isPicked)
+                      .map(TaskModel::getPicked)
                       .flatMap(List::stream)
                       .collect(Collectors.toList()));
               taskModel.setPickedBy(
@@ -90,11 +91,6 @@ public class TaskMapper {
               return taskModel;
             })
         .collect(Collectors.toList());
-  }
-
-  public static List<TaskModel> mapAllExecutionsToTaskModel(
-      List<ScheduledExecution<Object>> scheduledExecutions) {
-    return groupTasks(mapScheduledExecutionsToTaskModel(scheduledExecutions));
   }
 
   public static List<TaskModel> mapAllExecutionsToTaskModelUngrouped(

@@ -44,12 +44,13 @@ public class QueryUtils {
                 case FAILED:
                   return task.getConsecutiveFailures().stream().anyMatch(failures -> failures != 0);
                 case RUNNING:
-                  return task.isPicked().stream().anyMatch(Boolean::booleanValue);
+                  return task.getPicked().stream().anyMatch(Boolean::booleanValue);
                 case SCHEDULED:
-                  return IntStream.range(0, task.isPicked().size())
+                  return IntStream.range(0, task.getPicked().size())
                       .anyMatch(
                           i ->
-                              !task.isPicked().get(i) && task.getConsecutiveFailures().get(i) == 0);
+                              !task.getPicked().get(i)
+                                  && task.getConsecutiveFailures().get(i) == 0);
                 default:
                   return true;
               }
