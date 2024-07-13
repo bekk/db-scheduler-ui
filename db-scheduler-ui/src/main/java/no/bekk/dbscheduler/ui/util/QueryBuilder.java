@@ -22,18 +22,22 @@ import java.util.Optional;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 public class QueryBuilder {
+
   private final String tableName;
+  private final String databaseProductName;
 
   private final List<AndCondition> andConditions = new ArrayList<>();
 
   private Optional<String> orderBy = empty();
+  private int limit;
 
-  QueryBuilder(String tableName) {
+  QueryBuilder(String tableName, String databaseProductName) {
     this.tableName = tableName;
+    this.databaseProductName = databaseProductName;
   }
 
-  public static QueryBuilder selectFromTable(String tableName) {
-    return new QueryBuilder(tableName);
+  public static QueryBuilder selectFromTable(String tableName, String databaseProductName) {
+    return new QueryBuilder(tableName, databaseProductName);
   }
 
   public QueryBuilder andCondition(AndCondition andCondition) {
@@ -48,7 +52,13 @@ public class QueryBuilder {
 
   public String getQuery() {
     StringBuilder s = new StringBuilder();
-    s.append("SELECT * FROM ").append(tableName);
+    s.append("SELECT");
+
+    if (limit > 0 && databaseProductName.equals("Microsoft SQL Server")) {
+      s.append(" TOP ").append(limit);
+    }
+
+    s.append(" * FROM ").append(tableName);
 
     if (!andConditions.isEmpty()) {
       s.append(" WHERE ");
@@ -57,6 +67,14 @@ public class QueryBuilder {
 
     orderBy.ifPresent(o -> s.append(" ORDER BY ").append(o));
 
+    if (limit > 0) {
+      if (databaseProductName.equals("Oracle")) {
+        s.append(" FETCH NEXT ").append(limit).append(" ROWS ONLY");
+      } else if (!databaseProductName.equals("Microsoft SQL Server")) {
+        s.append(" LIMIT ").append(limit);
+      }
+    }
+
     return s.toString();
   }
 
@@ -64,5 +82,9 @@ public class QueryBuilder {
     MapSqlParameterSource parameterSource = new MapSqlParameterSource();
     andConditions.forEach(c -> c.setParameters(parameterSource));
     return parameterSource;
+  }
+
+  public void limit(int logLimit) {
+    this.limit = logLimit;
   }
 }

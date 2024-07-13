@@ -14,8 +14,9 @@
 package no.bekk.dbscheduler.ui.model;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import lombok.Getter;
 
+@Getter
 public class TaskRequestParams {
 
   private final TaskFilter filter;
@@ -23,16 +24,13 @@ public class TaskRequestParams {
   private final int size;
   private final TaskSort sorting;
   private final boolean asc;
-  private boolean refresh;
   private final String searchTermTaskName;
-
   private final String searchTermTaskInstance;
-
   private final boolean taskNameExactMatch;
-
   private final boolean taskInstanceExactMatch;
   private final Instant startTime;
   private final Instant endTime;
+  private final boolean refresh;
 
   public TaskRequestParams(
       TaskFilter filter,
@@ -56,61 +54,9 @@ public class TaskRequestParams {
     this.searchTermTaskInstance = searchTermTaskInstance;
     this.taskNameExactMatch = taskNameExactMatch != null ? taskNameExactMatch : false;
     this.taskInstanceExactMatch = taskInstanceExactMatch != null ? taskInstanceExactMatch : false;
-    this.startTime = startTime != null ? startTime : Instant.now().minus(50, ChronoUnit.DAYS);
-    this.endTime = endTime != null ? endTime : Instant.now().plus(50, ChronoUnit.DAYS);
+    this.startTime = startTime;
+    this.endTime = endTime;
     this.refresh = refresh != null ? refresh : true;
-  }
-
-  public TaskFilter getFilter() {
-    return filter;
-  }
-
-  public int getPageNumber() {
-    return pageNumber;
-  }
-
-  public int getSize() {
-    return size;
-  }
-
-  public TaskSort getSorting() {
-    return sorting;
-  }
-
-  public boolean isAsc() {
-    return asc;
-  }
-
-  public boolean isRefresh() {
-    return refresh;
-  }
-
-  public String getSearchTermTaskName() {
-    return searchTermTaskName;
-  }
-
-  public String getSearchTermTaskInstance() {
-    return searchTermTaskInstance;
-  }
-
-  public boolean isTaskNameExactMatch() {
-    return taskNameExactMatch;
-  }
-
-  public boolean isTaskInstanceExactMatch() {
-    return taskInstanceExactMatch;
-  }
-
-  public void setRefresh(boolean refresh) {
-    this.refresh = refresh;
-  }
-
-  public Instant getStartTime() {
-    return startTime;
-  }
-
-  public Instant getEndTime() {
-    return endTime;
   }
 
   public enum TaskFilter {

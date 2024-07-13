@@ -14,7 +14,9 @@
 package no.bekk.dbscheduler.ui.model;
 
 import java.time.Instant;
+import lombok.Getter;
 
+@Getter
 public class TaskDetailsRequestParams extends TaskRequestParams {
 
   private final String taskId;
@@ -50,13 +52,5 @@ public class TaskDetailsRequestParams extends TaskRequestParams {
         refresh);
     this.taskId = taskId;
     this.taskName = taskName;
-  }
-
-  public String getTaskId() {
-    return taskId;
-  }
-
-  public String getTaskName() {
-    return taskName;
   }
 }

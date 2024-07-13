@@ -46,13 +46,15 @@ public class LogLogic {
   private final LogModelRowMapper logModelRowMapper;
   private final String logTableName;
   private final String databaseProductName;
+  private final int logLimit;
 
   public LogLogic(
       DataSource dataSource,
       Serializer serializer,
       Caching caching,
       boolean showData,
-      String logTableName) {
+      String logTableName,
+      int logLimit) {
     try (Connection connection = dataSource.getConnection()) {
       DatabaseMetaData metaData = connection.getMetaData();
       databaseProductName = metaData.getDatabaseProductName();
@@ -64,6 +66,7 @@ public class LogLogic {
     this.namedParameterJdbcTemplate.getJdbcTemplate().setMaxRows(DEFAULT_LIMIT);
     this.caching = caching;
     this.logTableName = logTableName;
+    this.logLimit = logLimit;
     this.logModelRowMapper =
         new LogModelRowMapper(
             showData, serializer == null ? Serializer.DEFAULT_JAVA_SERIALIZER : serializer);
@@ -95,7 +98,7 @@ public class LogLogic {
   }
 
   public List<LogModel> getLogsDirectlyFromDB(TaskDetailsRequestParams requestParams) {
-    QueryBuilder queryBuilder = QueryBuilder.selectFromTable(logTableName);
+    QueryBuilder queryBuilder = QueryBuilder.selectFromTable(logTableName, databaseProductName);
     if (requestParams.getStartTime() != null) {
       queryBuilder.andCondition(
           new TimeCondition(
@@ -133,7 +136,11 @@ public class LogLogic {
               requestParams.isTaskInstanceExactMatch()));
     }
 
-    queryBuilder.orderBy(requestParams.isAsc() ? "time_finished desc" : "time_finished asc");
+    queryBuilder.orderBy(requestParams.isAsc() ? "id desc" : "id asc");
+
+    if (logLimit > 0) {
+      queryBuilder.limit(logLimit);
+    }
 
     return namedParameterJdbcTemplate.query(
         queryBuilder.getQuery(), queryBuilder.getParameters(), logModelRowMapper);
