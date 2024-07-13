@@ -21,7 +21,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @ConfigurationProperties("db-scheduler-ui")
 public class DbSchedulerUiProperties {
+
   private boolean enabled = true;
   private boolean taskData = true;
   private boolean history = false;
+  private int logLimit = 0;
 }

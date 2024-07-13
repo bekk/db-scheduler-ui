@@ -13,7 +13,11 @@
  */
 package no.bekk.dbscheduler.ui.model;
 
+import lombok.Getter;
+
+@Getter
 public class PollResponse {
+
   private final int newFailures;
   private final int newRunning;
   private final int newTasks;
@@ -27,25 +31,5 @@ public class PollResponse {
     this.newTasks = newTasks;
     this.stoppedFailing = stoppedFailing;
     this.finishedRunning = finishedRunning;
-  }
-
-  public int getNewFailures() {
-    return newFailures;
-  }
-
-  public int getNewRunning() {
-    return newRunning;
-  }
-
-  public int getNewTasks() {
-    return newTasks;
-  }
-
-  public int getStoppedFailing() {
-    return stoppedFailing;
-  }
-
-  public int getFinishedRunning() {
-    return finishedRunning;
   }
 }

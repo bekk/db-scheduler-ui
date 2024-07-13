@@ -13,21 +13,16 @@
  */
 package no.bekk.dbscheduler.ui.model;
 
+import lombok.Getter;
+
+@Getter
 public class LogPollResponse {
+
+  private final int newFailures;
+  private final int newSucceeded;
+
   public LogPollResponse(int newFailures, int newSucceeded) {
     this.newFailures = newFailures;
     this.newSucceeded = newSucceeded;
   }
-
-  private final int newFailures;
-
-  public int getNewFailures() {
-    return newFailures;
-  }
-
-  public int getNewSucceeded() {
-    return newSucceeded;
-  }
-
-  private final int newSucceeded;
 }
