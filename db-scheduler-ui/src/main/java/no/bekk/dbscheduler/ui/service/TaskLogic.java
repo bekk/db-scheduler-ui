@@ -44,7 +44,6 @@ public class TaskLogic {
 
   public TaskLogic(Scheduler scheduler, Caching caching, boolean showData) {
     this.scheduler = scheduler;
-    this.scheduler.start();
     this.caching = caching;
     this.showData = showData;
   }
