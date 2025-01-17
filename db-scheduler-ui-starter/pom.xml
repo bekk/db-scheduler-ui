@@ -15,6 +15,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>com.github.kagkarlsson</groupId>
             <artifactId>db-scheduler-spring-boot-starter</artifactId>
         </dependency>

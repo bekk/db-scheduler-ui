@@ -15,7 +15,7 @@ package com.github.bekk.exampleapp.tasks;
 
 import static utils.Utils.sleep;
 
-import com.github.kagkarlsson.scheduler.task.TaskWithoutDataDescriptor;
+import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.RecurringTask;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
@@ -26,8 +26,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RecurringTaskExample {
 
-  public static final TaskWithoutDataDescriptor RECURRING_TASK =
-      new TaskWithoutDataDescriptor("recurring-task");
+  public static final TaskDescriptor<Void> RECURRING_TASK =
+      TaskDescriptor.of("recurring-task");
 
   @Bean
   public RecurringTask<Void> getExample() {

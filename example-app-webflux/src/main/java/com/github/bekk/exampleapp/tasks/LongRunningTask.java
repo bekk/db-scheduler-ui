@@ -16,7 +16,7 @@ package com.github.bekk.exampleapp.tasks;
 import static utils.Utils.sleep;
 
 import com.github.kagkarlsson.scheduler.task.Task;
-import com.github.kagkarlsson.scheduler.task.TaskWithoutDataDescriptor;
+import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
 import org.springframework.context.annotation.Bean;
@@ -25,11 +25,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class LongRunningTask {
 
-  public static final TaskWithoutDataDescriptor LONG_RUNNING_ONETIME_TASK =
-      new TaskWithoutDataDescriptor("long-running-task");
+  public static final TaskDescriptor<Void> LONG_RUNNING_ONETIME_TASK =
+      TaskDescriptor.of("long-running-task");
 
-  public static final TaskWithoutDataDescriptor LONG_RUNNING_RECURRING_TASK =
-      new TaskWithoutDataDescriptor("long-running-recurring-task");
+  public static final TaskDescriptor<Void> LONG_RUNNING_RECURRING_TASK =
+      TaskDescriptor.of("long-running-recurring-task");
 
   @Bean
   public Task<?> runLongRunningTask() {

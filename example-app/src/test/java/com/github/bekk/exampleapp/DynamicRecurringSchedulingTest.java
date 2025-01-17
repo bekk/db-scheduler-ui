@@ -41,8 +41,8 @@ public class DynamicRecurringSchedulingTest {
     CronSchedule cron = Schedules.cron("0 0/1 * * * *"); // every minute
     TaskScheduleAndNoData data = new TaskScheduleAndNoData(cron);
 
-    schedulerClient.schedule(
-        DYNAMIC_RECURRING_TASK.instance("single_instance", data),
+    schedulerClient.scheduleIfNotExists(
+        DYNAMIC_RECURRING_TASK.instance("single_instance").data(data).build(),
         cron.getInitialExecutionTime(Instant.now()));
 
     // When
@@ -54,7 +54,7 @@ public class DynamicRecurringSchedulingTest {
             GetTasksResponse.class);
 
     // Then
-    Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
+    Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
     result.getBody().getItems().forEach(t -> System.out.println(t.getTaskName()));
     assertThat(result.getBody().getItems())
         .anyMatch(

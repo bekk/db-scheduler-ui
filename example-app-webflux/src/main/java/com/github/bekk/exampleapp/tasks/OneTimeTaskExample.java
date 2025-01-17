@@ -15,7 +15,7 @@ package com.github.bekk.exampleapp.tasks;
 
 import com.github.bekk.exampleapp.model.TaskData;
 import com.github.kagkarlsson.scheduler.task.Task;
-import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
+import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +23,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OneTimeTaskExample {
 
-  public static final TaskWithDataDescriptor<TaskData> ONE_TIME_TASK =
-      new TaskWithDataDescriptor<>("onetime-task", TaskData.class);
+  public static final TaskDescriptor<TaskData> ONE_TIME_TASK =
+      TaskDescriptor.of("onetime-task", TaskData.class);
 
   @Bean
   public Task<TaskData> exampleOneTimeTask() {

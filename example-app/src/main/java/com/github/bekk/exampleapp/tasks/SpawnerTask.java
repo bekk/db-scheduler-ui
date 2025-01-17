@@ -18,8 +18,7 @@ import static utils.Utils.sleep;
 import com.github.bekk.exampleapp.model.TaskData;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.Task;
-import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
-import com.github.kagkarlsson.scheduler.task.TaskWithoutDataDescriptor;
+import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
 import java.time.Instant;
@@ -31,11 +30,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SpawnerTask {
 
-  public static final TaskWithoutDataDescriptor RECURRING_SPAWNER_TASK =
-      new TaskWithoutDataDescriptor("recurring-spawner-task");
+  public static final TaskDescriptor<Void> RECURRING_SPAWNER_TASK =
+      TaskDescriptor.of("recurring-spawner-task");
 
-  public static final TaskWithDataDescriptor<TaskData> ONE_TIME_SPAWNER_TASK =
-      new TaskWithDataDescriptor<>("onetime-spawned-task", TaskData.class);
+  public static final TaskDescriptor<TaskData> ONE_TIME_SPAWNER_TASK =
+      TaskDescriptor.of("onetime-spawned-task", TaskData.class);
 
   @Bean
   public Task<?> runSpawner() {
@@ -46,10 +45,10 @@ public class SpawnerTask {
               final long randomUUID = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
 
               for (int i = 0; i < 100; i++) {
-                client.schedule(
-                    ONE_TIME_SPAWNER_TASK.instance(
-                        "spawned " + randomUUID + " loopnr: " + i,
-                        new TaskData(123, "{data: MASSIVEDATA}", Instant.now())),
+                client.scheduleIfNotExists(
+                    ONE_TIME_SPAWNER_TASK.instance("spawned " + randomUUID + " loopnr: " + i)
+                        .data(new TaskData(123, "{data: MASSIVEDATA}", Instant.now()))
+                        .build(),
                     Instant.now().plusSeconds(60));
               }
             });

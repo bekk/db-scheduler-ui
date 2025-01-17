@@ -18,7 +18,7 @@ import static utils.Utils.sleep;
 import com.github.bekk.exampleapp.model.TestObject;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.Task;
-import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
+import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 import java.time.Instant;
 import org.springframework.context.annotation.Bean;
@@ -27,11 +27,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ChainTask {
 
-  public static final TaskWithDataDescriptor<TestObject> CHAINED_STEP_1_TASK =
-      new TaskWithDataDescriptor<>("chained-step-1", TestObject.class);
+  public static final TaskDescriptor<TestObject> CHAINED_STEP_1_TASK =
+      TaskDescriptor.of("chained-step-1", TestObject.class);
 
-  public static final TaskWithDataDescriptor<TestObject> CHAINED_STEP_2_TASK =
-      new TaskWithDataDescriptor<>("chained-step-2", TestObject.class);
+  public static final TaskDescriptor<TestObject> CHAINED_STEP_2_TASK =
+      TaskDescriptor.of("chained-step-2", TestObject.class);
 
   @Bean
   public Task<TestObject> chainTaskStepOne() {
@@ -47,8 +47,9 @@ public class ChainTask {
                       + inst.getId());
               TestObject data = inst.getData();
               data.setId(data.getId() + 1);
-              client.schedule(
-                  CHAINED_STEP_2_TASK.instance(inst.getId(), data), Instant.now().plusSeconds(10));
+              client.scheduleIfNotExists(
+                  CHAINED_STEP_2_TASK.instance(inst.getId()).data( data).build(),
+                  Instant.now().plusSeconds(10));
             });
   }
 
@@ -66,8 +67,9 @@ public class ChainTask {
                       + inst.getId());
               TestObject data = inst.getData();
               data.setId(data.getId() + 1);
-              client.schedule(
-                  CHAINED_STEP_1_TASK.instance(inst.getId(), data), Instant.now().plusSeconds(20));
+              client.scheduleIfNotExists(
+                  CHAINED_STEP_1_TASK.instance(inst.getId()).data( data).build(),
+                  Instant.now().plusSeconds(20));
             });
   }
 }
