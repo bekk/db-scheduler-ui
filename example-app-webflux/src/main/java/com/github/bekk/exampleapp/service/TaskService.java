@@ -39,10 +39,14 @@ public class TaskService {
         Instant.now());
 
     scheduler.schedule(
-        CHAINED_STEP_1_TASK.instance("3").data(new TestObject("Ole Nordman", 1, "ole.nordman@mail.com")).build(),
+        CHAINED_STEP_1_TASK
+            .instance("3")
+            .data(new TestObject("Ole Nordman", 1, "ole.nordman@mail.com"))
+            .build(),
         Instant.now());
 
-    scheduler.schedule(LONG_RUNNING_ONETIME_TASK.instance("5").build(), Instant.now().plusSeconds(2));
+    scheduler.schedule(
+        LONG_RUNNING_ONETIME_TASK.instance("5").build(), Instant.now().plusSeconds(2));
     scheduler.schedule(FAILING_ONETIME_TASK.instance("6").build(), Instant.now().plusSeconds(2));
   }
 }

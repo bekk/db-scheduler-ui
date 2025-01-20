@@ -35,14 +35,18 @@ public class TaskService {
 
   public void runManuallyTriggeredTasks() {
     scheduler.schedule(
-        ONE_TIME_TASK.instance("1").data( new TaskData(1, "test data", Instant.now())).build(),
+        ONE_TIME_TASK.instance("1").data(new TaskData(1, "test data", Instant.now())).build(),
         Instant.now());
 
     scheduler.schedule(
-        CHAINED_STEP_1_TASK.instance("3").data(new TestObject("Ole Nordman", 1, "ole.nordman@mail.com")).build(),
+        CHAINED_STEP_1_TASK
+            .instance("3")
+            .data(new TestObject("Ole Nordman", 1, "ole.nordman@mail.com"))
+            .build(),
         Instant.now());
 
-    scheduler.schedule(LONG_RUNNING_ONETIME_TASK.instance("5").build(), Instant.now().plusSeconds(2));
+    scheduler.schedule(
+        LONG_RUNNING_ONETIME_TASK.instance("5").build(), Instant.now().plusSeconds(2));
     scheduler.schedule(FAILING_ONETIME_TASK.instance("6").build(), Instant.now().plusSeconds(2));
   }
 }

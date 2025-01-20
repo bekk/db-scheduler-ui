@@ -26,8 +26,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RecurringTaskExample {
 
-  public static final TaskDescriptor<Void> RECURRING_TASK =
-      TaskDescriptor.of("recurring-task");
+  public static final TaskDescriptor<Void> RECURRING_TASK = TaskDescriptor.of("recurring-task");
 
   @Bean
   public RecurringTask<Void> getExample() {

@@ -46,7 +46,8 @@ public class SpawnerTask {
 
               for (int i = 0; i < 100; i++) {
                 client.scheduleIfNotExists(
-                    ONE_TIME_SPAWNER_TASK.instance("spawned " + randomUUID + " loopnr: " + i)
+                    ONE_TIME_SPAWNER_TASK
+                        .instance("spawned " + randomUUID + " loopnr: " + i)
                         .data(new TaskData(123, "{data: MASSIVEDATA}", Instant.now()))
                         .build(),
                     Instant.now().plusSeconds(60));

@@ -48,7 +48,7 @@ public class ChainTask {
               TestObject data = inst.getData();
               data.setId(data.getId() + 1);
               client.scheduleIfNotExists(
-                  CHAINED_STEP_2_TASK.instance(inst.getId()).data( data).build(),
+                  CHAINED_STEP_2_TASK.instance(inst.getId()).data(data).build(),
                   Instant.now().plusSeconds(10));
             });
   }
@@ -68,7 +68,7 @@ public class ChainTask {
               TestObject data = inst.getData();
               data.setId(data.getId() + 1);
               client.scheduleIfNotExists(
-                  CHAINED_STEP_1_TASK.instance(inst.getId()).data( data).build(),
+                  CHAINED_STEP_1_TASK.instance(inst.getId()).data(data).build(),
                   Instant.now().plusSeconds(20));
             });
   }
