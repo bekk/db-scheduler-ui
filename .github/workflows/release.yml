@@ -36,7 +36,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
           gpg-private-key: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
           gpg-passphrase: JRELEASER_GPG_PASSPHRASE

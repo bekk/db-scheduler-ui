@@ -17,7 +17,7 @@ import static java.time.Duration.ofSeconds;
 
 import com.github.kagkarlsson.scheduler.task.FailureHandler;
 import com.github.kagkarlsson.scheduler.task.Task;
-import com.github.kagkarlsson.scheduler.task.TaskWithoutDataDescriptor;
+import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
 import org.springframework.context.annotation.Bean;
@@ -26,14 +26,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FailingTask {
 
-  public static final TaskWithoutDataDescriptor FAILING_ONETIME_TASK =
-      new TaskWithoutDataDescriptor("failing-one-time-task");
+  public static final TaskDescriptor<Void> FAILING_ONETIME_TASK =
+      TaskDescriptor.of("failing-one-time-task");
 
-  public static final TaskWithoutDataDescriptor FAILING_RECURRING_TASK =
-      new TaskWithoutDataDescriptor("failing-recurring-task");
+  public static final TaskDescriptor<Void> FAILING_RECURRING_TASK =
+      TaskDescriptor.of("failing-recurring-task");
 
-  public static final TaskWithoutDataDescriptor FAILING_ONETIME_TASK_BACKOFF =
-      new TaskWithoutDataDescriptor("failing-one-time-with-backoff-task");
+  public static final TaskDescriptor<Void> FAILING_ONETIME_TASK_BACKOFF =
+      TaskDescriptor.of("failing-one-time-with-backoff-task");
 
   @Bean
   public Task<?> runOneTimeFailing() {

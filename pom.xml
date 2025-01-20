@@ -69,9 +69,9 @@
     </distributionManagement>
 
     <properties>
-        <maven.compiler.release>11</maven.compiler.release>
-        <spring-boot.version>2.7.18</spring-boot.version>
-        <db-scheduler.version>14.0.0</db-scheduler.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <spring-boot.version>3.4.1</spring-boot.version>
+        <db-scheduler.version>15.1.1</db-scheduler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -80,7 +80,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.10.2</version>
+                <version>5.11.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -118,12 +118,12 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.1.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -136,7 +136,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.7.0</version>
+                    <version>3.11.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -146,7 +146,7 @@
                 <plugin>
                     <groupId>org.jreleaser</groupId>
                     <artifactId>jreleaser-maven-plugin</artifactId>
-                    <version>1.12.0</version>
+                    <version>1.16.0</version>
                     <configuration>
                         <jreleaser>
                             <release>
@@ -193,7 +193,7 @@
             <plugin>
                 <groupId>com.github.ekryd.sortpom</groupId>
                 <artifactId>sortpom-maven-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>4.0.0</version>
                 <configuration>
                     <nrOfIndentSpace>4</nrOfIndentSpace>
                     <createBackupFile>false</createBackupFile>
@@ -218,7 +218,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.2.7</version>
                 <configuration>
                     <gpgArguments>
                         <arg>--pinentry-mode</arg>
@@ -264,7 +264,7 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>4.5</version>
+                <version>4.6</version>
                 <configuration>
                     <mapping>
                         <ts>SLASHSTAR_STYLE</ts>
@@ -313,7 +313,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.5.0</version>
                 <inherited>false</inherited>
                 <executions>
                     <execution>
