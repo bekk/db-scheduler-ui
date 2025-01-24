@@ -60,8 +60,9 @@ export const pollTasks = async (
       'Content-Type': 'application/json',
     },
   });
-
-  if (!response.ok) {
+  if (response.status == 401) {
+    document.location.href = '/db-scheduler';
+  } else if (!response.ok) {
     throw new Error(`Error polling tasks. Status: ${response.statusText}`);
   }
 

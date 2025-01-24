@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        spring-boot: [ '3.3.7', '3.4.1' ]
+        spring-boot: [ '3.3.8', '3.4.2' ]
 
     steps:
       - name: Checkout repo

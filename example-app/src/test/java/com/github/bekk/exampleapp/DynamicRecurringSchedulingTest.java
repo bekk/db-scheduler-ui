@@ -8,27 +8,27 @@ import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.schedule.CronSchedule;
 import com.github.kagkarlsson.scheduler.task.schedule.Schedules;
 import java.time.Instant;
-import no.bekk.dbscheduler.ui.controller.TaskController;
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = {ExampleApp.class},
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class DynamicRecurringSchedulingTest {
+@EnableAutoConfiguration(
+    exclude = {SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class})
+class DynamicRecurringSchedulingTest {
 
-  @Autowired TaskController controller;
   @LocalServerPort private Integer serverPort;
   private String baseUrl;
   @Autowired private TestRestTemplate restTemplate;
@@ -36,7 +36,7 @@ public class DynamicRecurringSchedulingTest {
   @Autowired private SchedulerClient schedulerClient;
 
   @Test
-  public void testGetTasksReturnsDynamicRecurringTask() {
+  void testGetTasksReturnsDynamicRecurringTask() {
     // Given
     CronSchedule cron = Schedules.cron("0 0/1 * * * *"); // every minute
     TaskScheduleAndNoData data = new TaskScheduleAndNoData(cron);

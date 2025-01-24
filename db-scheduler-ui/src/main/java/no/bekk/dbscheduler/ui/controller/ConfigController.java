@@ -13,6 +13,7 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
+import java.util.function.Supplier;
 import no.bekk.dbscheduler.ui.model.ConfigResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,13 +26,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConfigController {
 
   private final boolean showHistory;
+  private final Supplier<Boolean> readOnly;
 
-  public ConfigController(boolean showHistory) {
+  public ConfigController(boolean showHistory, Supplier<Boolean> readOnly) {
     this.showHistory = showHistory;
+    this.readOnly = readOnly;
   }
 
   @GetMapping
   public ConfigResponse getConfig() {
-    return new ConfigResponse(showHistory);
+    return new ConfigResponse(showHistory, readOnly.get());
   }
 }

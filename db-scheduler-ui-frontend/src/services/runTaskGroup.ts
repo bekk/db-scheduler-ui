@@ -23,7 +23,9 @@ const runTaskGroup = async (name: string, onlyFailed: boolean) => {
     },
   );
 
-  if (!response.ok) {
+  if (response.status == 401) {
+    document.location.href = '/db-scheduler';
+  } else if (!response.ok) {
     throw new Error(`Error executing task. Status: ${response.statusText}`);
   }
 };

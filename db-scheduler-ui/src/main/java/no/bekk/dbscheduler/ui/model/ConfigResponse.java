@@ -22,4 +22,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ConfigResponse {
   private boolean showHistory;
+  private boolean readOnly;
 }

@@ -3,7 +3,7 @@ package com.github.bekk.exampleapp;
 import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.ONE_TIME_TASK;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import no.bekk.dbscheduler.ui.controller.TaskController;
+import no.bekk.dbscheduler.ui.controller.TaskAdminController;
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SmokeTest {
 
-  @Autowired TaskController controller;
+  @Autowired TaskAdminController controller;
   @LocalServerPort private Integer serverPort;
   private String baseUrl;
   @Autowired private TestRestTemplate restTemplate;

@@ -34,7 +34,9 @@ const runTask = async (id: string, name: string, scheduleTime?:Date) => {
     },
   );
 
-  if (!response.ok) {
+  if (response.status == 401) {
+    document.location.href = '/db-scheduler';
+  } else if (!response.ok) {
     throw new Error(`Error executing task. Status: ${response.statusText}`);
   }
 };

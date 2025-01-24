@@ -62,7 +62,9 @@ export const getLogs = async (
     },
   });
 
-  if (!response.ok) {
+  if (response.status == 401) {
+    document.location.href = '/db-scheduler';
+  } else if (!response.ok) {
     throw new Error(`Error fetching logs. Status: ${response.statusText}`);
   }
 
