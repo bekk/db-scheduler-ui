@@ -1,6 +1,6 @@
 package com.github.bekk.exampleapp;
 
-import static com.github.bekk.exampleapp.tasks.FailingTask.FAILING_ONETIME_TASK;
+import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.ONE_TIME_TASK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.BOOLEAN;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -178,8 +178,8 @@ class SmokeSpringSecurityTest {
     ResponseEntity<Void> result =
         userRestTemplate.postForEntity(
             baseUrl
-                + "/db-scheduler-api/tasks/delete?id=%d&name=%s"
-                    .formatted(6, FAILING_ONETIME_TASK.getTaskName()),
+                + "/db-scheduler-api/tasks/delete?id=%s&name=%s"
+                    .formatted("delete-2", ONE_TIME_TASK.getTaskName()),
             null,
             Void.class);
 
@@ -191,8 +191,8 @@ class SmokeSpringSecurityTest {
     ResponseEntity<Void> result =
         adminRestTemplate.postForEntity(
             baseUrl
-                + "/db-scheduler-api/tasks/delete?id=%d&name=%s"
-                    .formatted(6, FAILING_ONETIME_TASK.getTaskName()),
+                + "/db-scheduler-api/tasks/delete?id=%s&name=%s"
+                    .formatted("delete-2", ONE_TIME_TASK.getTaskName()),
             null,
             Void.class);
 
