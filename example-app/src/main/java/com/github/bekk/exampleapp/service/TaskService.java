@@ -48,5 +48,19 @@ public class TaskService {
     scheduler.schedule(
         LONG_RUNNING_ONETIME_TASK.instance("5").build(), Instant.now().plusSeconds(2));
     scheduler.schedule(FAILING_ONETIME_TASK.instance("6").build(), Instant.now().plusSeconds(2));
+
+    scheduler.schedule(
+        ONE_TIME_TASK
+            .instance("delete-1")
+            .data(new TaskData(-1, "task 1 to delete", Instant.now()))
+            .build(),
+        Instant.now());
+
+    scheduler.schedule(
+        ONE_TIME_TASK
+            .instance("delete-2")
+            .data(new TaskData(-2, "task 2 to delete", Instant.now()))
+            .build(),
+        Instant.now());
   }
 }

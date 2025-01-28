@@ -23,6 +23,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class DbSchedulerUiProperties {
 
   private boolean enabled = true;
+  private boolean readOnly = false;
   private boolean taskData = true;
   private boolean history = false;
   private int logLimit = 0;

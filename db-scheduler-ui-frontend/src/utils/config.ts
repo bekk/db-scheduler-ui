@@ -19,4 +19,7 @@ const config = await fetch('/db-scheduler-api/config').then((res) =>
 const showHistory =
   'showHistory' in config ? Boolean(config.showHistory) : false;
 
+const readOnly = 'readOnly' in config ? Boolean(config.readOnly) : false;
+
 export const getShowHistory = (): boolean => showHistory;
+export const getReadonly = (): boolean => readOnly;

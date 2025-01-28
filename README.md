@@ -41,7 +41,7 @@ dashboard for monitoring and basic administration of tasks.
 <dependency>
     <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-starter</artifactId>
-    <version>1.0.1</version>
+    <version>4.0.0</version>
 </dependency>
 ```
 
@@ -92,6 +92,59 @@ If you for some reason want to hide the task data you can set this to false. def
 
 ```
 db-scheduler-ui.task-data=false
+```
+
+Or if you want a _read-only_ mode (in which tasks cannot be manually run, deleted or scheduled) set `read-only` to `true`, defaults to `false`
+
+````
+db-scheduler-ui.read-only=true
+````
+
+## Security
+
+In case you want to secure db-scheduler-ui you can use [Spring Security](https://spring.io/projects/spring-security), you should secure the paths `/db-scheduler` and `/db-scheduler-api`.
+
+In a more advanced scenario, you could assign an _admin role_ and a _read-only user_ role.
+An example _filter chain_ with basic security:
+```java
+@Bean
+SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  return http
+      .csrf(CsrfConfigurer::disable)
+      .authorizeHttpRequests(
+          authz ->
+              authz
+                  // protect the UI
+                  .requestMatchers("/db-scheduler/**").hasAnyRole("ADMIN", "USER")
+                  // allow read access to the API for both users and admins
+                  .requestMatchers(HttpMethod.GET, "/db-scheduler-api/**").hasAnyRole("ADMIN", "USER")
+                  // only admins can delete tasks, alter scheduling, ...
+                  .requestMatchers(HttpMethod.POST, "/db-scheduler-api/**").hasAnyRole("ADMIN")
+                  // other application specific security
+                  .anyRequest().permitAll())
+      .httpBasic(withDefaults())
+      .build();
+}
+```
+additionally you might want to hide delete, run, ... buttons in the UI. To achieve this, declare the following bean:
+```java
+@Bean
+ConfigController configController(DbSchedulerUiProperties properties) {
+  return new ConfigController(properties.isHistory(), readOnly(properties));
+}
+
+private Supplier<Boolean> readOnly(DbSchedulerUiProperties properties) {
+  // either global readonly mode is active or user has no admin rights  
+  return () -> properties.isReadOnly() || !isAdmin();
+}
+
+private boolean isAdmin() {
+  Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+  if (auth == null) {
+    return false;
+  }
+  return auth.getAuthorities().stream().anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+}
 ```
 
 ## Contributing

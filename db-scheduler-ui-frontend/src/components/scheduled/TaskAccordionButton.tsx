@@ -30,6 +30,7 @@ import { NumberCircleGroup } from 'src/components/common/NumberCircleGroup';
 import { AttachmentIcon } from '@chakra-ui/icons';
 import { determineStatus, isStatus } from 'src/utils/determineStatus';
 import colors from 'src/styles/colors';
+import { getReadonly } from 'src/utils/config';
 
 interface TaskAccordionButtonProps extends Task {
   refetch: () => void;
@@ -128,7 +129,11 @@ export const TaskAccordionButton: React.FC<TaskAccordionButtonProps> = (
               }
               w={150}
             >
-              <TaskRunButton {...props} refetch={refetch} />
+              <TaskRunButton
+                {...props}
+                refetch={refetch}
+                style={{ visibility: getReadonly() ? 'hidden' : 'visible' }}
+              />
               <DotButton
                 taskName={taskName}
                 taskInstance={taskInstance[0]}

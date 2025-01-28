@@ -1,6 +1,6 @@
 package com.github.bekk.exampleapp;
 
-import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.ONE_TIME_TASK;
+import static com.github.bekk.exampleapp.tasks.FailingTask.FAILING_ONETIME_TASK;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
@@ -11,6 +11,7 @@ import org.springframework.boot.actuate.autoconfigure.security.servlet.Managemen
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
@@ -18,13 +19,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest(
-    classes = {ExampleApp.class},
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    properties = "db-scheduler-ui.read-only=true",
+    classes = ExampleApp.class,
+    webEnvironment = WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration(
     exclude = {SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class})
-class SmokeTest {
+class SmokeReadOnlyTest {
 
-  @LocalServerPort private Integer serverPort;
+  @LocalServerPort private int serverPort;
 
   private String baseUrl;
 
@@ -32,55 +34,36 @@ class SmokeTest {
 
   @Autowired private TestRestTemplate restTemplate;
 
+  @BeforeEach
+  void setUp() {
+    baseUrl = "http://localhost:" + serverPort;
+  }
+
   @Test
   void testContextLoads() {
-    assertThat(context.containsBean("taskAdminController")).isTrue();
+    assertThat(context.containsBean("taskAdminController")).isFalse();
     assertThat(context.containsBean("taskController")).isTrue();
   }
 
   @Test
-  void testGetTasksReturnsStatusOK() {
+  void readingTasksWorks() {
     ResponseEntity<GetTasksResponse> result =
-        this.restTemplate.getForEntity(
-            baseUrl
-                + "/db-scheduler-api/tasks/all?filter=ALL&pageNumber=0&size=10&sorting=DEFAULT&asc=true&searchTerm="
-                + ONE_TIME_TASK.getTaskName(),
-            GetTasksResponse.class);
+        restTemplate.getForEntity(baseUrl + "/db-scheduler-api/tasks/all", GetTasksResponse.class);
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(result.getBody()).isNotNull();
     assertThat(result.getBody().getItems()).isNotEmpty();
   }
 
   @Test
-  void testGetTasksReturnsExampleOneTimeTask() {
-    ResponseEntity<GetTasksResponse> result =
-        this.restTemplate.getForEntity(
-            baseUrl
-                + "/db-scheduler-api/tasks/all?filter=ALL&pageNumber=0&size=10&sorting=DEFAULT&asc=true&searchTerm="
-                + ONE_TIME_TASK.getTaskName(),
-            GetTasksResponse.class);
-    assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(result.getBody()).isNotNull();
-    result.getBody().getItems().forEach(t -> System.out.println(t.getTaskName()));
-    assertThat(result.getBody().getItems())
-        .anyMatch(taskModel -> taskModel.getTaskName().equals(ONE_TIME_TASK.getTaskName()));
-  }
-
-  @Test
-  void deletingTaskReturnsStatusOK() {
+  void deletingTasksIsNotAvailableInReadOnlyMode() {
     ResponseEntity<Void> result =
         restTemplate.postForEntity(
             baseUrl
-                + "/db-scheduler-api/tasks/delete?id=%s&name=%s"
-                    .formatted("delete-1", ONE_TIME_TASK.getTaskName()),
+                + "/db-scheduler-api/tasks/delete?id=%d&name=%s"
+                    .formatted(6, FAILING_ONETIME_TASK.getTaskName()),
             null,
             Void.class);
 
-    assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-  }
-
-  @BeforeEach
-  void setUp() {
-    baseUrl = "http://localhost:" + serverPort;
+    assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 }

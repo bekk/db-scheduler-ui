@@ -13,40 +13,46 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
-import no.bekk.dbscheduler.ui.model.GetTasksResponse;
-import no.bekk.dbscheduler.ui.model.PollResponse;
-import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
-import no.bekk.dbscheduler.ui.model.TaskRequestParams;
+import java.time.Instant;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/db-scheduler-api/tasks")
-public class TaskController {
+@ConditionalOnProperty(
+    prefix = "db-scheduler-ui",
+    name = "read-only",
+    havingValue = "false",
+    matchIfMissing = true)
+public class TaskAdminController {
+
   private final TaskLogic taskLogic;
 
   @Autowired
-  public TaskController(TaskLogic taskLogic) {
+  public TaskAdminController(TaskLogic taskLogic) {
     this.taskLogic = taskLogic;
   }
 
-  @GetMapping("/all")
-  public GetTasksResponse getTasks(TaskRequestParams params) {
-    return taskLogic.getAllTasks(params);
+  @PostMapping("/rerun")
+  public void runNow(
+      @RequestParam String id, @RequestParam String name, @RequestParam Instant scheduleTime) {
+    taskLogic.runTaskNow(id, name, scheduleTime);
   }
 
-  @GetMapping("/details")
-  public GetTasksResponse getTaskDetails(TaskDetailsRequestParams params) {
-    return taskLogic.getTask(params);
+  @PostMapping("/rerunGroup")
+  public void runAllNow(@RequestParam String name, @RequestParam boolean onlyFailed) {
+    taskLogic.runTaskGroupNow(name, onlyFailed);
   }
 
-  @GetMapping("/poll")
-  public PollResponse pollForUpdates(TaskDetailsRequestParams params) {
-    return taskLogic.pollTasks(params);
+  @PostMapping("/delete")
+  public void deleteTaskNow(@RequestParam String id, @RequestParam String name) {
+    taskLogic.deleteTask(id, name);
   }
 }

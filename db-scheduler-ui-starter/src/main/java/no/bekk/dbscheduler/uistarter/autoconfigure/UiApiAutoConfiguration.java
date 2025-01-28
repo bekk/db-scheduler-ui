@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.ConfigController;
 import no.bekk.dbscheduler.ui.controller.LogController;
 import no.bekk.dbscheduler.ui.controller.SpaFallbackMvc;
+import no.bekk.dbscheduler.ui.controller.TaskAdminController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
 import no.bekk.dbscheduler.ui.service.LogLogic;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
@@ -90,6 +91,17 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "read-only",
+      havingValue = "false",
+      matchIfMissing = true)
+  TaskAdminController taskAdminController(TaskLogic taskLogic) {
+    return new TaskAdminController(taskLogic);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
   TaskController taskController(TaskLogic taskLogic) {
     return new TaskController(taskLogic);
   }
@@ -125,6 +137,6 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   ConfigController configController(DbSchedulerUiProperties properties) {
-    return new ConfigController(properties.isHistory());
+    return new ConfigController(properties.isHistory(), properties::isReadOnly);
   }
 }

@@ -32,6 +32,7 @@ import { CalendarIcon, DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { IoEllipsisVerticalIcon } from '../../assets/icons';
 import { useNavigate } from 'react-router-dom';
 import { ScheduleRunAlert } from './ScheduleRunAlert';
+import { getReadonly } from 'src/utils/config';
 
 interface TaskProps {
   taskName: string;
@@ -65,6 +66,7 @@ export const DotButton: React.FC<TaskProps> = ({
 
         <MenuList padding={0}>
           <MenuItem
+            display={getReadonly() ? 'none' : 'unset'}
             rounded={6}
             minBlockSize={10}
             onClick={(event) => {
@@ -87,6 +89,7 @@ export const DotButton: React.FC<TaskProps> = ({
             See history for task
           </MenuItem>
           <MenuItem
+            display={getReadonly() ? 'none' : 'unset'}
             rounded={6}
             minBlockSize={10}
             onClick={(event) => {
