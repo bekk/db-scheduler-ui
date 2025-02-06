@@ -41,7 +41,7 @@ dashboard for monitoring and basic administration of tasks.
 <dependency>
     <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-starter</artifactId>
-    <version>4.0.0</version>
+    <version>4.1.0</version>
 </dependency>
 ```
 
