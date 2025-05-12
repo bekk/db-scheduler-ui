@@ -16,8 +16,10 @@ package no.bekk.dbscheduler.uistarter.autoconfigure;
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
+import java.io.IOException;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.ConfigController;
+import no.bekk.dbscheduler.ui.controller.IndexHtmlController;
 import no.bekk.dbscheduler.ui.controller.LogController;
 import no.bekk.dbscheduler.ui.controller.SpaFallbackMvc;
 import no.bekk.dbscheduler.ui.controller.TaskAdminController;
@@ -138,5 +140,13 @@ public class UiApiAutoConfiguration {
   @ConditionalOnMissingBean
   ConfigController configController(DbSchedulerUiProperties properties) {
     return new ConfigController(properties.isHistory(), properties::isReadOnly);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnProperty(prefix = "server.servlet", name = "context-path")
+  IndexHtmlController indexHtmlController(
+      @Value("${server.servlet.context-path}") String contextPath) throws IOException {
+    return new IndexHtmlController(contextPath);
   }
 }

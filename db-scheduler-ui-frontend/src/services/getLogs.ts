@@ -17,7 +17,7 @@ import { LogResponse } from 'src/models/TasksResponse';
 
 const API_BASE_URL: string =
   (import.meta.env.VITE_API_BASE_URL as string) ??
-  window.location.origin + '/db-scheduler-api';
+  window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
 
 export const ALL_LOG_QUERY_KEY = `logs/all`;
 
