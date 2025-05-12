@@ -11,19 +11,11 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export {};
 
-const API_BASE_URL: string =
-    (import.meta.env.VITE_API_BASE_URL as string) ??
-    window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
-
-const config = await fetch(`${API_BASE_URL}/config`).then((res) =>
-  res.json(),
-);
-
-const showHistory =
-  'showHistory' in config ? Boolean(config.showHistory) : false;
-
-const readOnly = 'readOnly' in config ? Boolean(config.readOnly) : false;
-
-export const getShowHistory = (): boolean => showHistory;
-export const getReadonly = (): boolean => readOnly;
+declare global {
+    interface Window {
+        /** Path to prepended to API calls and the router basename (optional). */
+        CONTEXT_PATH: string;
+    }
+}
