@@ -83,7 +83,7 @@ public class UiApiAutoConfiguration {
       @Value("${db-scheduler-log.table-name:scheduled_execution_logs}") String logTableName,
       @Value("${db-scheduler-ui.log-limit:0}") int logLimit) {
     return new LogLogic(
-        dataSource,
+        customizer.dataSource().orElse(dataSource),
         customizer.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
         caching,
         properties.isTaskData(),

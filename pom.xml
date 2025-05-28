@@ -71,7 +71,7 @@
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
         <spring-boot.version>3.4.2</spring-boot.version>
-        <db-scheduler.version>15.1.2</db-scheduler.version>
+        <db-scheduler.version>15.6.0</db-scheduler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
