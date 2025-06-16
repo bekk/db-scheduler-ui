@@ -41,7 +41,7 @@ dashboard for monitoring and basic administration of tasks.
 <dependency>
     <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-starter</artifactId>
-    <version>4.1.0</version>
+    <version>4.3.0</version>
 </dependency>
 ```
 
@@ -98,6 +98,12 @@ Or if you want a _read-only_ mode (in which tasks cannot be manually run, delete
 
 ````
 db-scheduler-ui.read-only=true
+````
+
+If you want to add a _prefix_ for the ui you can set the property below.
+
+````
+db-scheduler-ui.context-path=prefix
 ````
 
 ## Security
