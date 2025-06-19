@@ -30,8 +30,12 @@ public class IndexHtmlController {
   }
 
   @GetMapping(
-      path = {"/db-scheduler/index.html", "/db-scheduler", "/db-scheduler/history/all/index.html",
-          "/db-scheduler/history/all"},
+      path = {
+        "/db-scheduler/index.html",
+        "/db-scheduler",
+        "/db-scheduler/history/all/index.html",
+        "/db-scheduler/history/all"
+      },
       produces = MediaType.TEXT_HTML_VALUE)
   String indexHtml() {
     return patchedIndexHtml;

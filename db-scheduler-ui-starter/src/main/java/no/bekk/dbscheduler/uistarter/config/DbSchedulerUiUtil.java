@@ -15,7 +15,7 @@ package no.bekk.dbscheduler.uistarter.config;
 
 public class DbSchedulerUiUtil {
 
-  private DbSchedulerUiUtil(){}
+  private DbSchedulerUiUtil() {}
 
   public static String normalizePath(String path) {
     if (path == null || path.isEmpty()) {
@@ -33,5 +33,4 @@ public class DbSchedulerUiUtil {
     }
     return normalized;
   }
-
 }
