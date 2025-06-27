@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "db-scheduler-ui.context-path",
+      "type": "java.lang.String",
+      "description": "Add a prefix for the UI context path."
+    }
+  ]
+}
