@@ -18,7 +18,7 @@ public class DbSchedulerUiUtil {
   private DbSchedulerUiUtil() {}
 
   public static String normalizePath(String path) {
-    if (path == null || path.isEmpty()) {
+    if (path == null || path.trim().isEmpty()) {
       return "";
     }
 
@@ -30,6 +30,17 @@ public class DbSchedulerUiUtil {
 
     if (normalized.length() > 1 && normalized.endsWith("/")) {
       normalized = normalized.substring(0, normalized.length() - 1);
+    }
+    return normalized;
+  }
+
+  public static String normalizePaths(String... paths) {
+    String normalized = "";
+    for (String path : paths) {
+      String normalizedPath = normalizePath(path);
+      if (!normalizedPath.trim().isEmpty()) {
+        normalized = normalizePath(normalized + normalizedPath);
+      }
     }
     return normalized;
   }

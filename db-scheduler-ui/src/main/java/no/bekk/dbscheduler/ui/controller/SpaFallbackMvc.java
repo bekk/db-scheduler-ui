@@ -14,8 +14,10 @@
 package no.bekk.dbscheduler.ui.controller;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -28,8 +30,11 @@ public class SpaFallbackMvc implements WebMvcConfigurer {
 
   private final String prefix;
 
-  public SpaFallbackMvc(@Value("${db-scheduler-ui.context-path}") String prefix) {
+  private final String indexHtml;
+
+  public SpaFallbackMvc(@Value("${db-scheduler-ui.context-path}") String prefix, String indexHtml) {
     this.prefix = prefix;
+    this.indexHtml = indexHtml;
   }
 
   @Override
@@ -38,10 +43,15 @@ public class SpaFallbackMvc implements WebMvcConfigurer {
         .addResourceHandler(prefix + "/db-scheduler", prefix + "/db-scheduler/**")
         .addResourceLocations("classpath:/static/db-scheduler/")
         .resourceChain(true)
-        .addResolver(new SpaFallbackResolver());
+        .addResolver(new SpaFallbackResolver(indexHtml));
   }
 
   static class SpaFallbackResolver extends PathResourceResolver {
+
+    private final String indexHtml;
+    public SpaFallbackResolver(String indexHtml) {
+      this.indexHtml = indexHtml;
+    }
 
     @Override
     protected Resource getResource(@NonNull String resourcePath, Resource location)
@@ -52,7 +62,7 @@ public class SpaFallbackMvc implements WebMvcConfigurer {
         return requestedResource;
       }
 
-      return new ClassPathResource(DEFAULT_STARTING_PAGE);
+      return new ByteArrayResource(indexHtml.getBytes(StandardCharsets.UTF_8));
     }
   }
 }
