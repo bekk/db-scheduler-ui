@@ -37,7 +37,7 @@ public class IndexHtmlController {
         "/db-scheduler/history/all"
       },
       produces = MediaType.TEXT_HTML_VALUE)
-  String indexHtml() {
+  public String indexHtml() {
     return patchedIndexHtml;
   }
 

@@ -14,6 +14,7 @@
 package no.bekk.dbscheduler.uistarter.autoconfigure;
 
 import static no.bekk.dbscheduler.uistarter.config.DbSchedulerUiUtil.normalizePath;
+import static no.bekk.dbscheduler.uistarter.config.DbSchedulerUiUtil.normalizePaths;
 
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
@@ -41,7 +42,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -125,18 +125,17 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnWebApplication(type = Type.SERVLET)
   @ConditionalOnMissingBean
-  SpaFallbackMvc spaFallbackMvc(@Value("${db-scheduler-ui.context-path:}") String contextPath) {
-    return new SpaFallbackMvc(normalizePath(contextPath));
+  SpaFallbackMvc spaFallbackMvc(IndexHtmlController indexHtmlController, @Value("${db-scheduler-ui.context-path:}") String contextPath) {
+    return new SpaFallbackMvc(normalizePath(contextPath), indexHtmlController.indexHtml());
   }
 
   @Bean
   @ConditionalOnWebApplication(type = Type.REACTIVE)
   @ConditionalOnMissingBean
-  public RouterFunction<ServerResponse> dbSchedulerRouter(
-      @Value("classpath:/static/db-scheduler/index.html") Resource indexHtml) {
+  public RouterFunction<ServerResponse> dbSchedulerRouter(IndexHtmlController indexHtmlController) {
     return RouterFunctions.route(
         RequestPredicates.GET("/db-scheduler/**").and(request -> !request.path().contains(".")),
-        request -> ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(indexHtml));
+        request -> ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(indexHtmlController.indexHtml()));
   }
 
   @Bean
@@ -147,16 +146,16 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "context-path")
   IndexHtmlController indexHtmlController(
-      @Value("${db-scheduler-ui.context-path}") String contextPath) throws IOException {
-    return new IndexHtmlController(normalizePath(contextPath));
+      @Value("${server.servlet.context-path:}") String servletContextPath,
+      @Value("${db-scheduler-ui.context-path:}") String contextPath) throws IOException {
+    return new IndexHtmlController(normalizePaths(servletContextPath, contextPath));
   }
 
   @Bean
   @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "context-path")
   DbSchedulerUiWebConfiguration dbSchedulerUiWebConfiguration(
-      @Value("${db-scheduler-ui.context-path}") String contextPath) {
+      @Value("${db-scheduler-ui.context-path:}") String contextPath) {
     return new DbSchedulerUiWebConfiguration(normalizePath(contextPath));
   }
 }
