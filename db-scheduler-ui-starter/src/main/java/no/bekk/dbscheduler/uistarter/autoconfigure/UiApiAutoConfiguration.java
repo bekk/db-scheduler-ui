@@ -125,7 +125,9 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnWebApplication(type = Type.SERVLET)
   @ConditionalOnMissingBean
-  SpaFallbackMvc spaFallbackMvc(IndexHtmlController indexHtmlController, @Value("${db-scheduler-ui.context-path:}") String contextPath) {
+  SpaFallbackMvc spaFallbackMvc(
+      IndexHtmlController indexHtmlController,
+      @Value("${db-scheduler-ui.context-path:}") String contextPath) {
     return new SpaFallbackMvc(normalizePath(contextPath), indexHtmlController.indexHtml());
   }
 
@@ -135,7 +137,10 @@ public class UiApiAutoConfiguration {
   public RouterFunction<ServerResponse> dbSchedulerRouter(IndexHtmlController indexHtmlController) {
     return RouterFunctions.route(
         RequestPredicates.GET("/db-scheduler/**").and(request -> !request.path().contains(".")),
-        request -> ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(indexHtmlController.indexHtml()));
+        request ->
+            ServerResponse.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .bodyValue(indexHtmlController.indexHtml()));
   }
 
   @Bean
@@ -148,7 +153,8 @@ public class UiApiAutoConfiguration {
   @ConditionalOnMissingBean
   IndexHtmlController indexHtmlController(
       @Value("${server.servlet.context-path:}") String servletContextPath,
-      @Value("${db-scheduler-ui.context-path:}") String contextPath) throws IOException {
+      @Value("${db-scheduler-ui.context-path:}") String contextPath)
+      throws IOException {
     return new IndexHtmlController(normalizePaths(servletContextPath, contextPath));
   }
 
