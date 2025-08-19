@@ -18,7 +18,6 @@ import java.nio.charset.StandardCharsets;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -49,6 +48,7 @@ public class SpaFallbackMvc implements WebMvcConfigurer {
   static class SpaFallbackResolver extends PathResourceResolver {
 
     private final String indexHtml;
+
     public SpaFallbackResolver(String indexHtml) {
       this.indexHtml = indexHtml;
     }

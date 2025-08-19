@@ -29,7 +29,8 @@ class CtxPathTest {
 
   @LocalServerPort private Integer serverPort;
 
-  @Value("${server.servlet.context-path:}") private String ctxPath;
+  @Value("${server.servlet.context-path:}")
+  private String ctxPath;
 
   private String baseUrl;
 
@@ -86,11 +87,8 @@ class CtxPathTest {
 
   @Test
   void testGetUiPage() {
-   ResponseEntity<String> result =
-        this.restTemplate.getForEntity(
-            baseUrl
-                + "/db-scheduler/index.html",
-            String.class);
+    ResponseEntity<String> result =
+        this.restTemplate.getForEntity(baseUrl + "/db-scheduler/index.html", String.class);
     assertThat(result).isNotNull();
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(result.getBody().contains("/api/test")).isTrue();

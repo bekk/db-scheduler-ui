@@ -1,7 +1,8 @@
 package no.bekk.dbscheduler.uistarter.config;
 
-import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 class DbSchedulerUiUtilTest {
 
@@ -46,5 +47,4 @@ class DbSchedulerUiUtilTest {
     String path = DbSchedulerUiUtil.normalizePaths("/api/", "/db-scheduler-ui");
     assertThat(path).isEqualTo("/api/db-scheduler-ui");
   }
-
 }
