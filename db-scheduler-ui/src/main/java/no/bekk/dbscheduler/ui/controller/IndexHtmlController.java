@@ -13,9 +13,7 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,8 +23,8 @@ public class IndexHtmlController {
 
   private final String patchedIndexHtml;
 
-  public IndexHtmlController(String contextPath) throws IOException {
-    this.patchedIndexHtml = contextPathAwareIndexHtml(contextPath);
+  public IndexHtmlController(@Qualifier("indexHtml") String indexHtml) {
+    this.patchedIndexHtml = indexHtml;
   }
 
   @GetMapping(
@@ -39,22 +37,5 @@ public class IndexHtmlController {
       produces = MediaType.TEXT_HTML_VALUE)
   public String indexHtml() {
     return patchedIndexHtml;
-  }
-
-  private static String contextPathAwareIndexHtml(String contextPath) throws IOException {
-    String indexHtml =
-        new ClassPathResource(SpaFallbackMvc.DEFAULT_STARTING_PAGE)
-            .getContentAsString(StandardCharsets.UTF_8);
-
-    return indexHtml
-        .replaceAll("/db-scheduler", contextPath + "/db-scheduler")
-        .replaceAll(
-            "<head>",
-            """
-                <head>
-                    <script>
-                      window.CONTEXT_PATH = '%s';
-                    </script>"""
-                .formatted(contextPath));
   }
 }
