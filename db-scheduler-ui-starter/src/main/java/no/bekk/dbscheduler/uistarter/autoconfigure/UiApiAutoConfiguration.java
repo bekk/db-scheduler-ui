@@ -58,14 +58,17 @@ public class UiApiAutoConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(UiApiAutoConfiguration.class);
   private final String servletContextPath;
+  private final String mvcServletPath;
   private final String dbSchedulerContextPath;
 
   UiApiAutoConfiguration(
       @Value("${server.servlet.context-path:}") String servletContextPath,
+      @Value("${spring.mvc.servlet.path:}") String mvcServletPath,
       @Value("${db-scheduler-ui.context-path:}") String dbSchedulerContextPath) {
     logger.info("UiApiAutoConfiguration created");
     this.servletContextPath = normalizePaths(servletContextPath);
     this.dbSchedulerContextPath = normalizePaths(dbSchedulerContextPath);
+    this.mvcServletPath = normalizePaths(mvcServletPath);
   }
 
   @Bean
@@ -172,7 +175,7 @@ public class UiApiAutoConfiguration {
 
   @Bean(name = "contextPath")
   public String contextPath() {
-    return normalizePaths(servletContextPath, dbSchedulerContextPath);
+    return normalizePaths(servletContextPath, mvcServletPath, dbSchedulerContextPath);
   }
 
   @Bean(name = "indexHtml")

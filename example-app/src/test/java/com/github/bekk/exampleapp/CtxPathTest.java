@@ -32,6 +32,9 @@ class CtxPathTest {
   @Value("${server.servlet.context-path:}")
   private String ctxPath;
 
+  @Value("${spring.mvc.servlet.path:}")
+  private String mvcServletPath;
+
   private String baseUrl;
 
   @Autowired private ApplicationContext context;
@@ -88,7 +91,7 @@ class CtxPathTest {
   @Test
   void testGetUiPage() {
     ResponseEntity<String> result =
-        this.restTemplate.getForEntity(baseUrl + "/db-scheduler/index.html", String.class);
+        this.restTemplate.getForEntity(baseUrl + "/db-scheduler", String.class);
     assertThat(result).isNotNull();
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(result.getBody().contains("/api/test")).isTrue();
@@ -96,6 +99,6 @@ class CtxPathTest {
 
   @BeforeEach
   void setUp() {
-    baseUrl = "http://localhost:" + serverPort + ctxPath;
+    baseUrl = "http://localhost:" + serverPort + ctxPath + mvcServletPath;
   }
 }
