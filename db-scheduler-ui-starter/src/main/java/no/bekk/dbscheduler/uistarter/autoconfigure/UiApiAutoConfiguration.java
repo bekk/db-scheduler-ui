@@ -158,8 +158,9 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  IndexHtmlController indexHtmlController(@Qualifier("indexHtml") String indexHtml) {
-    return new IndexHtmlController(indexHtml);
+  IndexHtmlController indexHtmlController(
+      @Qualifier("indexHtml") String indexHtml, @Qualifier("contextPath") String contextPath) {
+    return new IndexHtmlController(indexHtml, contextPath);
   }
 
   @Bean
@@ -169,12 +170,18 @@ public class UiApiAutoConfiguration {
     return new DbSchedulerUiWebConfiguration(normalizePath(contextPath));
   }
 
+  @Bean(name = "contextPath")
+  public String contextPath() {
+    return normalizePaths(servletContextPath, dbSchedulerContextPath);
+  }
+
   @Bean(name = "indexHtml")
-  public String indexHtml() throws IOException {
-    String contextPath = normalizePaths(servletContextPath, dbSchedulerContextPath);
+  public String indexHtml(@Qualifier("contextPath") String contextPath) throws IOException {
     String indexHtml =
         new ClassPathResource(SpaFallbackMvc.DEFAULT_STARTING_PAGE)
             .getContentAsString(StandardCharsets.UTF_8);
+
+    String contextPathScript = contextPath + "/db-scheduler/js/context-path.js";
 
     return indexHtml
         .replaceAll("/db-scheduler", contextPath + "/db-scheduler")
@@ -182,9 +189,7 @@ public class UiApiAutoConfiguration {
             "<head>",
             """
                 <head>
-                    <script>
-                      window.CONTEXT_PATH = '%s';
-                    </script>"""
-                .formatted(contextPath));
+                    <script src='%s'></script>"""
+                .formatted(contextPathScript));
   }
 }
