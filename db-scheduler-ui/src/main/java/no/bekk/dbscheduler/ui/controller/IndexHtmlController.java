@@ -22,9 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexHtmlController {
 
   private final String patchedIndexHtml;
+  private final String contextPath;
 
-  public IndexHtmlController(@Qualifier("indexHtml") String indexHtml) {
+  public IndexHtmlController(
+      @Qualifier("indexHtml") String indexHtml, @Qualifier("contextPath") String contextPath) {
     this.patchedIndexHtml = indexHtml;
+    this.contextPath = contextPath;
   }
 
   @GetMapping(
@@ -37,5 +40,12 @@ public class IndexHtmlController {
       produces = MediaType.TEXT_HTML_VALUE)
   public String indexHtml() {
     return patchedIndexHtml;
+  }
+
+  @GetMapping(
+      path = {"/db-scheduler/js/context-path.js"},
+      produces = "text/javascript")
+  public String contextPath() {
+    return "window.CONTEXT_PATH='" + contextPath + "';";
   }
 }
