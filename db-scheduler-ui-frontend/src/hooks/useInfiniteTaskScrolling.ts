@@ -179,7 +179,7 @@ export const useInfiniteScrolling = <
     isFetched,
   } = useInfiniteQuery<T>(queryKey, fetchItems, {
     getNextPageParam: (lastPage, allPages) => {
-      const nextPage = allPages.length + 1;
+      const nextPage = allPages.length;
       return nextPage <= lastPage.numberOfPages ? nextPage : undefined;
     },
     refetchInterval: 0,
