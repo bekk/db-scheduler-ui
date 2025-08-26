@@ -245,17 +245,15 @@
                         </release>
                         <deploy>
                             <maven>
-                                <nexus2>
-                                    <maven-central>
+                                <mavenCentral>
+                                    <sonatype>
+                                        <applyMavenCentralRules>true</applyMavenCentralRules>
                                         <active>ALWAYS</active>
-                                        <url>https://oss.sonatype.org/service/local/</url>
-                                        <snapshotUrl>https://oss.sonatype.org/content/repositories/snapshots
-                                        </snapshotUrl>
-                                        <closeRepository>true</closeRepository>
-                                        <releaseRepository>true</releaseRepository>
+                                        <url>https://central.sonatype.com/api/v1/publisher</url>
+<!--                                        <authorization>BASIC</authorization>-->
                                         <stagingRepositories>target/staging-deploy</stagingRepositories>
-                                    </maven-central>
-                                </nexus2>
+                                    </sonatype>
+                                </mavenCentral>
                             </maven>
                         </deploy>
                     </jreleaser>
