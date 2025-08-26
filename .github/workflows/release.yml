@@ -10,7 +10,7 @@ jobs:
     name: Build and release packages
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
