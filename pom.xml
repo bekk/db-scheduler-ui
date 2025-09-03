@@ -250,7 +250,7 @@
                                         <applyMavenCentralRules>true</applyMavenCentralRules>
                                         <active>ALWAYS</active>
                                         <url>https://central.sonatype.com/api/v1/publisher</url>
-<!--                                        <authorization>BASIC</authorization>-->
+                                        <authorization>BASIC</authorization>
                                         <stagingRepositories>target/staging-deploy</stagingRepositories>
                                     </sonatype>
                                 </mavenCentral>
