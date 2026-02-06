@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.bekk.db-scheduler-ui</groupId>
     <artifactId>db-scheduler-ui-parent</artifactId>
@@ -46,7 +45,9 @@
     <modules>
         <module>db-scheduler-ui</module>
         <module>db-scheduler-ui-starter</module>
+        <module>db-scheduler-ui-spring-boot-4-starter</module>
         <module>example-app</module>
+        <module>example-app-boot4</module>
         <module>example-app-webflux</module>
     </modules>
 
@@ -71,7 +72,10 @@
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
         <spring-boot.version>3.4.7</spring-boot.version>
+        <lombok.version>1.18.38</lombok.version>
         <db-scheduler.version>15.6.0</db-scheduler.version>
+        <spring-boot-4.version>4.0.2</spring-boot-4.version>
+        <db-scheduler-boot4.version>16.7.0</db-scheduler-boot4.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -96,6 +100,11 @@
                 <groupId>com.github.kagkarlsson</groupId>
                 <artifactId>db-scheduler</artifactId>
                 <version>${db-scheduler.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.kagkarlsson</groupId>
+                <artifactId>db-scheduler-spring-boot-4-starter</artifactId>
+                <version>${db-scheduler-boot4.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.kagkarlsson</groupId>
@@ -131,6 +140,13 @@
                     <version>3.14.0</version>
                     <configuration>
                         <parameters>true</parameters>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -168,7 +184,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.44.3</version>
+                <version>3.2.1</version>
                 <configuration>
                     <java>
                         <includes>
@@ -179,7 +195,7 @@
                             code -->
                         </includes>
                         <googleJavaFormat>
-                            <version>1.17.0</version>
+                            <version>1.28.0</version>
                             <style>GOOGLE</style>
                         </googleJavaFormat>
                         <importOrder/>
