@@ -21,6 +21,7 @@ dashboard for monitoring and basic administration of tasks.
 ## Table of contents
 
 * [Getting started](#getting-started)
+* [Using with Ktor (non-Spring applications)](#using-with-ktor-non-spring-applications)
 * [Prerequisites](#prerequisites)
 * [How it works](#how-it-works)
 * [Configuration](#configuration)
@@ -58,6 +59,29 @@ dashboard for monitoring and basic administration of tasks.
    most important is to create the `scheduled_tasks` table correctly.
    You do not need to add db-scheduler as a dependency.
 3. Start your application. The db-scheduler UI can be reached at `<your-app-url>/db-scheduler`
+
+## Using with Ktor (non-Spring applications)
+
+If you want to use db-scheduler-ui without Spring dependencies, you can use the Ktor plugin provided by [db-scheduler-additions](https://github.com/osoykan/db-scheduler-additions).
+
+Add the dependency:
+
+```kotlin
+implementation("io.github.osoykan:db-scheduler-ui-ktor:$version")
+```
+
+Install the plugin in your Ktor application:
+
+```kotlin
+install(DbSchedulerUI) {
+  routePath = "/db-scheduler"
+  scheduler = { get<Scheduler>() } // provide your Scheduler instance
+  enabled = true
+  taskData = true
+}
+```
+
+For more details and advanced configuration (including execution history support), see the [db-scheduler-additions repository](https://github.com/osoykan/db-scheduler-additions).
 
 ## Optional: task history
 
