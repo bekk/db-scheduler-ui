@@ -29,21 +29,30 @@ dashboard for monitoring and basic administration of tasks.
 
 * An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * Minimum db-scheduler version 15
-* Minimum Java 17 and SpringBoot 3.3
+* Minimum Java 17 and SpringBoot 3.3 (or SpringBoot 4.0 for the Spring Boot 4 starter)
 * Optional (if you want task history): db-scheduler-log version 0.7.0
 
 ## Getting started
 
 1. Add the db-scheduler-ui spring boot starter maven dependency
 
-```xml
+   **For Spring Boot 3:**
+   ```xml
+   <dependency>
+       <groupId>no.bekk.db-scheduler-ui</groupId>
+       <artifactId>db-scheduler-ui-starter</artifactId>
+       <version>4.3.0</version>
+   </dependency>
+   ```
 
-<dependency>
-    <groupId>no.bekk.db-scheduler-ui</groupId>
-    <artifactId>db-scheduler-ui-starter</artifactId>
-    <version>4.3.0</version>
-</dependency>
-```
+   **For Spring Boot 4:**
+   ```xml
+   <dependency>
+       <groupId>no.bekk.db-scheduler-ui</groupId>
+       <artifactId>db-scheduler-ui-spring-boot-4-starter</artifactId>
+       <version>4.6.0</version>
+   </dependency>
+   ```
 
 2. Read the [db-scheduler](https://github.com/kagkarlsson/db-scheduler) readme and follow the getting started guide. The
    most important is to create the `scheduled_tasks` table correctly.
