@@ -19,9 +19,9 @@ import no.bekk.dbscheduler.ui.model.TaskRequestParams.TaskFilter;
 import no.bekk.dbscheduler.ui.model.TaskRequestParams.TaskSort;
 
 /**
- * Test-data builder for {@link TaskDetailsRequestParams}. Any field left unset falls through to
- * the constructor's default (e.g. {@code filter=ALL}, {@code pageNumber=0}, {@code asc=true},
- * {@code refresh=true}).
+ * Test-data builder for {@link TaskDetailsRequestParams}. Any field left unset falls through to the
+ * constructor's default (e.g. {@code filter=ALL}, {@code pageNumber=0}, {@code asc=true}, {@code
+ * refresh=true}).
  */
 public final class TaskDetailsRequestParamsBuilder {
 
