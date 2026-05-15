@@ -30,7 +30,7 @@ dashboard for monitoring and basic administration of tasks.
 
 * An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * Minimum db-scheduler version 15
-* Minimum Java 17 and SpringBoot 3.3 (or SpringBoot 4.0 for the Spring Boot 4 starter)
+* Minimum Java 17 and SpringBoot 3.4 (or SpringBoot 4.0 for the Spring Boot 4 starter)
 * Optional (if you want task history): db-scheduler-log version 0.7.0
 
 ## Getting started

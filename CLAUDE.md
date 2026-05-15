@@ -66,5 +66,5 @@ Multi-module Maven project (`pom.xml` at root):
 - Controllers are not annotated with `@Component` — they're instantiated as `@Bean` in `UiApiAutoConfiguration` so auto-configuration controls their lifecycle.
 - Java code uses Lombok (`@Data`, `@Builder`, etc.) and Google Java Format style.
 - All `.java`, `.ts`, `.tsx` source files (except tests) require Apache 2.0 license headers (enforced by `license-maven-plugin`).
-- CI tests against Spring Boot 3.3, 3.4, 3.5, and 4.0 for compatibility.
+- CI tests against Spring Boot 3.4, 3.5, and 4.0 for compatibility.
 - Frontend uses path alias `src` → `/src` (configured in vite.config.ts).
