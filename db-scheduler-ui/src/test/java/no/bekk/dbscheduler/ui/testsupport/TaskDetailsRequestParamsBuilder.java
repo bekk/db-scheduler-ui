@@ -26,19 +26,19 @@ import no.bekk.dbscheduler.ui.model.TaskRequestParams.TaskSort;
 public final class TaskDetailsRequestParamsBuilder {
 
   private TaskFilter filter;
-  private Integer pageNumber;
+  private final Integer pageNumber = null;
   private Integer size;
-  private TaskSort sorting;
-  private Boolean asc;
-  private String searchTermTaskName;
-  private String searchTermTaskInstance;
-  private Boolean taskNameExactMatch;
-  private Boolean taskInstanceExactMatch;
-  private Instant startTime;
-  private Instant endTime;
-  private String taskName;
-  private String taskId;
-  private Boolean refresh;
+  private final TaskSort sorting = null;
+  private final Boolean asc = null;
+  private final String searchTermTaskName = null;
+  private final String searchTermTaskInstance = null;
+  private final Boolean taskNameExactMatch = null;
+  private final Boolean taskInstanceExactMatch = null;
+  private final Instant startTime = null;
+  private final Instant endTime = null;
+  private final String taskName = null;
+  private final String taskId = null;
+  private final Boolean refresh = null;
 
   private TaskDetailsRequestParamsBuilder() {}
 
@@ -51,68 +51,8 @@ public final class TaskDetailsRequestParamsBuilder {
     return this;
   }
 
-  public TaskDetailsRequestParamsBuilder pageNumber(int pageNumber) {
-    this.pageNumber = pageNumber;
-    return this;
-  }
-
   public TaskDetailsRequestParamsBuilder size(int size) {
     this.size = size;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder sorting(TaskSort sorting) {
-    this.sorting = sorting;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder asc(boolean asc) {
-    this.asc = asc;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder searchTermTaskName(String searchTermTaskName) {
-    this.searchTermTaskName = searchTermTaskName;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder searchTermTaskInstance(String searchTermTaskInstance) {
-    this.searchTermTaskInstance = searchTermTaskInstance;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder taskNameExactMatch(boolean taskNameExactMatch) {
-    this.taskNameExactMatch = taskNameExactMatch;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder taskInstanceExactMatch(boolean taskInstanceExactMatch) {
-    this.taskInstanceExactMatch = taskInstanceExactMatch;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder startTime(Instant startTime) {
-    this.startTime = startTime;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder endTime(Instant endTime) {
-    this.endTime = endTime;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder taskName(String taskName) {
-    this.taskName = taskName;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder taskId(String taskId) {
-    this.taskId = taskId;
-    return this;
-  }
-
-  public TaskDetailsRequestParamsBuilder refresh(boolean refresh) {
-    this.refresh = refresh;
     return this;
   }
 
