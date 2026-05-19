@@ -14,21 +14,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: db-scheduler-ui-frontend/package.json
+
       - name: Setup Node
         uses: actions/setup-node@v3
-
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          cache: 'pnpm'
+          cache-dependency-path: db-scheduler-ui-frontend/pnpm-lock.yaml
 
       - name: Install Node.js dependencies
-        run: |
-          cd db-scheduler-ui-frontend
-          npm install
+        working-directory: db-scheduler-ui-frontend
+        run: pnpm install --frozen-lockfile
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -50,21 +49,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: db-scheduler-ui-frontend/package.json
+
       - name: Setup Node
         uses: actions/setup-node@v3
-
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          cache: 'pnpm'
+          cache-dependency-path: db-scheduler-ui-frontend/pnpm-lock.yaml
 
       - name: Install Node.js dependencies
-        run: |
-          cd db-scheduler-ui-frontend
-          npm install
+        working-directory: db-scheduler-ui-frontend
+        run: pnpm install --frozen-lockfile
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3

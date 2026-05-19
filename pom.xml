@@ -332,27 +332,28 @@
                 <inherited>false</inherited>
                 <executions>
                     <execution>
-                        <id>npm-install</id>
+                        <id>pnpm-install</id>
                         <goals>
                             <goal>exec</goal>
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <executable>npm</executable>
+                            <executable>pnpm</executable>
                             <arguments>
-                                <argument>ci</argument>
+                                <argument>install</argument>
+                                <argument>--frozen-lockfile</argument>
                             </arguments>
                             <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>npm-build</id>
+                        <id>pnpm-build</id>
                         <goals>
                             <goal>exec</goal>
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <executable>npm</executable>
+                            <executable>pnpm</executable>
                             <arguments>
                                 <argument>run</argument>
                                 <argument>build</argument>

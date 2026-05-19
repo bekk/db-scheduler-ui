@@ -51,3 +51,6 @@ replay_pid*
 
 # Claude
 .claude
+
+# pnpm content-addressable store
+.pnpm-store/
