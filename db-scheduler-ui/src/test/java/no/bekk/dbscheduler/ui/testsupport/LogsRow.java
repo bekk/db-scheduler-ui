@@ -13,44 +13,19 @@
  */
 package no.bekk.dbscheduler.ui.testsupport;
 
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.experimental.FieldDefaults;
+
+@Builder
+@FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 public final class LogsRow {
 
-  final String taskName;
-  final String taskInstance;
-  final boolean succeeded;
+  String taskName;
+  String taskInstance;
+  boolean succeeded;
 
-  private LogsRow(Builder b) {
-    this.taskName = b.taskName;
-    this.taskInstance = b.taskInstance;
-    this.succeeded = b.succeeded;
-  }
-
-  public static Builder defaultRow() {
-    return new Builder().taskName("happy-task").taskInstance("happy-task-1").succeeded(true);
-  }
-
-  public static final class Builder {
-    private String taskName;
-    private String taskInstance;
-    private boolean succeeded;
-
-    public Builder taskName(String taskName) {
-      this.taskName = taskName;
-      return this;
-    }
-
-    public Builder taskInstance(String taskInstance) {
-      this.taskInstance = taskInstance;
-      return this;
-    }
-
-    public Builder succeeded(boolean succeeded) {
-      this.succeeded = succeeded;
-      return this;
-    }
-
-    public LogsRow build() {
-      return new LogsRow(this);
-    }
+  public static LogsRowBuilder defaultRow() {
+    return builder().taskName("happy-task").taskInstance("happy-task-1").succeeded(true);
   }
 }
