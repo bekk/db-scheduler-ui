@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        spring-boot: [ '3.3.13', '3.4.7', '3.5.3' ]
+        spring-boot: [ '3.4.13', '3.5.14' ]
 
     steps:
       - name: Checkout repo
@@ -42,6 +42,9 @@ jobs:
   tests-boot4:
     name: Run tests with Spring Boot 4
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        spring-boot-4: [ '4.0.6' ]
 
     steps:
       - name: Checkout repo
@@ -70,4 +73,4 @@ jobs:
           distribution: 'temurin'
 
       - name: Run tests
-        run: mvn -B -pl db-scheduler-ui-spring-boot-4-starter,example-app-boot4 -am clean test --file pom.xml
+        run: mvn -B -Dspring-boot-4.version=${{ matrix.spring-boot-4 }} -pl db-scheduler-ui-spring-boot-4-starter,example-app-boot4 -am clean test --file pom.xml
