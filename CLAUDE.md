@@ -18,6 +18,10 @@ A UI dashboard extension for [db-scheduler](https://github.com/kagkarlsson/db-sc
 # Run a single test class
 ./mvnw test -pl example-app -am -q -DskipTests && ./mvnw test -pl example-app -q -Dtest="SmokeTest"
 
+# Fast feedback loop — skips frontend (pnpm install/build) and example-app* smoke tests.
+# Use while iterating; see "Verification ladder" below for when to escalate.
+./mvnw test -Pfast -q
+
 # Format Java code (Google Java Format via Spotless — required before PR)
 ./mvnw spotless:apply
 
@@ -38,6 +42,22 @@ cd db-scheduler-ui-frontend && pnpm run lint
 ```
 
 Tests are safe to run in a Docker-less environment: this project does not use Testcontainers. All integration tests run against in-memory H2 (`jdbc:h2:mem:...;MODE=PostgreSQL`), so `./mvnw test` and `./mvnw clean install` execute the full test suite without any external services.
+
+## Verification ladder
+
+A full `./mvnw test` takes ~2m30s cold. Most of that is the frontend pnpm build (~60s cold, ~15s warm), the recursive `license:check` walking the whole tree (~30s), and three `example-app*` Spring Boot smoke tests (~50s combined, one fresh context per test class). No test fetches any frontend asset — smoke tests only hit `/db-scheduler-api/...` — so skipping the frontend is safe for verification. Use the cheapest level that still covers the code you touched, and escalate before opening a PR.
+
+| Level | Command | Cold time | Use when |
+|---|---|---|---|
+| `-Pfast` | `./mvnw -T 2C test -Pfast -q` | ~8s | Default fast loop. Runs library + starter unit tests; skips frontend, license check, and example-app smoke tests. |
+| Skip-frontend, all tests | `./mvnw -T 2C test -Dexec.skip=true -q` | ~1m10s | Touched starter wiring, controllers, or anything the smoke tests exercise |
+| Full clean build | `./mvnw clean install -q` | ~2m30s | Pre-PR; also runs spotless, license check, frontend build, and packages JARs |
+
+Notes:
+- `-Pfast` is defined in the root pom. It sets `exec.skip=true` (skips `pnpm install` + `pnpm run build`), sets `license.skip=true`, and activates a matching profile in each `example-app*` pom that sets `skipTests=true`.
+- `-T 2C` runs modules in parallel; harmless to always include.
+- If a change touches `db-scheduler-ui-frontend/`, drop `-Pfast` so the frontend actually rebuilds.
+- Always run `./mvnw spotless:apply` and `./mvnw license:format` before pushing — the full build fails without them.
 
 ## Module Architecture
 

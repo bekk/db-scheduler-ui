@@ -113,4 +113,13 @@
         </plugins>
     </build>
 
+    <profiles>
+        <!-- Skip this module's Spring Boot smoke tests under the parent's -Pfast loop. -->
+        <profile>
+            <id>fast</id>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+    </profiles>
 </project>
