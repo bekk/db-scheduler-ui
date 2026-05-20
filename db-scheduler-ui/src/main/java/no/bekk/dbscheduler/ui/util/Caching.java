@@ -35,7 +35,7 @@ public class Caching {
 
   public List<ScheduledExecution<Object>> getExecutionsFromCacheOrDB(
       boolean isRefresh, Scheduler scheduler) {
-    if (isRefresh || !taskDataCache.isEmpty()) {
+    if (isRefresh || taskDataCache.isEmpty()) {
       List<ScheduledExecution<Object>> executions =
           getExecutionsFromDBWithoutUpdatingCache(scheduler);
       updateCache(executions);
