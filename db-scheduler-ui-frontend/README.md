@@ -4,7 +4,8 @@
 
 ### Getting started:
 
-1. Install dependencies: `npm install`
-2. Run the app: `npm run dev`
-3. Run the backend `DemoApplication.java`
-4. Open the app: http://localhost:51373
+1. Install [pnpm](https://pnpm.io/): `corepack enable`
+2. Install dependencies: `pnpm install`
+3. Run the app: `pnpm run dev`
+4. Run the backend `DemoApplication.java`
+5. Open the app: http://localhost:51373

@@ -203,11 +203,11 @@ Prerequisites:
 * Maven
 * JDK17
 * Node
-* npm
+* pnpm (`corepack enable`)
 
 There are two ways to run the frontend locally.
 
-1. running `npm run dev` inside the db-scheduler-ui-frontend folder
+1. running `pnpm run dev` inside the db-scheduler-ui-frontend folder
 2. running `mvn install` will build the frontend and copy the output to the resources folder in the `db-scheduler-ui`
    module. The frontend will then be available at the same port as the example app.
 

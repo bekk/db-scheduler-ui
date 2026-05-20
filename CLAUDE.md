@@ -31,11 +31,13 @@ A UI dashboard extension for [db-scheduler](https://github.com/kagkarlsson/db-sc
 ./mvnw license:format
 
 # Frontend dev server (proxies API to localhost:8081)
-cd db-scheduler-ui-frontend && npm run dev
+cd db-scheduler-ui-frontend && pnpm run dev
 
 # Frontend lint
-cd db-scheduler-ui-frontend && npm run lint
+cd db-scheduler-ui-frontend && pnpm run lint
 ```
+
+Tests are safe to run in a Docker-less environment: this project does not use Testcontainers. All integration tests run against in-memory H2 (`jdbc:h2:mem:...;MODE=PostgreSQL`), so `./mvnw test` and `./mvnw clean install` execute the full test suite without any external services.
 
 ## Module Architecture
 
@@ -62,7 +64,7 @@ Multi-module Maven project (`pom.xml` at root):
 
 ## Key Patterns
 
-- The frontend build is triggered during Maven's `generate-resources` phase via `exec-maven-plugin` (runs `npm install` and `npm run build` in `db-scheduler-ui-frontend/`), then output is copied to backend resources via `maven-resources-plugin`.
+- The frontend build is triggered during Maven's `generate-resources` phase via `exec-maven-plugin` (runs `pnpm install --frozen-lockfile` and `pnpm run build` in `db-scheduler-ui-frontend/`), then output is copied to backend resources via `maven-resources-plugin`. The pnpm version is pinned via the `packageManager` field in `package.json`.
 - Controllers are not annotated with `@Component` — they're instantiated as `@Bean` in `UiApiAutoConfiguration` so auto-configuration controls their lifecycle.
 - Java code uses Lombok (`@Data`, `@Builder`, etc.) and Google Java Format style.
 - All `.java`, `.ts`, `.tsx` source files (except tests) require Apache 2.0 license headers (enforced by `license-maven-plugin`).
