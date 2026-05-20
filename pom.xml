@@ -390,6 +390,20 @@
 
     <profiles>
         <profile>
+            <!--
+              Fast feedback loop for agents / local iteration. Skips the frontend pnpm
+              install/build (no test fetches index.html or any bundled asset) and skips
+              tests in the example-app* modules (each spins up its own Spring Boot
+              context, which dominates wall time). Combine with -T 2C for parallel build.
+              Activated by -Pfast.
+            -->
+            <id>fast</id>
+            <properties>
+                <exec.skip>true</exec.skip>
+                <license.skip>true</license.skip>
+            </properties>
+        </profile>
+        <profile>
             <id>clean-frontend</id>
             <build>
                 <plugins>
