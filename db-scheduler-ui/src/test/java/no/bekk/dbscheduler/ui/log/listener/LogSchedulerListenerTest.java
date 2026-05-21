@@ -26,8 +26,7 @@ class LogSchedulerListenerTest {
           return true;
         };
 
-    ExecutorService synchronous =
-        Executors.newSingleThreadExecutor(); // sequential so we can join on it
+    ExecutorService synchronous = Executors.newSingleThreadExecutor();
     try (LogSchedulerListener listener = new LogSchedulerListener(repo, synchronous)) {
       Instant started = Instant.parse("2026-01-01T12:00:00Z");
       ExecutionComplete event =
