@@ -32,12 +32,17 @@ class CachingTest {
     caching = new Caching();
   }
 
+  private static ScheduledExecution<Object> buildScheduledExecution(
+      String taskName, String instanceId) {
+    TaskInstance<Object> taskInstance = new TaskInstance<>(taskName, instanceId);
+    Execution execution = new Execution(Instant.now(), taskInstance);
+    return new ScheduledExecution<>(Object.class, execution);
+  }
+
   @Test
   void getExecutionsFromCacheOrDB_returnsCachedDataWhenPopulatedAndNoRefresh() {
-    TaskInstance<Object> taskInstance = new TaskInstance<>("my-task", "instance-1");
-    Execution execution = new Execution(Instant.now(), taskInstance);
     ScheduledExecution<Object> scheduledExecution =
-        new ScheduledExecution<>(Object.class, execution);
+        buildScheduledExecution("my-task", "instance-1");
     caching.updateCache(List.of(scheduledExecution));
 
     List<ScheduledExecution<Object>> result = caching.getExecutionsFromCacheOrDB(false, null);
