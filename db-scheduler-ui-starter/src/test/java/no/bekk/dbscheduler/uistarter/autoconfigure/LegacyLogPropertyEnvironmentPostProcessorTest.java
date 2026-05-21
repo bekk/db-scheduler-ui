@@ -56,8 +56,7 @@ class LegacyLogPropertyEnvironmentPostProcessorTest {
 
   @Test
   void doesNotThrowWhenNoLegacyPropertiesPresent() {
-    MockEnvironment env =
-        new MockEnvironment().withProperty("db-scheduler-ui.log.enabled", "true");
+    MockEnvironment env = new MockEnvironment().withProperty("db-scheduler-ui.log.enabled", "true");
 
     assertThatCode(() -> processor.postProcessEnvironment(env, application))
         .doesNotThrowAnyException();
