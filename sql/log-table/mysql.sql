@@ -9,8 +9,8 @@ CREATE TABLE scheduled_execution_logs (
     succeeded            BOOLEAN         NOT NULL,
     duration_ms          BIGINT          NOT NULL,
     exception_class      VARCHAR(1000),
-    exception_message    BLOB,
-    exception_stacktrace BLOB
+    exception_message    TEXT,
+    exception_stacktrace MEDIUMTEXT
 );
 
 CREATE INDEX stl_started_idx         ON scheduled_execution_logs (time_started);
