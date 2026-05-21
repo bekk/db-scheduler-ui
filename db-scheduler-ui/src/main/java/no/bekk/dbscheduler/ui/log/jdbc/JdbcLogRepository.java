@@ -89,7 +89,7 @@ public class JdbcLogRepository implements LogRepository {
     }
   }
 
-  protected String getStacktrace(Throwable cause) {
+  private String getStacktrace(Throwable cause) {
     if (cause == null) {
       return null;
     }
@@ -99,7 +99,7 @@ public class JdbcLogRepository implements LogRepository {
     return writer.toString();
   }
 
-  protected byte[] serialize(Object value) {
+  private byte[] serialize(Object value) {
     if (value == null) {
       return null;
     }
