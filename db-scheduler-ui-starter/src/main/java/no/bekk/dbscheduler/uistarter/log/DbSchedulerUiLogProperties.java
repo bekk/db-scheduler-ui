@@ -21,8 +21,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("db-scheduler-ui.log")
 public class DbSchedulerUiLogProperties {
 
-  /** Whether to enable auto-configuration of the execution-log writer. */
-  private boolean enabled = true;
+  /** Whether to enable auto-configuration of the execution-log writer. Opt-in. */
+  private boolean enabled = false;
 
   /**
    * Name of the table used to log executions. Must match the database schema; change here and in

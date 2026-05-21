@@ -46,7 +46,7 @@ import org.springframework.core.ConfigurableObjectInputStream;
 @EnableConfigurationProperties(DbSchedulerUiLogProperties.class)
 @AutoConfigureAfter(DataSourceAutoConfiguration.class)
 @ConditionalOnBean(DataSource.class)
-@ConditionalOnProperty(value = "db-scheduler-ui.log.enabled", matchIfMissing = true)
+@ConditionalOnProperty(value = "db-scheduler-ui.log.enabled", havingValue = "true")
 public class DbSchedulerUiLogAutoConfiguration {
 
   private static final Logger log =

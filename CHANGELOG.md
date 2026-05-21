@@ -4,7 +4,7 @@
 
 ### Breaking changes
 
-- **Execution-log writer is now built in.** The `io.rocketbase.extension:db-scheduler-log-spring-boot-starter` dependency is no longer required; `db-scheduler-ui-starter` (Spring Boot 3) and `db-scheduler-ui-spring-boot-4-starter` (Spring Boot 4) now auto-configure the writer themselves.
+- **Execution-log writer is now built in.** The `io.rocketbase.extension:db-scheduler-log-spring-boot-starter` dependency is no longer required; `db-scheduler-ui-starter` (Spring Boot 3) and `db-scheduler-ui-spring-boot-4-starter` (Spring Boot 4) now auto-configure the writer themselves. The writer is **opt-in**: set `db-scheduler-ui.log.enabled=true` to activate it. (Rocketbase used the dependency itself as the opt-in; with the writer bundled, an explicit property is the new gate, so users not interested in execution history are unaffected.)
 - **Property prefix renamed**: `db-scheduler-log.*` → `db-scheduler-ui.log.*`.
   - Applications that still set `db-scheduler-log.enabled=true` will fail at startup with a migration message. Remove the rocketbase starter from your dependencies and rename the properties.
 - **Package rename**: classes previously imported from `io.rocketbase.extension.*` now live under `no.bekk.dbscheduler.ui.log.*`:
