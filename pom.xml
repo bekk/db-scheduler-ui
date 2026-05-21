@@ -356,6 +356,9 @@
                                 <argument>--frozen-lockfile</argument>
                             </arguments>
                             <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
+                            <environmentVariables>
+                                <CI>true</CI>
+                            </environmentVariables>
                         </configuration>
                     </execution>
                     <execution>
@@ -371,6 +374,9 @@
                                 <argument>build</argument>
                             </arguments>
                             <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
+                            <environmentVariables>
+                                <CI>true</CI>
+                            </environmentVariables>
                         </configuration>
                     </execution>
                 </executions>
