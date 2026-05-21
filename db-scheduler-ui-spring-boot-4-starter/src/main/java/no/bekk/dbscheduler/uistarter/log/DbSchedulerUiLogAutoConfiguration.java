@@ -16,7 +16,6 @@
 package no.bekk.dbscheduler.uistarter.log;
 
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
-import com.github.kagkarlsson.scheduler.event.SchedulerListener;
 import com.github.kagkarlsson.scheduler.exceptions.SerializationException;
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import java.io.ByteArrayInputStream;
@@ -89,7 +88,7 @@ public class DbSchedulerUiLogAutoConfiguration {
 
   @Bean(destroyMethod = "close")
   @ConditionalOnMissingBean(LogSchedulerListener.class)
-  SchedulerListener logSchedulerListener(LogRepository logRepository) {
+  LogSchedulerListener logSchedulerListener(LogRepository logRepository) {
     log.debug("Registering LogSchedulerListener for execution logging");
     return new LogSchedulerListener(logRepository);
   }
