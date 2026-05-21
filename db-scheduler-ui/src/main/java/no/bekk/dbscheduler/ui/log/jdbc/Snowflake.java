@@ -30,8 +30,6 @@ import java.time.Instant;
  */
 public final class Snowflake implements IdProvider {
 
-  private static Snowflake instance;
-
   public static final int UNUSED_BITS = 1; // Sign bit, unused (always set to 0)
   public static final int EPOCH_BITS = 43;
   public static final int NODE_ID_BITS = 10;
@@ -65,13 +63,6 @@ public final class Snowflake implements IdProvider {
   public Snowflake() {
     this.nodeId = createNodeId();
     this.customEpoch = DEFAULT_CUSTOM_EPOCH;
-  }
-
-  public static synchronized Snowflake getInstance() {
-    if (instance == null) {
-      instance = new Snowflake();
-    }
-    return instance;
   }
 
   @Override
