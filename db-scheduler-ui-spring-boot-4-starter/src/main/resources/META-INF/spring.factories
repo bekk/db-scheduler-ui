@@ -1,5 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  no.bekk.dbscheduler.uistarter.autoconfigure.UiApiAutoConfiguration
-
 org.springframework.boot.env.EnvironmentPostProcessor=\
   no.bekk.dbscheduler.uistarter.autoconfigure.LegacyLogPropertyEnvironmentPostProcessor

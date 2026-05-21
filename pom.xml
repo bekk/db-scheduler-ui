@@ -295,6 +295,18 @@
                             <excludes>
                                 <exclude>.github/**</exclude>
                                 <exclude>**/src/test/**</exclude>
+                                <exclude>**/no/bekk/dbscheduler/ui/log/**</exclude>
+                                <exclude>**/no/bekk/dbscheduler/uistarter/log/**</exclude>
+                            </excludes>
+                        </licenseSet>
+                        <licenseSet>
+                            <header>./.license/license-header-rocketbase.txt</header>
+                            <includes>
+                                <include>**/no/bekk/dbscheduler/ui/log/**/*.java</include>
+                                <include>**/no/bekk/dbscheduler/uistarter/log/**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/src/test/**</exclude>
                             </excludes>
                         </licenseSet>
                     </licenseSets>

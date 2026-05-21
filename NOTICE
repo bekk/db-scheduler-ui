@@ -1,0 +1,14 @@
+db-scheduler-ui
+Copyright (C) Bekk
+
+This product includes code originally developed by Marten Prieß
+as part of db-scheduler-log (https://github.com/rocketbase-io/db-scheduler-log),
+licensed under the Apache License, Version 2.0.
+
+The vendored code lives under:
+  db-scheduler-ui/src/main/java/no/bekk/dbscheduler/ui/log/
+  db-scheduler-ui-starter/src/main/java/no/bekk/dbscheduler/uistarter/log/
+  db-scheduler-ui-spring-boot-4-starter/src/main/java/no/bekk/dbscheduler/uistarter/log/
+
+The Snowflake id generator is in turn adapted from java-snowflake by callicoder
+(https://github.com/callicoder/java-snowflake).

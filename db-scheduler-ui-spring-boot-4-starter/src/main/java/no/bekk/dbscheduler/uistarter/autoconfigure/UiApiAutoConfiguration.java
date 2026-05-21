@@ -95,7 +95,7 @@ public class UiApiAutoConfiguration {
       Caching caching,
       DbSchedulerCustomizer customizer,
       DbSchedulerUiProperties properties,
-      @Value("${db-scheduler-log.table-name:scheduled_execution_logs}") String logTableName,
+      @Value("${db-scheduler-ui.log.table-name:scheduled_execution_logs}") String logTableName,
       @Value("${db-scheduler-ui.log-limit:0}") int logLimit) {
     return new LogLogic(
         customizer.dataSource().orElse(dataSource),
