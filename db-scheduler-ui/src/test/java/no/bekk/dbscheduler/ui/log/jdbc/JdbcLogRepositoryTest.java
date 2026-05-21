@@ -6,6 +6,7 @@ import com.github.kagkarlsson.scheduler.serializer.JavaSerializer;
 import com.github.kagkarlsson.scheduler.task.Execution;
 import com.github.kagkarlsson.scheduler.task.ExecutionComplete;
 import com.github.kagkarlsson.scheduler.task.TaskInstance;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 class JdbcLogRepositoryTest {
+
+  private static final Instant START = Instant.parse("2026-01-01T12:00:00Z");
 
   private DataSource dataSource;
   private JdbcLogRepository repo;
@@ -32,11 +35,7 @@ class JdbcLogRepositoryTest {
 
   @Test
   void insertsSuccessfulExecution() {
-    Instant started = Instant.parse("2026-01-01T12:00:00Z");
-    Instant finished = started.plusSeconds(2);
-    ExecutionComplete event =
-        ExecutionComplete.success(
-            new Execution(started, new TaskInstance<>("task-a", "instance-1")), started, finished);
+    ExecutionComplete event = success("task-a", "instance-1", Duration.ofSeconds(2));
 
     assertThat(repo.createIfNotExists(ExecutionLog.from(event))).isTrue();
 
@@ -55,15 +54,8 @@ class JdbcLogRepositoryTest {
 
   @Test
   void insertsFailedExecutionWithStacktrace() {
-    Instant started = Instant.parse("2026-01-01T12:00:00Z");
-    Instant finished = started.plusMillis(500);
     RuntimeException cause = new RuntimeException("boom");
-    ExecutionComplete event =
-        ExecutionComplete.failure(
-            new Execution(started, new TaskInstance<>("task-b", "instance-2")),
-            started,
-            finished,
-            cause);
+    ExecutionComplete event = failure("task-b", "instance-2", Duration.ofMillis(500), cause);
 
     assertThat(repo.createIfNotExists(ExecutionLog.from(event))).isTrue();
 
@@ -79,12 +71,20 @@ class JdbcLogRepositoryTest {
     IdProvider fixedId = () -> 99L;
     JdbcLogRepository fixedRepo =
         new JdbcLogRepository(dataSource, JavaSerializer::new, LogsTable.NAME, fixedId);
-    Instant now = Instant.parse("2026-01-01T12:00:00Z");
-    ExecutionComplete event =
-        ExecutionComplete.success(
-            new Execution(now, new TaskInstance<>("task-c", "instance-3")), now, now.plusMillis(1));
+    ExecutionComplete event = success("task-c", "instance-3", Duration.ofMillis(1));
 
     assertThat(fixedRepo.createIfNotExists(ExecutionLog.from(event))).isTrue();
     assertThat(fixedRepo.createIfNotExists(ExecutionLog.from(event))).isFalse();
+  }
+
+  private static ExecutionComplete success(String taskName, String instanceId, Duration duration) {
+    Execution execution = new Execution(START, new TaskInstance<>(taskName, instanceId));
+    return ExecutionComplete.success(execution, START, START.plus(duration));
+  }
+
+  private static ExecutionComplete failure(
+      String taskName, String instanceId, Duration duration, Throwable cause) {
+    Execution execution = new Execution(START, new TaskInstance<>(taskName, instanceId));
+    return ExecutionComplete.failure(execution, START, START.plus(duration), cause);
   }
 }
