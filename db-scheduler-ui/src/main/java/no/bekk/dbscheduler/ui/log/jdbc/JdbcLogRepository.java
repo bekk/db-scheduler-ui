@@ -22,8 +22,7 @@ import java.io.NotSerializableException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
+import java.util.Objects;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.log.ExecutionLog;
 import no.bekk.dbscheduler.ui.log.LogRepository;
@@ -40,20 +39,16 @@ public class JdbcLogRepository implements LogRepository {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcLogRepository.class);
 
   private final JdbcTemplate jdbcTemplate;
-  private final Supplier<Serializer> serializerSupplier;
+  private final Serializer serializer;
   private final String tableName;
   private final JdbcCustomization jdbcCustomization;
   private final IdProvider idProvider;
-  private final AtomicReference<Serializer> resolvedSerializer = new AtomicReference<>();
 
   public JdbcLogRepository(
-      DataSource dataSource,
-      Supplier<Serializer> serializerSupplier,
-      String tableName,
-      IdProvider idProvider) {
+      DataSource dataSource, Serializer serializer, String tableName, IdProvider idProvider) {
     this.tableName = tableName;
     this.jdbcTemplate = new JdbcTemplate(dataSource);
-    this.serializerSupplier = serializerSupplier;
+    this.serializer = Objects.requireNonNull(serializer, "serializer");
     this.jdbcCustomization = new AutodetectJdbcCustomization(dataSource);
     this.idProvider = idProvider;
   }
@@ -105,10 +100,6 @@ public class JdbcLogRepository implements LogRepository {
     if (value == null) {
       return null;
     }
-    Serializer serializer = resolveSerializer();
-    if (serializer == null) {
-      return null;
-    }
     try {
       return serializer.serialize(value);
     } catch (Exception e) {
@@ -119,18 +110,5 @@ public class JdbcLogRepository implements LogRepository {
       }
       return null;
     }
-  }
-
-  private Serializer resolveSerializer() {
-    Serializer cached = resolvedSerializer.get();
-    if (cached != null) {
-      return cached;
-    }
-    Serializer fresh = serializerSupplier == null ? null : serializerSupplier.get();
-    if (fresh == null) {
-      return null;
-    }
-    resolvedSerializer.compareAndSet(null, fresh);
-    return resolvedSerializer.get();
   }
 }

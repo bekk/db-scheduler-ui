@@ -30,7 +30,7 @@ class JdbcLogRepositoryTest {
   void setUp() {
     dataSource = TestDatabase.newDataSourceWithTables();
     jdbc = new JdbcTemplate(dataSource);
-    repo = new JdbcLogRepository(dataSource, JavaSerializer::new, LogsTable.NAME, new Snowflake(1));
+    repo = new JdbcLogRepository(dataSource, new JavaSerializer(), LogsTable.NAME, new Snowflake(1));
   }
 
   @Test
@@ -70,7 +70,7 @@ class JdbcLogRepositoryTest {
   void returnsFalseOnDuplicateId() {
     IdProvider fixedId = () -> 99L;
     JdbcLogRepository fixedRepo =
-        new JdbcLogRepository(dataSource, JavaSerializer::new, LogsTable.NAME, fixedId);
+        new JdbcLogRepository(dataSource, new JavaSerializer(), LogsTable.NAME, fixedId);
     ExecutionComplete event = success("task-c", "instance-3", Duration.ofMillis(1));
 
     assertThat(fixedRepo.createIfNotExists(ExecutionLog.from(event))).isTrue();

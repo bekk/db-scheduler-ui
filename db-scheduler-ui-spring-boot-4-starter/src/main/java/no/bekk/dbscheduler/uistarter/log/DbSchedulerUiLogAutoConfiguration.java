@@ -31,7 +31,6 @@ import no.bekk.dbscheduler.ui.log.jdbc.Snowflake;
 import no.bekk.dbscheduler.ui.log.listener.LogSchedulerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -70,20 +69,11 @@ public class DbSchedulerUiLogAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean(LogRepository.class)
-  LogRepository logRepository(
-      IdProvider idProvider, ObjectProvider<DbSchedulerCustomizer> customizerProvider) {
+  LogRepository logRepository(IdProvider idProvider, DbSchedulerCustomizer customizer) {
     log.debug("No LogRepository bean found, creating a JdbcLogRepository");
+    Serializer serializer = customizer.serializer().orElse(SPRING_JAVA_SERIALIZER);
     return new JdbcLogRepository(
-        existingDataSource,
-        () -> {
-          DbSchedulerCustomizer customizer = customizerProvider.getIfAvailable();
-          if (customizer == null) {
-            return SPRING_JAVA_SERIALIZER;
-          }
-          return customizer.serializer().orElse(SPRING_JAVA_SERIALIZER);
-        },
-        config.getTableName(),
-        idProvider);
+        existingDataSource, serializer, config.getTableName(), idProvider);
   }
 
   @Bean(destroyMethod = "close")
