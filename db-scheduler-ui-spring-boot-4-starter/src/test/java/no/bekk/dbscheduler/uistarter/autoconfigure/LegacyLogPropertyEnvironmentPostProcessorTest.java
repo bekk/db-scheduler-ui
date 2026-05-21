@@ -1,6 +1,6 @@
 package no.bekk.dbscheduler.uistarter.autoconfigure;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
@@ -24,28 +24,42 @@ class LegacyLogPropertyEnvironmentPostProcessorTest {
   }
 
   @Test
-  void includesTableNameMigrationHintWhenSet() {
+  void throwsWhenLegacyEnabledIsFalse() {
+    MockEnvironment env = new MockEnvironment().withProperty("db-scheduler-log.enabled", "false");
+
+    assertThatThrownBy(() -> processor.postProcessEnvironment(env, application))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("db-scheduler-ui.log.enabled=false");
+  }
+
+  @Test
+  void throwsWhenOnlyLegacyTableNameSet() {
+    MockEnvironment env =
+        new MockEnvironment().withProperty("db-scheduler-log.table-name", "my_logs");
+
+    assertThatThrownBy(() -> processor.postProcessEnvironment(env, application))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("db-scheduler-ui.log.table-name=my_logs");
+  }
+
+  @Test
+  void includesBothMigrationHintsWhenBothSet() {
     MockEnvironment env =
         new MockEnvironment()
             .withProperty("db-scheduler-log.enabled", "true")
             .withProperty("db-scheduler-log.table-name", "my_logs");
 
     assertThatThrownBy(() -> processor.postProcessEnvironment(env, application))
-        .hasMessageContaining("my_logs")
+        .hasMessageContaining("db-scheduler-ui.log.enabled=true")
         .hasMessageContaining("db-scheduler-ui.log.table-name=my_logs");
   }
 
   @Test
-  void doesNotThrowWhenLegacyEnabledIsFalse() {
-    MockEnvironment env = new MockEnvironment().withProperty("db-scheduler-log.enabled", "false");
-    processor.postProcessEnvironment(env, application);
-  }
-
-  @Test
-  void doesNotThrowWhenLegacyEnabledAbsent() {
+  void doesNotThrowWhenNoLegacyPropertiesPresent() {
     MockEnvironment env =
-        new MockEnvironment().withProperty("db-scheduler-log.table-name", "leftover");
-    processor.postProcessEnvironment(env, application);
-    assertThat(env.getProperty("db-scheduler-log.table-name")).isEqualTo("leftover");
+        new MockEnvironment().withProperty("db-scheduler-ui.log.enabled", "true");
+
+    assertThatCode(() -> processor.postProcessEnvironment(env, application))
+        .doesNotThrowAnyException();
   }
 }
