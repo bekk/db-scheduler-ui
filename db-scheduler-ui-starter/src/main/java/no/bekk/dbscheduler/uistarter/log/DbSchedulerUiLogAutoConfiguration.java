@@ -25,7 +25,6 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.util.Objects;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.log.LogRepository;
 import no.bekk.dbscheduler.ui.log.jdbc.IdProvider;
@@ -59,8 +58,8 @@ public class DbSchedulerUiLogAutoConfiguration {
 
   public DbSchedulerUiLogAutoConfiguration(
       DbSchedulerUiLogProperties config, DataSource dataSource) {
-    this.config = Objects.requireNonNull(config, "DbSchedulerUiLogProperties is required");
-    this.existingDataSource = Objects.requireNonNull(dataSource, "DataSource is required");
+    this.config = config;
+    this.existingDataSource = dataSource;
   }
 
   @Bean
