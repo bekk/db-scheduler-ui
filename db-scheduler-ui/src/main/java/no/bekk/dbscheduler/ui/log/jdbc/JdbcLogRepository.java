@@ -30,6 +30,7 @@ import no.bekk.dbscheduler.ui.log.LogRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class JdbcLogRepository implements LogRepository {
@@ -81,10 +82,11 @@ public class JdbcLogRepository implements LogRepository {
             p.setString(12, getStacktrace(log.cause()));
           });
       return true;
+    } catch (DuplicateKeyException e) {
+      LOG.debug("Skipping duplicate execution-log row (id collision): {}", e.getMessage());
+      return false;
     } catch (DataAccessException e) {
-      LOG.warn(
-          "Exception when inserting execution-log. Assuming it to be a constraint violation: {}",
-          e.getMessage());
+      LOG.error("Failed to insert execution-log row", e);
       return false;
     }
   }
