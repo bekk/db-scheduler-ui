@@ -82,7 +82,7 @@ public class JdbcLogRepository implements LogRepository {
           });
       return true;
     } catch (DataAccessException e) {
-      LOG.error(
+      LOG.warn(
           "Exception when inserting execution-log. Assuming it to be a constraint violation: {}",
           e.getMessage());
       return false;
