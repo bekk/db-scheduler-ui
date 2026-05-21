@@ -16,7 +16,7 @@ package no.bekk.dbscheduler.ui.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import no.bekk.dbscheduler.ui.model.TaskModel;
@@ -85,11 +85,8 @@ class QueryUtilsTest {
   @Test
   void sortTasks_byNameAscending_returnsSortedAlphabetically() {
     List<TaskModel> tasks =
-        new ArrayList<>(
-            List.of(
-                task("zebra-job", false, 0),
-                task("alpha-job", false, 0),
-                task("middle-job", false, 0)));
+        Arrays.asList(
+            task("zebra-job", false, 0), task("alpha-job", false, 0), task("middle-job", false, 0));
 
     List<TaskModel> sorted = QueryUtils.sortTasks(tasks, TaskSort.NAME, true);
 
@@ -101,11 +98,8 @@ class QueryUtilsTest {
   @Test
   void sortTasks_byNameDescending_returnsReverseSorted() {
     List<TaskModel> tasks =
-        new ArrayList<>(
-            List.of(
-                task("zebra-job", false, 0),
-                task("alpha-job", false, 0),
-                task("middle-job", false, 0)));
+        Arrays.asList(
+            task("zebra-job", false, 0), task("alpha-job", false, 0), task("middle-job", false, 0));
 
     List<TaskModel> sorted = QueryUtils.sortTasks(tasks, TaskSort.NAME, false);
 
