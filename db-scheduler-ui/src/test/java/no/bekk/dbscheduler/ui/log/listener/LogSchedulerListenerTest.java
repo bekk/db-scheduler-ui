@@ -42,9 +42,12 @@ class LogSchedulerListenerTest {
       assertThat(synchronous.awaitTermination(5, TimeUnit.SECONDS)).isTrue();
     }
 
-    assertThat(captured).singleElement().satisfies(log -> {
-      assertThat(log.taskInstance().getTaskName()).isEqualTo("task-a");
-      assertThat(log.succeeded()).isTrue();
-    });
+    assertThat(captured)
+        .singleElement()
+        .satisfies(
+            log -> {
+              assertThat(log.taskInstance().getTaskName()).isEqualTo("task-a");
+              assertThat(log.succeeded()).isTrue();
+            });
   }
 }

@@ -21,7 +21,6 @@ import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInput;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import javax.sql.DataSource;
@@ -50,7 +49,8 @@ import org.springframework.core.ConfigurableObjectInputStream;
 @ConditionalOnProperty(value = "db-scheduler-ui.log.enabled", matchIfMissing = true)
 public class DbSchedulerUiLogAutoConfiguration {
 
-  private static final Logger log = LoggerFactory.getLogger(DbSchedulerUiLogAutoConfiguration.class);
+  private static final Logger log =
+      LoggerFactory.getLogger(DbSchedulerUiLogAutoConfiguration.class);
 
   private final DbSchedulerUiLogProperties config;
   private final DataSource existingDataSource;

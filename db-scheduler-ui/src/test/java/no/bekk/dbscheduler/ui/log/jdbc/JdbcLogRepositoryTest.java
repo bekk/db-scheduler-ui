@@ -27,8 +27,7 @@ class JdbcLogRepositoryTest {
   void setUp() {
     dataSource = TestDatabase.newDataSourceWithTables();
     jdbc = new JdbcTemplate(dataSource);
-    repo =
-        new JdbcLogRepository(dataSource, JavaSerializer::new, LogsTable.NAME, new Snowflake(1));
+    repo = new JdbcLogRepository(dataSource, JavaSerializer::new, LogsTable.NAME, new Snowflake(1));
   }
 
   @Test
@@ -42,13 +41,16 @@ class JdbcLogRepositoryTest {
     assertThat(repo.createIfNotExists(ExecutionLog.from(event))).isTrue();
 
     List<Map<String, Object>> rows = jdbc.queryForList("select * from " + LogsTable.NAME);
-    assertThat(rows).singleElement().satisfies(row -> {
-      assertThat(row).containsEntry("task_name", "task-a");
-      assertThat(row).containsEntry("task_instance", "instance-1");
-      assertThat(row).containsEntry("succeeded", Boolean.TRUE);
-      assertThat(row).containsEntry("duration_ms", 2000L);
-      assertThat(row.get("exception_class")).isNull();
-    });
+    assertThat(rows)
+        .singleElement()
+        .satisfies(
+            row -> {
+              assertThat(row).containsEntry("task_name", "task-a");
+              assertThat(row).containsEntry("task_instance", "instance-1");
+              assertThat(row).containsEntry("succeeded", Boolean.TRUE);
+              assertThat(row).containsEntry("duration_ms", 2000L);
+              assertThat(row.get("exception_class")).isNull();
+            });
   }
 
   @Test
