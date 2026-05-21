@@ -39,7 +39,7 @@ class JdbcLogRepositoryTest {
         ExecutionComplete.success(
             new Execution(started, new TaskInstance<>("task-a", "instance-1")), started, finished);
 
-    assertThat(repo.createIfNotExists(new ExecutionLog(event))).isTrue();
+    assertThat(repo.createIfNotExists(ExecutionLog.from(event))).isTrue();
 
     List<Map<String, Object>> rows = jdbc.queryForList("select * from " + LogsTable.NAME);
     assertThat(rows).singleElement().satisfies(row -> {
@@ -63,7 +63,7 @@ class JdbcLogRepositoryTest {
             finished,
             cause);
 
-    assertThat(repo.createIfNotExists(new ExecutionLog(event))).isTrue();
+    assertThat(repo.createIfNotExists(ExecutionLog.from(event))).isTrue();
 
     Map<String, Object> row = jdbc.queryForMap("select * from " + LogsTable.NAME);
     assertThat(row).containsEntry("succeeded", Boolean.FALSE);
@@ -82,7 +82,7 @@ class JdbcLogRepositoryTest {
         ExecutionComplete.success(
             new Execution(now, new TaskInstance<>("task-c", "instance-3")), now, now.plusMillis(1));
 
-    assertThat(fixedRepo.createIfNotExists(new ExecutionLog(event))).isTrue();
-    assertThat(fixedRepo.createIfNotExists(new ExecutionLog(event))).isFalse();
+    assertThat(fixedRepo.createIfNotExists(ExecutionLog.from(event))).isTrue();
+    assertThat(fixedRepo.createIfNotExists(ExecutionLog.from(event))).isFalse();
   }
 }

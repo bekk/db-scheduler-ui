@@ -43,8 +43,8 @@ class LogSchedulerListenerTest {
     }
 
     assertThat(captured).singleElement().satisfies(log -> {
-      assertThat(log.taskInstance.getTaskName()).isEqualTo("task-a");
-      assertThat(log.succeeded).isTrue();
+      assertThat(log.taskInstance().getTaskName()).isEqualTo("task-a");
+      assertThat(log.succeeded()).isTrue();
     });
   }
 }

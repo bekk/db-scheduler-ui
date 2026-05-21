@@ -50,24 +50,10 @@ public class JdbcLogRepository implements LogRepository {
       Supplier<Serializer> serializerSupplier,
       String tableName,
       IdProvider idProvider) {
-    this(
-        tableName,
-        new JdbcTemplate(dataSource),
-        serializerSupplier,
-        new AutodetectJdbcCustomization(dataSource),
-        idProvider);
-  }
-
-  public JdbcLogRepository(
-      String tableName,
-      JdbcTemplate jdbcTemplate,
-      Supplier<Serializer> serializerSupplier,
-      JdbcCustomization jdbcCustomization,
-      IdProvider idProvider) {
     this.tableName = tableName;
-    this.jdbcTemplate = jdbcTemplate;
+    this.jdbcTemplate = new JdbcTemplate(dataSource);
     this.serializerSupplier = serializerSupplier;
-    this.jdbcCustomization = jdbcCustomization;
+    this.jdbcCustomization = new AutodetectJdbcCustomization(dataSource);
     this.idProvider = idProvider;
   }
 
@@ -82,17 +68,17 @@ public class JdbcLogRepository implements LogRepository {
               + " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
           p -> {
             p.setLong(1, idProvider.nextId());
-            p.setString(2, log.taskInstance.getTaskName());
-            p.setString(3, log.taskInstance.getId());
-            p.setObject(4, serialize(log.taskInstance.getData()));
-            p.setString(5, log.pickedBy);
-            jdbcCustomization.setInstant(p, 6, log.timeStarted);
-            jdbcCustomization.setInstant(p, 7, log.timeFinished);
-            p.setBoolean(8, log.succeeded);
-            p.setLong(9, Duration.between(log.timeStarted, log.timeFinished).toMillis());
-            p.setString(10, log.cause != null ? log.cause.getClass().getName() : null);
-            p.setString(11, log.cause != null ? log.cause.getMessage() : null);
-            p.setString(12, getStacktrace(log.cause));
+            p.setString(2, log.taskInstance().getTaskName());
+            p.setString(3, log.taskInstance().getId());
+            p.setObject(4, serialize(log.taskInstance().getData()));
+            p.setString(5, log.pickedBy());
+            jdbcCustomization.setInstant(p, 6, log.timeStarted());
+            jdbcCustomization.setInstant(p, 7, log.timeFinished());
+            p.setBoolean(8, log.succeeded());
+            p.setLong(9, Duration.between(log.timeStarted(), log.timeFinished()).toMillis());
+            p.setString(10, log.cause() != null ? log.cause().getClass().getName() : null);
+            p.setString(11, log.cause() != null ? log.cause().getMessage() : null);
+            p.setString(12, getStacktrace(log.cause()));
           });
       return true;
     } catch (DataAccessException e) {

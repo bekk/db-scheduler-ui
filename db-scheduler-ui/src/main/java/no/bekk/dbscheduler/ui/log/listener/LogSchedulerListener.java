@@ -39,7 +39,7 @@ public class LogSchedulerListener extends AbstractSchedulerListener implements A
 
   @Override
   public void onExecutionComplete(ExecutionComplete executionComplete) {
-    ExecutionLog log = new ExecutionLog(executionComplete);
+    ExecutionLog log = ExecutionLog.from(executionComplete);
     executorService.submit(() -> logRepository.createIfNotExists(log));
   }
 
