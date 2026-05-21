@@ -18,18 +18,34 @@ package no.bekk.dbscheduler.ui.log.listener;
 import com.github.kagkarlsson.scheduler.event.AbstractSchedulerListener;
 import com.github.kagkarlsson.scheduler.task.ExecutionComplete;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import no.bekk.dbscheduler.ui.log.ExecutionLog;
 import no.bekk.dbscheduler.ui.log.LogRepository;
 
 public class LogSchedulerListener extends AbstractSchedulerListener implements AutoCloseable {
 
+  private static final int DEFAULT_THREADS = 5;
+  private static final int DEFAULT_QUEUE_CAPACITY = 10_000;
+
   private final LogRepository logRepository;
   private final ExecutorService executorService;
 
   public LogSchedulerListener(LogRepository logRepository) {
-    this(logRepository, Executors.newFixedThreadPool(5));
+    this(logRepository, defaultExecutor());
+  }
+
+  private static ExecutorService defaultExecutor() {
+    // Bounded queue + CallerRunsPolicy: under sustained DB slowness, back-pressure onto the
+    // scheduler thread rather than growing the queue unbounded and risking OOM.
+    return new ThreadPoolExecutor(
+        DEFAULT_THREADS,
+        DEFAULT_THREADS,
+        0L,
+        TimeUnit.MILLISECONDS,
+        new LinkedBlockingQueue<>(DEFAULT_QUEUE_CAPACITY),
+        new ThreadPoolExecutor.CallerRunsPolicy());
   }
 
   public LogSchedulerListener(LogRepository logRepository, ExecutorService executorService) {
