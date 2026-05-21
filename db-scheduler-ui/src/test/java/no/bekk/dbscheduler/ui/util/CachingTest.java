@@ -32,6 +32,7 @@ class CachingTest {
     caching = new Caching();
   }
 
+  // TODO: Should be replaced by a constructor in the main product (db-scheduler)
   private static ScheduledExecution<Object> buildScheduledExecution(
       String taskName, String instanceId) {
     TaskInstance<Object> taskInstance = new TaskInstance<>(taskName, instanceId);
