@@ -30,7 +30,8 @@ class JdbcLogRepositoryTest {
   void setUp() {
     dataSource = TestDatabase.newDataSourceWithTables();
     jdbc = new JdbcTemplate(dataSource);
-    repo = new JdbcLogRepository(dataSource, new JavaSerializer(), LogsTable.NAME, new Snowflake(1));
+    repo =
+        new JdbcLogRepository(dataSource, new JavaSerializer(), LogsTable.NAME, new Snowflake(1));
   }
 
   @Test

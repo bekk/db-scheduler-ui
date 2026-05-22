@@ -72,8 +72,7 @@ public class DbSchedulerUiLogAutoConfiguration {
   LogRepository logRepository(IdProvider idProvider, DbSchedulerCustomizer customizer) {
     log.debug("No LogRepository bean found, creating a JdbcLogRepository");
     Serializer serializer = customizer.serializer().orElse(SPRING_JAVA_SERIALIZER);
-    return new JdbcLogRepository(
-        existingDataSource, serializer, config.tableName(), idProvider);
+    return new JdbcLogRepository(existingDataSource, serializer, config.tableName(), idProvider);
   }
 
   @Bean(destroyMethod = "close")
