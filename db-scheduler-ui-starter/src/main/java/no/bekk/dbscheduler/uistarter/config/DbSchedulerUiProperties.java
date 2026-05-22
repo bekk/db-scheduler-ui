@@ -13,18 +13,22 @@
  */
 package no.bekk.dbscheduler.uistarter.config;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
-@Setter
-@Getter
+/**
+ * Configuration for the db-scheduler UI.
+ *
+ * @param enabled whether the UI auto-configuration is active
+ * @param readOnly when true, disables mutating endpoints (rerun, delete, reschedule)
+ * @param taskData whether to surface serialized task data in API responses
+ * @param history whether the UI exposes task execution history (requires the log writer)
+ * @param logLimit cap on the number of history rows fetched per request; 0 means unlimited
+ */
 @ConfigurationProperties("db-scheduler-ui")
-public class DbSchedulerUiProperties {
-
-  private boolean enabled = true;
-  private boolean readOnly = false;
-  private boolean taskData = true;
-  private boolean history = false;
-  private int logLimit = 0;
-}
+public record DbSchedulerUiProperties(
+    @DefaultValue("true") boolean enabled,
+    @DefaultValue("false") boolean readOnly,
+    @DefaultValue("true") boolean taskData,
+    @DefaultValue("false") boolean history,
+    @DefaultValue("0") int logLimit) {}

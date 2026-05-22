@@ -80,7 +80,7 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   TaskLogic taskLogic(Scheduler scheduler, Caching caching, DbSchedulerUiProperties properties) {
-    return new TaskLogic(scheduler, caching, properties.isTaskData());
+    return new TaskLogic(scheduler, caching, properties.taskData());
   }
 
   @Bean
@@ -101,7 +101,7 @@ public class UiApiAutoConfiguration {
         customizer.dataSource().orElse(dataSource),
         customizer.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
         caching,
-        properties.isTaskData(),
+        properties.taskData(),
         logTableName,
         logLimit);
   }
@@ -156,7 +156,7 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   ConfigController configController(DbSchedulerUiProperties properties) {
-    return new ConfigController(properties.isHistory(), properties::isReadOnly);
+    return new ConfigController(properties.history(), properties::readOnly);
   }
 
   @Bean

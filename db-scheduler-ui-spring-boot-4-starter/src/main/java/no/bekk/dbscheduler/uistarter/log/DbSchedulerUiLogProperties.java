@@ -17,32 +17,16 @@ package no.bekk.dbscheduler.uistarter.log;
 
 import no.bekk.dbscheduler.ui.log.jdbc.JdbcLogRepository;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
+/**
+ * Configuration for the bundled execution-log writer.
+ *
+ * @param enabled whether to enable auto-configuration of the execution-log writer (opt-in)
+ * @param tableName name of the table used to log executions; must match the database schema —
+ *     change here and in the migration scripts together
+ */
 @ConfigurationProperties("db-scheduler-ui.log")
-public class DbSchedulerUiLogProperties {
-
-  /** Whether to enable auto-configuration of the execution-log writer. Opt-in. */
-  private boolean enabled = false;
-
-  /**
-   * Name of the table used to log executions. Must match the database schema; change here and in
-   * migrations together.
-   */
-  private String tableName = JdbcLogRepository.DEFAULT_TABLE_NAME;
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  public void setEnabled(final boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  public String getTableName() {
-    return tableName;
-  }
-
-  public void setTableName(final String tableName) {
-    this.tableName = tableName;
-  }
-}
+public record DbSchedulerUiLogProperties(
+    @DefaultValue("false") boolean enabled,
+    @DefaultValue(JdbcLogRepository.DEFAULT_TABLE_NAME) String tableName) {}
