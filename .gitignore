@@ -49,8 +49,13 @@ replay_pid*
 .sts4-cache
 .dbeaver
 
-# Claude
-.claude
+# Claude (personal overrides only — skills and shared settings stay tracked)
+.claude/settings.local.json
 
 # pnpm content-addressable store
 .pnpm-store/
+
+# Agent scratch dirs (browser snapshots, indexer caches)
+.screenshots/
+.playwright-mcp/
+.serena/
