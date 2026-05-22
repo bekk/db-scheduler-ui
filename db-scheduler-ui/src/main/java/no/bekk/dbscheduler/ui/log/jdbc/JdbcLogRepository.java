@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.function.Supplier;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.log.ExecutionLog;
 import no.bekk.dbscheduler.ui.log.LogRepository;
@@ -39,16 +40,20 @@ public class JdbcLogRepository implements LogRepository {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcLogRepository.class);
 
   private final JdbcTemplate jdbcTemplate;
-  private final Serializer serializer;
+  private final Supplier<Serializer> serializerSupplier;
   private final String tableName;
   private final JdbcCustomization jdbcCustomization;
   private final IdProvider idProvider;
+  private volatile Serializer cachedSerializer;
 
   public JdbcLogRepository(
-      DataSource dataSource, Serializer serializer, String tableName, IdProvider idProvider) {
+      DataSource dataSource,
+      Supplier<Serializer> serializerSupplier,
+      String tableName,
+      IdProvider idProvider) {
     this.tableName = tableName;
     this.jdbcTemplate = new JdbcTemplate(dataSource);
-    this.serializer = Objects.requireNonNull(serializer, "serializer");
+    this.serializerSupplier = Objects.requireNonNull(serializerSupplier, "serializerSupplier");
     this.jdbcCustomization = new AutodetectJdbcCustomization(dataSource);
     this.idProvider = idProvider;
   }
@@ -101,7 +106,7 @@ public class JdbcLogRepository implements LogRepository {
       return null;
     }
     try {
-      return serializer.serialize(value);
+      return resolveSerializer().serialize(value);
     } catch (Exception e) {
       if (e instanceof NotSerializableException) {
         LOG.warn("object is not serializable - you need to add Serializable");
@@ -110,5 +115,15 @@ public class JdbcLogRepository implements LogRepository {
       }
       return null;
     }
+  }
+
+  private Serializer resolveSerializer() {
+    Serializer cached = cachedSerializer;
+    if (cached != null) {
+      return cached;
+    }
+    Serializer fresh = Objects.requireNonNull(serializerSupplier.get(), "serializer");
+    cachedSerializer = fresh;
+    return fresh;
   }
 }

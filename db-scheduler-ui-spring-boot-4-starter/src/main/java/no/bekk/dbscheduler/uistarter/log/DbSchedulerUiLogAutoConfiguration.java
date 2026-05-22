@@ -39,6 +39,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ConfigurableObjectInputStream;
 
 @AutoConfiguration
@@ -69,10 +70,13 @@ public class DbSchedulerUiLogAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean(LogRepository.class)
-  LogRepository logRepository(IdProvider idProvider, DbSchedulerCustomizer customizer) {
+  LogRepository logRepository(IdProvider idProvider, @Lazy DbSchedulerCustomizer customizer) {
     log.debug("No LogRepository bean found, creating a JdbcLogRepository");
-    Serializer serializer = customizer.serializer().orElse(SPRING_JAVA_SERIALIZER);
-    return new JdbcLogRepository(existingDataSource, serializer, config.tableName(), idProvider);
+    return new JdbcLogRepository(
+        existingDataSource,
+        () -> customizer.serializer().orElse(SPRING_JAVA_SERIALIZER),
+        config.tableName(),
+        idProvider);
   }
 
   @Bean(destroyMethod = "close")
