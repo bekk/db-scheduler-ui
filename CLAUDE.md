@@ -59,15 +59,17 @@ Notes:
 - If a change touches `db-scheduler-ui-frontend/`, drop `-Pfast` so the frontend actually rebuilds.
 - Always run `./mvnw spotless:apply` and `./mvnw license:format` before pushing — the full build fails without them.
 
+To launch the UI in a browser (screenshot, drive with Playwright, etc.), see the `explore-ui` project skill at `.claude/skills/explore-ui/SKILL.md`.
+
 ## Module Architecture
 
 Multi-module Maven project (`pom.xml` at root):
 
 - **db-scheduler-ui** — Core library. REST controllers (`/db-scheduler-api/**`), service logic (`TaskLogic`, `LogLogic`), query/filter/sort utilities, and task-to-model mapping. Contains the bundled frontend in `src/main/resources/static/`. No Spring Boot auto-configuration here — just plain Spring `@RestController` beans.
-  - `TaskController` (GET endpoints: `/all`, `/details`, `/poll`)
-  - `TaskAdminController` (POST endpoints: `/rerun`, `/rerunGroup`, `/delete`) — disabled when `read-only=true`
-  - `LogController` — task execution history (requires `history=true`)
-  - `ConfigController` — exposes UI config (history enabled, read-only mode)
+  - `TaskController` — `GET /db-scheduler-api/tasks/{all,details,poll}`
+  - `TaskAdminController` — `POST /db-scheduler-api/tasks/{rerun,rerunGroup,delete}`; disabled when `read-only=true`
+  - `LogController` — `GET /db-scheduler-api/logs/...`; requires `db-scheduler-ui.history=true`
+  - `ConfigController` — `GET /db-scheduler-api/config`; exposes UI config (history enabled, read-only mode)
   - `Caching` — in-memory cache of scheduler executions for polling/status changes
 
 - **db-scheduler-ui-starter** — Spring Boot 3 auto-configuration (`UiApiAutoConfiguration`). Wires up all beans from `db-scheduler-ui`, handles context-path/servlet-path resolution, SPA fallback routing, and index.html rewriting. Properties class: `DbSchedulerUiProperties`.
