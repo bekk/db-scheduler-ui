@@ -53,7 +53,11 @@ Severity order **failing > running > scheduled > dormant**. Multi-instance row s
 | failing   | any instance `consecutiveFailures > 0`           |
 | running   | any instance `picked == true` (and none failing) |
 | scheduled | ≥1 scheduled instance, none failing/running      |
-| dormant   | registered task with **0** scheduled instances   |
+| dormant   | **one-time/custom** task definition with **0** scheduled instances |
+
+> Recurring tasks are **never dormant** — a recurring task always reschedules itself, so a
+> registered recurring definition always has ≥1 scheduled instance. (A recurring task with 0
+> scheduled instances is an error/abnormal state, not a normal "dormant" row — out of scope here.)
 
 ### Sub-line rules
 
@@ -134,8 +138,9 @@ beans into `UiApiAutoConfiguration` to build the recurring-name set.
 
 ### Dormant tasks
 
-Show **all** registered task definitions, including those with 0 scheduled executions, flagged
-`dormant`. Requires the registered task list (same source as recurring detection).
+Show **one-time/custom** task definitions with 0 scheduled executions, flagged `dormant`.
+Requires the registered task list (same source as recurring detection). Recurring definitions
+are **never** shown as dormant (see Status table note).
 
 ### Graceful degradation
 
