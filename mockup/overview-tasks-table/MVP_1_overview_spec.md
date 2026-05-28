@@ -9,7 +9,8 @@ operator sees the health of every task at a glance. Companion mockup:
 - New **Overview** tab, nav order `Overview | Scheduled | History`.
 - **Overview is the default landing page.**
 - **Scheduled** = unchanged flat per-execution list; it is the drill-down target of the
-  `→ list` link. **History** unchanged.
+  `→ list` and `→ instance` link. 
+- **History** unchanged.
 
 ## Page structure
 
@@ -33,26 +34,26 @@ ONE-TIME / CUSTOM · 4
 
 Each row aggregates all instances of one task name:
 
-| Element | Content |
-|---|---|
-| **Status marker** | Colored dot **+ one-word label**. Color is never the only signal (a11y). |
-| **Task name** | Bold. |
-| **Sub-line** | `<status word> [for <duration>] [· instance summary]` — see rules below. |
-| **Next run** | Relative time to soonest next execution; hover = absolute timestamp. |
-| **Last run** | Most-recent last-success / last-failure across instances; hover = absolute. |
-| **Link** | `→ instance` (1 instance) or `→ list` (many → Scheduled filtered by task name). |
+| Element           | Content                                                                         |
+|-------------------|---------------------------------------------------------------------------------|
+| **Status marker** | Colored dot **+ one-word label**. Color is never the only signal (a11y).        |
+| **Task name**     | Bold.                                                                           |
+| **Sub-line**      | `<status word> [for <duration>] [· instance summary]` — see rules below.        |
+| **Next run**      | Relative time to soonest next execution; hover = absolute timestamp.            |
+| **Last run**      | Most-recent last-success / last-failure across instances; hover = absolute.     |
+| **Link**          | `→ instance` (1 instance) or `→ list` (many → Scheduled filtered by task name). |
 
 ### Status (dot + label)
 
 Severity order **failing > running > scheduled > dormant**. Multi-instance row shows the
 **worst** state present.
 
-| State | Condition |
-|---|---|
-| failing | any instance `consecutiveFailures > 0` |
-| running | any instance `picked == true` (and none failing) |
-| scheduled | ≥1 scheduled instance, none failing/running |
-| dormant | registered task with **0** scheduled instances |
+| State     | Condition                                        |
+|-----------|--------------------------------------------------|
+| failing   | any instance `consecutiveFailures > 0`           |
+| running   | any instance `picked == true` (and none failing) |
+| scheduled | ≥1 scheduled instance, none failing/running      |
+| dormant   | registered task with **0** scheduled instances   |
 
 ### Sub-line rules
 
@@ -89,7 +90,7 @@ Severity order **failing > running > scheduled > dormant**. Multi-instance row s
 
 `GET /db-scheduler-api/tasks/overview` — does group-by + aggregation **server-side**. Do
 **not** patch legacy `TaskMapper.groupTasks` (latent bug: its `lastFailure` is the *first*
-non-null instance, not the most recent). One object per task name:
+non-null instance, not the most recent). One object per task name, suggestion:
 
 ```
 OverviewTask {
