@@ -5,6 +5,24 @@ operator sees the health of every task at a glance. Companion mockup:
 `screenshots/01-overview.png` (source sketch `design.excalidraw`). Deferred items:
 `../future_features.md`.
 
+## Suggested implementation split
+
+All work hides behind a **non-public** feature toggle (`db-scheduler-ui.overview`, default
+off) so each step merges to `main` without changing current behavior. Implement one phase at a
+time:
+
+1. **Toggle + empty page** — add the `overview` flag (both starters → `ConfigController`/`ConfigResponse` → frontend `getShowOverview`) plus a flag-gated Overview **nav tab** and empty route reachable from it, so it merges invisibly; also set `db-scheduler-ui.overview=true` in the example-app(s) so the page is actually reachable for verification (the off-state stays covered by targeted `@TestPropertySource` tests).
+2. **Backend** — add `GET /tasks/overview` doing server-side per-task aggregation in a new clean method (Java-side for now — the dep is released `db-scheduler 15.6.0`, not a SNAPSHOT), with the recurring/dormant overlay from registered task defs and graceful degradation when none exist.
+3. **Frontend** — build the two-section task table (status dot+label, sub-line, next/last-run columns, drill-down links) against the endpoint, reusing `determineStatus.ts`/`dateFormatText.ts`.
+4. **Leftovers** — make Overview the default landing page *only when the flag is on*, and (deferred) swap the Java aggregation for a DB-side group-by once it's released in db-scheduler core.
+
+### Implementation notes
+
+- **Mirror backend changes in both starters** — `db-scheduler-ui-starter` (Boot 3) and `db-scheduler-ui-spring-boot-4-starter` (Boot 4) each have their own `DbSchedulerUiProperties` + `UiApiAutoConfiguration`; `ConfigController`/`ConfigResponse` are shared in `db-scheduler-ui` (edit once).
+- **TopBar nav quirk** — today the Scheduled/History buttons render *only when `history=true`*, so with history off there is no tab bar at all; the Overview tab must appear independently of that (render Scheduled when `showOverview || showHistory`).
+- **Route precedence** — `/:taskName` is a catch-all sibling of the index route, so the phase-4 default-landing change (moving Scheduled off `/`) must not collide with it; verify ordering in `FrontPage.tsx`.
+- **Verifying the frontend** — an implementing subagent verifies non-visually: `pnpm run lint`, `pnpm run build` (catches TS/type errors), and `curl` `/db-scheduler-api/tasks/overview`. Leave the browser/screenshot check to the orchestrator via the `explore-ui` skill in **Vite dev mode** (mode B) — bundled mode (A) serves a stale frontend until `mvn install` reruns, a common false negative. Remember the page is only visible with the `overview` flag on (set in example-app per phase 1).
+
 ## Navigation
 
 - New **Overview** tab, nav order `Overview | Scheduled | History`.
@@ -114,18 +132,22 @@ OverviewTask {
 Time-in-state durations need **no extra fields** — derived client-side (*failing for X* =
 `now − lastSuccess`; *running for X* = `now − nextExecutionTime` for a picked single-schedule row).
 
-### Aggregation (new `SchedulerClient` group-by method — in MVP 1)
+### Aggregation
 
-Aggregate by grouping by task name **in the database**, not by fetching every
-`ScheduledExecution` and grouping in Java (today's `Caching.java` / `TaskMapper.groupTasks`).
+Group by task name in a **new clean method** (do **not** patch legacy `TaskMapper.groupTasks`
+— its `lastFailure` is the *first* non-null instance, not the most recent). Returns
+per-task-name: `instanceCount`, `counts`, soonest `nextExecutionTime`, most-recent
+`lastSuccess`/`lastFailure`, `maxConsecutiveFailures`.
 
-- Returns per-task-name: `instanceCount`, `counts`, soonest `nextExecutionTime`, most-recent
-  `lastSuccess`/`lastFailure`, `maxConsecutiveFailures`.
-- `SchedulerClient` lives in **db-scheduler core**; repo tracks `db-scheduler:master-SNAPSHOT`,
-  so add the method upstream.
+- **Java-side for now.** The repo depends on **released** `db-scheduler 15.6.0` (Boot 3) /
+  `16.7.0` (Boot 4), not a SNAPSHOT, so aggregate over `getScheduledExecutions()` in Java
+  (same data source as today's `Caching.java`).
+- **Deferred:** a DB-side group-by belongs in **db-scheduler core** (`SchedulerClient`) — file
+  it upstream, and once released, bump the dependency and swap the Java aggregation for it
+  (the per-task-name contract is identical, so the swap is transparent).
 - Per-execution fields available: `taskInstance`, `executionTime`, `picked`, `pickedBy`,
   `lastSuccess`, `lastFailure`, `consecutiveFailures`.
-- `recurring` flag and dormant rows are **not** from this DB aggregation — they overlay from
+- `recurring` flag and dormant rows are **not** from this aggregation — they overlay from
   registered task definitions (below).
 
 ### Recurring detection
@@ -165,5 +187,6 @@ task-definition lookup optional.
 
 ## Out of scope (deferred — see `future_features.md`)
 
-Global summary bar, quick-filter chips, task-name search, `lastHeartbeat` cleanup, and precise
-core-sourced run-duration. (The `SchedulerClient` group-by method **is** in MVP 1.)
+Global summary bar, quick-filter chips, task-name search, `lastHeartbeat` cleanup, precise
+core-sourced run-duration, and the upstream DB-side `SchedulerClient` group-by method (MVP 1
+aggregates in Java — see §Aggregation).
