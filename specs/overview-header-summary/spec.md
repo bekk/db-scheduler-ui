@@ -133,13 +133,15 @@ Consistent with the table spec's SchedulerClient-only fallback:
 
 ## Visual / tokens
 
-Reuse the Overview tokens from the table prototype (`--ov-red`, `--ov-blue`, `--ov-green`,
+Reuse the Overview tokens from the table mockup (`--ov-red`, `--ov-blue`, `--ov-green`,
 `--ov-grey`, `--ov-muted`). The strip cells mirror the per-task header's `.summary-cell`
 styling (`.bad` = red, `.run` = blue) but at page scope. Chips: outline when inactive,
 filled/tinted when active, always text-labeled.
 
-> The table prototype `../overview-tasks-table/prototype/01-overview.html` currently has no
-> strip or chips — add them above `<section data-name="tasks-table">` when prototyping this.
+> Mockups: `screenshots/01-overview-header.png` (strip + chips, no filter active) and
+> `screenshots/02-overview-filtered.png` (*Has failures* chip active, sections filtered).
+> The base table mockup (`../overview-tasks-table/screenshots/01-overview.png`) has no strip
+> or chips — these sit above the task table.
 
 ## Relevant existing code
 

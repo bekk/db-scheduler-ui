@@ -2,7 +2,8 @@
 
 Task-centric landing dashboard: **one row per task name** (not per execution) so an
 operator sees the health of every task at a glance. Companion mockup:
-`MVP_1_overview_v2.excalidraw`. Deferred items: `mockup/future_features.md`.
+`screenshots/01-overview.png` (source sketch `design.excalidraw`). Deferred items:
+`../future_features.md`.
 
 ## Navigation
 

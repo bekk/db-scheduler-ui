@@ -1,8 +1,10 @@
 # Instance panel — single-instance detail (implementation spec)
 
 The side drawer in the task drill-down that shows **one execution** in full: status, why
-it's broken, payload, last exception, recent history, and per-instance actions. Source
-mockup: `.screenshots/mockups/03-instance-panel.html`.
+it's broken, payload, last exception, recent history, and per-instance actions. Mockups of
+the three candidate presentation forms: `screenshots/01-side-panel.png` (docked side panel),
+`screenshots/02-slide-over.png` (slide-over overlay), `screenshots/03-popover.png` (floating
+popover).
 
 Child of the **task-detail** drill-down (planned spec) — it opens for the row the operator
 selects in that view. Builds on `../overview-tasks-table/spec.md` (status model) and reuses
@@ -26,14 +28,14 @@ the existing history (`LogModel`) and admin (`TaskAdminController`) plumbing.
 ## Presentation — open for prototyping
 
 The *content* and *behaviour* above are fixed; **how the detail is rendered is not** — settle
-it by prototyping a few variants. Mockup `03-instance-panel.html` shows the **docked
-side-panel** option, but that's one candidate, not the decision.
+it by prototyping a few variants. The three mockup screenshots above show the **docked
+side-panel**, **slide-over**, and **popover** candidates — none is the decision yet.
 
 | Variant | Sketch | Strengths | Weaknesses |
 |---|---|---|---|
-| **Docked side panel** | list left, detail pinned right (mockup 03) | compare instances; list stays visible; room for stack traces | needs width; cramped on narrow screens |
-| **Slide-over overlay** | detail slides in over the list, dims the rest | works on narrow screens; standard Chakra `Drawer` | hides the list while open |
-| **Floating / hover popover** | small panel anchored to the clicked row | lightweight peek; fast scan | too small for stack traces / payload; awkward to pin |
+| **Docked side panel** | list left, detail pinned right (`screenshots/01-side-panel.png`) | compare instances; list stays visible; room for stack traces | needs width; cramped on narrow screens |
+| **Slide-over overlay** | detail slides in over the list, dims the rest (`screenshots/02-slide-over.png`) | works on narrow screens; standard Chakra `Drawer` | hides the list while open |
+| **Floating / hover popover** | small panel anchored to the clicked row (`screenshots/03-popover.png`) | lightweight peek; fast scan | too small for stack traces / payload; awkward to pin |
 | **Inline row expansion** | row expands in place (today's accordion) | familiar; no new layout | pushes rows down; poor for long traces / comparing |
 | **Dedicated route/page** | navigate to `/…/instance/<id>` | best for deep links + lots of content | loses list context; heavier nav |
 
