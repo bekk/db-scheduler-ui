@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Instance panel · Variant C — floating popover</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="annotate.js" defer></script>
+  <style>
+    .brand .logo-dot { width:10px;height:10px;border-radius:50%;background:var(--primary);display:inline-block; }
+    .variant-note { font-size:12px; color:var(--text-muted); margin:0 0 12px; }
+    .variant-note b { color:var(--text); }
+
+    .task-table { display:flex; flex-direction:column; gap:8px; position:relative; }
+    .instance-row { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center;
+      background:#fff; border:1px solid var(--border); border-radius:8px; padding:10px 14px; cursor:pointer; }
+    .instance-row:hover { border-color:var(--border-strong); }
+    .instance-row.selected { border-color:var(--primary); box-shadow:0 0 0 1px var(--primary); }
+    .instance-id { font-weight:600; font-size:13px; }
+    .instance-meta { font-size:12px; color:var(--text-muted); margin-top:2px; }
+    .instance-time { font-size:12px; color:var(--text-muted); white-space:nowrap; }
+
+    .detail h3 { margin:0; font-size:14px; display:flex; align-items:center; gap:8px; }
+    .detail .sub { font-size:11px; color:var(--text-muted); margin:2px 0 10px; word-break:break-all; }
+    .kv { display:flex; justify-content:space-between; gap:12px; padding:4px 0; border-bottom:1px solid var(--border); font-size:12.5px; }
+    .kv .k { color:var(--text-muted); }
+    .kv .v.bad { color:var(--failed-fg); font-weight:600; }
+    .kv .v.muted { color:var(--text-dim); }
+    .section-title { margin:12px 0 6px; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+    .gate { font-size:10px; font-weight:700; background:var(--idle-bg); color:var(--idle-fg); border-radius:4px; padding:1px 5px; text-transform:none; letter-spacing:0; }
+    pre.json, pre.stack { margin:0; background:#0f172a0a; border:1px solid var(--border); border-radius:6px; padding:9px; font-size:11.5px; overflow:auto; max-height:120px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+    pre.stack { color:var(--failed-fg); }
+    .hist-row { font-size:11.5px; color:var(--text-muted); padding:4px 0; border-bottom:1px solid var(--border); }
+    .hist-row .x { color:var(--failed-fg); font-weight:700; }
+    .detail .actions { display:flex; gap:8px; margin-top:12px; align-items:center; }
+
+    /* layout: floating popover anchored to the selected row */
+    .popover-wrap { position:relative; }
+    .popover { position:absolute; right:24px; top:96px; width:360px; max-height:72vh; overflow:auto; z-index:6;
+      background:#fff; border:1px solid var(--border-strong); border-radius:10px; padding:14px;
+      box-shadow:0 12px 32px rgba(0,0,0,.18); }
+    .popover .pop-close { position:absolute; top:8px; right:10px; border:none; background:transparent; font-size:18px; cursor:pointer; color:var(--text-muted); }
+    .popover::before { content:""; position:absolute; left:-8px; top:24px; width:14px; height:14px; background:#fff;
+      border-left:1px solid var(--border-strong); border-bottom:1px solid var(--border-strong); transform:rotate(45deg); }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="logo-dot"></span> DB Scheduler UI</div>
+  <nav><a href="#">Overview</a><a href="#" class="active">Scheduled</a><a href="#">History</a></nav>
+</div>
+
+<main class="page">
+  <div class="crumb"><a href="#">← All tasks</a> / onetime-spawned-task · failed instances</div>
+  <p class="variant-note">Variant <b>C — floating popover</b>: a card floats next to the clicked row. Lightweight peek; note it must scroll for long stack traces (the trickiest fit).</p>
+
+  <div class="popover-wrap">
+    <div data-name="instance-list" class="task-table">
+      <div class="instance-row"><span class="status-pill failed">⚠ ×4</span><div><div class="instance-id">spawned … loopnr: 34</div><div class="instance-meta">Simulated task failure</div></div><div class="instance-time">next 12:07:09</div></div>
+      <div class="instance-row selected"><span class="status-pill failed">⚠ ×2</span><div><div class="instance-id">spawned … loopnr: 35</div><div class="instance-meta">NullPointerException</div></div><div class="instance-time">next 12:07:09</div></div>
+      <div class="instance-row"><span class="status-pill failed">⚠ ×1</span><div><div class="instance-id">spawned … loopnr: 36</div><div class="instance-meta">NullPointerException</div></div><div class="instance-time">next 12:07:09</div></div>
+      <div class="instance-row"><span class="status-pill running">▶ run</span><div><div class="instance-id">spawned … loopnr: 40</div><div class="instance-meta">picked by scheduler-2</div></div><div class="instance-time">running now</div></div>
+    </div>
+
+    <!-- floating popover -->
+    <aside data-name="instance-detail" class="popover detail">
+      <button class="pop-close" title="Close (Esc)">×</button>
+      <div data-name="detail-header">
+        <h3>spawned … loopnr: 35 <span class="status-pill failed">⚠ Failed</span></h3>
+        <div class="sub">7388344167784533789 · loopnr: 35</div>
+      </div>
+      <div data-name="detail-fields">
+        <div class="kv"><span class="k">Consecutive failures</span><span class="v bad">2</span></div>
+        <div class="kv"><span class="k">Next execution</span><span class="v">26 May · 12:07:09</span></div>
+        <div class="kv"><span class="k">Last failure</span><span class="v">26 May 12:06:25</span></div>
+        <div class="kv"><span class="k">Last success</span><span class="v muted">never</span></div>
+        <div class="kv"><span class="k">Picked by</span><span class="v muted">—</span></div>
+        <div class="kv"><span class="k">Version</span><span class="v">3</span></div>
+      </div>
+      <div data-name="detail-taskdata" class="section-title">Task data</div>
+      <pre class="json">{ "loopnr": 35, "payload": { "userId": "u-9012", "kind": "rebuild" } }</pre>
+      <div data-name="detail-exception" class="section-title">Last exception <span class="gate">history</span></div>
+      <pre class="stack">java.lang.NullPointerException: Cannot invoke "User.getId()"
+    at com.acme.Worker.process(Worker.java:42)
+    at com.acme.Worker.handle(Worker.java:21)
+    at com.github.kagkarlsson…ExecutePicked.run(…)</pre>
+      <div data-name="detail-history" class="section-title">Recent history <span class="gate">history</span></div>
+      <div class="hist-row"><span class="x">⚠ Failed</span> · 12:06:25 · 1.2s</div>
+      <div class="hist-row" style="border:0;"><a href="#">View full history →</a></div>
+      <div data-name="detail-actions" class="actions">
+        <button class="btn primary sm">⟳ Rerun</button>
+        <button class="btn danger sm">Delete</button>
+      </div>
+    </aside>
+  </div>
+</main>
+</body>
+</html>

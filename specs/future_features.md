@@ -8,36 +8,15 @@ current feature. Keep MVP 1 lean; park anything non-essential below.
 
 ## Header++ : global summary bar
 
-A summary strip on top of the Overview, above the task list.
-
-Proposed content (left → right):
-- `N tasks` — count of distinct task names.
-- `N failing (M instances)` — tasks with ≥1 failing instance, and the total failing
-  instance count.
-- `N running` — count of picked instances.
-- `N total scheduled` — total scheduled instances.
-- `last hour: N ok · M failed` — throughput.
-
-Feasibility / data:
-- All counts except throughput are **free** from the Overview endpoint's aggregation
-  (no extra query, no history).
-- `last hour: N ok · M failed` **requires `history=true`** (the log table, via
-  `LogLogic`). Render this element **only when history is enabled**
-  (`ConfigController` exposes the flag at `/db-scheduler-api/config`); hide it otherwise.
-
-Interaction:
-- Counts double as **click-to-filter** shortcuts (e.g. click "failing" → filter list to
-  failing tasks). Depends on the filter chips below.
+> **Moved to its own spec** (`overview-header-summary/spec.md`) — 2026-05-28. The global
+> summary strip (N tasks · N failing · N running · N scheduled · history-gated last-hour
+> throughput) is now specced there, together with the quick-filter chips below.
 
 ## Quick-filter chips
 
-Toggle chips above the list:
-- **Has failures** → existing `filter=FAILED`.
-- **Running now** → existing `filter=RUNNING`.
-- **Recurring only** → the `recurring` flag from the new endpoint.
-
-These map onto the existing filter params (`ALL | FAILED | RUNNING | SCHEDULED |
-SUCCEEDED`) plus the new recurring flag. Cheap once the endpoint exposes `recurring`.
+> **Moved to `overview-header-summary/spec.md`** — 2026-05-28. Specced as three
+> AND-combined client-side toggles (Has failures / Running now / Recurring only); the
+> summary-strip counts double as click-to-filter shortcuts for them.
 
 ## Task-name search box
 
@@ -76,3 +55,14 @@ Append items here as they come up during implementation (date · note):
 - 2026-05-28 · (seed) doc created from the MVP 1 interview.
 - 2026-05-28 · run-duration **proxy** (`now − executionTime`) pulled into MVP 1 for the
   `running for <duration>` sub-line; precise/core-sourced duration stays deferred (above).
+- 2026-05-28 · global summary bar + quick-filter chips promoted out of this backlog into
+  `overview-header-summary/spec.md`; task-name search box stays deferred here.
+- 2026-05-29 · `instance-panel/spec.md` written. Discovered: (a) **Reschedule** has **no
+  backend** — `TaskAdminController` only has rerun/rerunGroup/delete; **dropped for this work**
+  (not in the current version); would need a new `POST /tasks/reschedule`
+  (`SchedulerClient.reschedule`) + time-picker if revived later;
+  (b) the instance **exception + stack trace** live only in the log table (`LogModel`), so the
+  detail's exception/recent-history sections are **history-gated**; scheduled_tasks has none.
+- 2026-05-29 · instance-panel **presentation form left open** in the spec (side panel /
+  slide-over / popover / inline / dedicated route) — to be settled by prototyping variants;
+  only the information set + behaviour are locked.
