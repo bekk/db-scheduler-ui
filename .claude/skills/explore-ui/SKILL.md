@@ -47,6 +47,8 @@ Key UI routes (both modes serve the same SPA):
 - `/` — "Scheduled" tab: all tasks with status, next-execution time, run/rerun controls
 - `/history/all` — "History" tab: execution log (requires `db-scheduler-ui.history=true`, which `example-app` sets)
 
+**Flag-gated pages won't appear unless their flag is set** (e.g. History needs `db-scheduler-ui.history=true`; an in-progress feature behind its own toggle needs that toggle on). If a tab/route is missing, check the flag is enabled in the example-app's `application.properties` before assuming it's broken.
+
 ## Driving it
 
 Whatever headless browser is available — Playwright MCP (`mcp__playwright__browser_*`), `chromium-cli`, raw `curl` for API smoke. Same URLs above.
