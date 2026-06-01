@@ -18,12 +18,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Per-task-name instance breakdown. Buckets are mutually exclusive (each execution counted by its
+ * worst applicable state) and sum to {@code OverviewTask.instanceCount}.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConfigResponse {
-  private boolean showHistory;
-  private boolean readOnly;
-  private boolean showOverview;
+public class OverviewCounts {
+  private int failing;
+  private int running;
+  private int scheduled;
 }

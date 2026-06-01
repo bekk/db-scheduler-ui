@@ -26,5 +26,6 @@ public class DbSchedulerUiProperties {
   private boolean readOnly = false;
   private boolean taskData = true;
   private boolean history = false;
+  private boolean overview = false;
   private int logLimit = 0;
 }
