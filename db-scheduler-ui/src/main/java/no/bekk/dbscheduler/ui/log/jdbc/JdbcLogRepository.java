@@ -77,7 +77,8 @@ public class JdbcLogRepository implements LogRepository {
             jdbcCustomization.setInstant(p, 7, log.timeFinished());
             p.setBoolean(8, log.succeeded());
             p.setLong(9, Duration.between(log.timeStarted(), log.timeFinished()).toMillis());
-            p.setString(10, log.cause() != null ? log.cause().getClass().getName() : null);
+            p.setString(
+                10, log.cause() != null ? truncate(log.cause().getClass().getName(), 255) : null);
             p.setString(11, log.cause() != null ? log.cause().getMessage() : null);
             p.setString(12, getStacktrace(log.cause()));
           });
@@ -89,6 +90,10 @@ public class JdbcLogRepository implements LogRepository {
       LOG.error("Failed to insert execution-log row", e);
       return false;
     }
+  }
+
+  static String truncate(String value, int maxLength) {
+    return value.length() <= maxLength ? value : value.substring(0, maxLength);
   }
 
   private String getStacktrace(Throwable cause) {

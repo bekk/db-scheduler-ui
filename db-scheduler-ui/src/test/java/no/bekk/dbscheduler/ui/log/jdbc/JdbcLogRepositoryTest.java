@@ -82,6 +82,13 @@ class JdbcLogRepositoryTest {
   }
 
   @Test
+  void truncatesValuesLongerThanMaxLength() {
+    assertThat(JdbcLogRepository.truncate("short", 255)).isEqualTo("short");
+    assertThat(JdbcLogRepository.truncate("abcde", 5)).isEqualTo("abcde");
+    assertThat(JdbcLogRepository.truncate("abcdef", 5)).isEqualTo("abcde");
+  }
+
+  @Test
   void returnsFalseOnDuplicateId() {
     IdProvider fixedId = () -> 99L;
     JdbcLogRepository fixedRepo =
