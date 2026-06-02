@@ -14,7 +14,6 @@
 package no.bekk.dbscheduler.ui.testsupport;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -53,7 +52,7 @@ public final class LogsTable {
   }
 
   public void insert(LogsRow row) {
-    Timestamp now = Timestamp.from(Instant.now());
+    Timestamp ts = Timestamp.from(row.time);
     jdbc.update(
         "insert into "
             + NAME
@@ -63,8 +62,8 @@ public final class LogsTable {
         row.taskName,
         row.taskInstance,
         "test",
-        now,
-        now,
+        ts,
+        ts,
         row.succeeded,
         0L);
   }

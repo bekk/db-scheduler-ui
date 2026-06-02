@@ -13,6 +13,7 @@
  */
 package no.bekk.dbscheduler.ui.testsupport;
 
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.experimental.FieldDefaults;
@@ -24,8 +25,13 @@ public final class LogsRow {
   String taskName;
   String taskInstance;
   boolean succeeded;
+  Instant time;
 
   public static LogsRowBuilder defaultRow() {
-    return builder().taskName("happy-task").taskInstance("happy-task-1").succeeded(true);
+    return builder()
+        .taskName("happy-task")
+        .taskInstance("happy-task-1")
+        .succeeded(true)
+        .time(Instant.now());
   }
 }

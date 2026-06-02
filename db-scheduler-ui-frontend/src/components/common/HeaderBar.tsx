@@ -35,6 +35,7 @@ import colors from 'src/styles/colors';
 import { RunAllAlert } from 'src/components/scheduled/RunAllAlert';
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 import { useParams } from 'react-router-dom';
+import { useDebouncedCallback } from 'src/hooks/useDebouncedCallback';
 
 interface HeaderBarProps {
   params: TaskDetailsRequestParams;
@@ -69,6 +70,12 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   const isDetailsView = !!urlTaskName;
   const [isOpen, setIsOpen] = React.useState('');
   const { taskName, taskId: taskInstance, filter: currentFilter } = params;
+  const debouncedSetSearchTermTaskName = useDebouncedCallback(
+    setSearchTermTaskName,
+  );
+  const debouncedSetSearchTermTaskInstance = useDebouncedCallback(
+    setSearchTermTaskInstance,
+  );
 
   return (
     <Box
@@ -130,7 +137,9 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
                 <Input
                   placeholder={'Search for task name'}
                   defaultValue={taskName}
-                  onChange={(e) => setSearchTermTaskName(e.currentTarget.value)}
+                  onChange={(e) =>
+                    debouncedSetSearchTermTaskName(e.currentTarget.value)
+                  }
                   bgColor={colors.primary['100']}
                   w={'20vmax'}
                   mt={7}
@@ -159,7 +168,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
                 placeholder={'Search for task id'}
                 defaultValue={taskInstance}
                 onChange={(e) =>
-                  setSearchTermTaskInstance(e.currentTarget.value)
+                  debouncedSetSearchTermTaskInstance(e.currentTarget.value)
                 }
                 bgColor={colors.primary['100']}
                 w={'20vmax'}

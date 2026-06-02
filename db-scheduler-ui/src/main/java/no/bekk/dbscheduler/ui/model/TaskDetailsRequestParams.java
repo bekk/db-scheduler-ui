@@ -14,6 +14,7 @@
 package no.bekk.dbscheduler.ui.model;
 
 import java.time.Instant;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -22,6 +23,7 @@ public class TaskDetailsRequestParams extends TaskRequestParams {
   private final String taskId;
   private final String taskName;
 
+  @Builder
   public TaskDetailsRequestParams(
       TaskFilter filter,
       Integer pageNumber,
