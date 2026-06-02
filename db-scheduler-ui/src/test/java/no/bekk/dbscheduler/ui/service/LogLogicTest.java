@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.model.LogModel;
+import no.bekk.dbscheduler.ui.model.TaskRequestParams.TaskFilter;
 import no.bekk.dbscheduler.ui.testsupport.LogsRow;
 import no.bekk.dbscheduler.ui.testsupport.LogsTable;
 import no.bekk.dbscheduler.ui.testsupport.TaskDetailsRequestParamsBuilder;
@@ -54,5 +55,21 @@ class LogLogicTest {
               assertThat(log.getTaskInstance()).isEqualTo("happy-task-1");
               assertThat(log.isSucceeded()).isTrue();
             });
+  }
+
+  @Test
+  void filtersBySucceededStatus() {
+    logsTable.insert(LogsRow.defaultRow().taskName("ok-task").succeeded(true).build());
+    logsTable.insert(LogsRow.defaultRow().taskName("failed-task").succeeded(false).build());
+
+    List<LogModel> succeeded =
+        logLogic.getLogsDirectlyFromDB(
+            TaskDetailsRequestParamsBuilder.builder().filter(TaskFilter.SUCCEEDED).build());
+    List<LogModel> failed =
+        logLogic.getLogsDirectlyFromDB(
+            TaskDetailsRequestParamsBuilder.builder().filter(TaskFilter.FAILED).build());
+
+    assertThat(succeeded).singleElement().satisfies(log -> assertThat(log.isSucceeded()).isTrue());
+    assertThat(failed).singleElement().satisfies(log -> assertThat(log.isSucceeded()).isFalse());
   }
 }

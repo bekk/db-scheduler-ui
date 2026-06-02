@@ -8,7 +8,7 @@ CREATE TABLE scheduled_execution_logs (
     time_finished        DATETIME(6)    NOT NULL,
     succeeded            BOOLEAN         NOT NULL,
     duration_ms          BIGINT          NOT NULL,
-    exception_class      VARCHAR(1000),
+    exception_class      VARCHAR(255),
     exception_message    TEXT,
     exception_stacktrace MEDIUMTEXT
 );

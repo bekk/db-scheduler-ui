@@ -115,8 +115,7 @@ public class LogLogic {
     }
     if (requestParams.getFilter() != null
         && requestParams.getFilter() != TaskRequestParams.TaskFilter.ALL) {
-      queryBuilder.andCondition(
-          new FilterCondition(requestParams.getFilter(), databaseProductName));
+      queryBuilder.andCondition(new FilterCondition(requestParams.getFilter()));
     }
     if (requestParams.getSearchTermTaskName() != null) {
       queryBuilder.andCondition(
@@ -217,24 +216,19 @@ public class LogLogic {
   public static class FilterCondition implements AndCondition {
 
     private final TaskRequestParams.TaskFilter filterCondition;
-    private final String databaseProductName;
 
-    public FilterCondition(
-        TaskRequestParams.TaskFilter filterCondition, String databaseProductName) {
+    public FilterCondition(TaskRequestParams.TaskFilter filterCondition) {
       this.filterCondition = filterCondition;
-      this.databaseProductName = databaseProductName;
     }
 
     @Override
     public String getQueryPart() {
-      return filterCondition == TaskRequestParams.TaskFilter.SUCCEEDED
-          ? databaseProductName.equals("Oracle") ? "succeeded = 1" : "succeeded = TRUE"
-          : databaseProductName.equals("Oracle") ? "succeeded = 0" : "succeeded = FALSE";
+      return "succeeded = :succeededFilter";
     }
 
     @Override
     public void setParameters(MapSqlParameterSource p) {
-      p.addValue("filterCondition", filterCondition);
+      p.addValue("succeededFilter", filterCondition == TaskRequestParams.TaskFilter.SUCCEEDED);
     }
   }
 
