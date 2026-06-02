@@ -2,10 +2,12 @@ package no.bekk.dbscheduler.ui.log.jdbc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.kagkarlsson.scheduler.exceptions.SerializationException;
 import com.github.kagkarlsson.scheduler.serializer.JavaSerializer;
 import com.github.kagkarlsson.scheduler.task.Execution;
 import com.github.kagkarlsson.scheduler.task.ExecutionComplete;
 import com.github.kagkarlsson.scheduler.task.TaskInstance;
+import java.io.NotSerializableException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -64,6 +66,19 @@ class JdbcLogRepositoryTest {
     assertThat(row).containsEntry("exception_class", "java.lang.RuntimeException");
     assertThat(row).containsEntry("exception_message", "boom");
     assertThat((String) row.get("exception_stacktrace")).contains("boom");
+  }
+
+  @Test
+  void detectsNotSerializableExceptionWrappedInCauseChain() {
+    Throwable wrapped =
+        new SerializationException(
+            "Failed to serialize object", new NotSerializableException("com.example.TaskData"));
+
+    assertThat(JdbcLogRepository.hasCause(wrapped, NotSerializableException.class)).isTrue();
+    assertThat(
+            JdbcLogRepository.hasCause(
+                new RuntimeException("boom"), NotSerializableException.class))
+        .isFalse();
   }
 
   @Test

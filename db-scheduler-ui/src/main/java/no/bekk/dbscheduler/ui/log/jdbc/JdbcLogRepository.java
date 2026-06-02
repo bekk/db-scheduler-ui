@@ -108,13 +108,22 @@ public class JdbcLogRepository implements LogRepository {
     try {
       return resolveSerializer().serialize(value);
     } catch (Exception e) {
-      if (e instanceof NotSerializableException) {
+      if (hasCause(e, NotSerializableException.class)) {
         LOG.warn("object is not serializable - you need to add Serializable");
       } else {
         LOG.error("serialization failed for {} -> {}", value.getClass(), e.getMessage());
       }
       return null;
     }
+  }
+
+  static boolean hasCause(Throwable throwable, Class<? extends Throwable> type) {
+    for (Throwable t = throwable; t != null && t != t.getCause(); t = t.getCause()) {
+      if (type.isInstance(t)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private Serializer resolveSerializer() {
