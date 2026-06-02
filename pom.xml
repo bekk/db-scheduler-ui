@@ -295,6 +295,18 @@
                             <excludes>
                                 <exclude>.github/**</exclude>
                                 <exclude>**/src/test/**</exclude>
+                                <exclude>**/no/bekk/dbscheduler/ui/log/**</exclude>
+                                <exclude>**/no/bekk/dbscheduler/uistarter/log/**</exclude>
+                            </excludes>
+                        </licenseSet>
+                        <licenseSet>
+                            <header>./.license/license-header-rocketbase.txt</header>
+                            <includes>
+                                <include>**/no/bekk/dbscheduler/ui/log/**/*.java</include>
+                                <include>**/no/bekk/dbscheduler/uistarter/log/**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/src/test/**</exclude>
                             </excludes>
                         </licenseSet>
                     </licenseSets>
@@ -344,6 +356,9 @@
                                 <argument>--frozen-lockfile</argument>
                             </arguments>
                             <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
+                            <environmentVariables>
+                                <CI>true</CI>
+                            </environmentVariables>
                         </configuration>
                     </execution>
                     <execution>
@@ -359,6 +374,9 @@
                                 <argument>build</argument>
                             </arguments>
                             <workingDirectory>./db-scheduler-ui-frontend</workingDirectory>
+                            <environmentVariables>
+                                <CI>true</CI>
+                            </environmentVariables>
                         </configuration>
                     </execution>
                 </executions>

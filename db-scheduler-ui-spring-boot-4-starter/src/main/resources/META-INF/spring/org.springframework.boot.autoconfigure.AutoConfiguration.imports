@@ -1,1 +1,2 @@
 no.bekk.dbscheduler.uistarter.autoconfigure.UiApiAutoConfiguration
+no.bekk.dbscheduler.uistarter.log.DbSchedulerUiLogAutoConfiguration

@@ -27,15 +27,11 @@
             <artifactId>spring-boot-devtools</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.rocketbase.extension</groupId>
-            <artifactId>db-scheduler-log-spring-boot-starter</artifactId>
-            <version>0.7.0</version>
-        </dependency>
-        <dependency>
             <groupId>no.bekk.db-scheduler-ui</groupId>
             <artifactId>db-scheduler-ui-starter</artifactId>
             <version>main-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>

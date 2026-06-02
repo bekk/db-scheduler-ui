@@ -31,7 +31,6 @@ dashboard for monitoring and basic administration of tasks.
 * An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
 * Minimum db-scheduler version 15
 * Minimum Java 17 and SpringBoot 3.4 (or SpringBoot 4.0 for the Spring Boot 4 starter)
-* Optional (if you want task history): db-scheduler-log version 0.7.0
 
 ## Getting started
 
@@ -57,7 +56,6 @@ dashboard for monitoring and basic administration of tasks.
 
 2. Read the [db-scheduler](https://github.com/kagkarlsson/db-scheduler) readme and follow the getting started guide. The
    most important is to create the `scheduled_tasks` table correctly.
-   You do not need to add db-scheduler as a dependency.
 3. Start your application. The db-scheduler UI can be reached at `<your-app-url>/db-scheduler`
 
 ## Using with Ktor (non-Spring applications)
@@ -85,21 +83,31 @@ For more details and advanced configuration (including execution history support
 
 ## Optional: task history
 
-If you want to add task history to your UI you need to add the following dependency:
+Task-history support is now built into the UI starter — no extra Maven dependency is required. The
+execution-log writer is derived from
+[`rocketbase-io/db-scheduler-log`](https://github.com/rocketbase-io/db-scheduler-log) by
+Marten Prieß, vendored here with permission and under the Apache License 2.0. See [`NOTICE`](NOTICE)
+for full attribution.
 
-```xml
+1. Create the `scheduled_execution_logs` table in your database. Pick the script for your engine from
+   [`sql/log-table/`](sql/log-table):
+   [postgresql](sql/log-table/postgresql.sql) ·
+   [h2](sql/log-table/h2.sql) ·
+   [oracle](sql/log-table/oracle.sql) ·
+   [mssql](sql/log-table/mssql.sql) ·
+   [mysql](sql/log-table/mysql.sql).
 
-<dependency>
-    <groupId>io.rocketbase.extension</groupId>
-    <artifactId>db-scheduler-log-spring-boot-starter</artifactId>
-    <version>0.7.0</version>
-</dependency>
-```
+2. Enable history in your `application.properties`:
 
-Follow the [readme](https://github.com/rocketbase-io/db-scheduler-log) to create the correct database table.
+   ```properties
+   # enable the UI-component for history
+   db-scheduler-ui.history=true
+   # enable the log-writer
+   db-scheduler-ui.log.enabled=true
+   ```
 
-You also need to set `db-scheduler-ui.history=true` in your application.properties file, and consider setting a limit to
-the number of logs fetched: `db-scheduler-ui.log-limit=1000`.
+> **Migrating from `io.rocketbase.extension:db-scheduler-log-spring-boot-starter`:**
+> remove that dependency and rename `db-scheduler-log.*` properties to `db-scheduler-ui.log.*`.
 
 ## How it works
 
