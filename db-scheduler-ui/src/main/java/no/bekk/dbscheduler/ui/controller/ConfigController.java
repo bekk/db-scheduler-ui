@@ -27,16 +27,14 @@ public class ConfigController {
 
   private final boolean showHistory;
   private final Supplier<Boolean> readOnly;
-  private final boolean showOverview;
 
-  public ConfigController(boolean showHistory, Supplier<Boolean> readOnly, boolean showOverview) {
+  public ConfigController(boolean showHistory, Supplier<Boolean> readOnly) {
     this.showHistory = showHistory;
     this.readOnly = readOnly;
-    this.showOverview = showOverview;
   }
 
   @GetMapping
   public ConfigResponse getConfig() {
-    return new ConfigResponse(showHistory, readOnly.get(), showOverview);
+    return new ConfigResponse(showHistory, readOnly.get());
   }
 }

@@ -39,11 +39,11 @@ TASK                  NEXT RUN     LAST RUN         ← column headers
 RECURRING · 5                                       ← section header + count
 ● <name>              <relative>   <last run>   →   ← row
   <status> [for <duration>]                         ← sub-line
-ONE-TIME, DYNAMIC & CUSTOM · 4
+ONE-TIME / CUSTOM · 4
 ● <name>              <relative>   <last run>   →
 ```
 
-- Two sections: **RECURRING** and **ONE-TIME, DYNAMIC & CUSTOM**, each with a `· N` count.
+- Two sections: **RECURRING** and **ONE-TIME / CUSTOM**, each with a `· N` count.
 - **Strictly alphabetical** within each section. Stable positions — never reorder by status.
 - **No pagination** — render all rows (bounded by task-definition count, not executions).
 - **No search / filter controls** and **no action buttons** (Run/Rerun/Delete) in this MVP.
@@ -72,14 +72,11 @@ Severity order **failing > running > scheduled > dormant**. Multi-instance row s
 | failing   | any instance `consecutiveFailures > 0`           |
 | running   | any instance `picked == true` (and none failing) |
 | scheduled | ≥1 scheduled instance, none failing/running      |
-| dormant   | **one-time/dynamic/custom** task definition with **0** scheduled instances |
+| dormant   | **one-time/custom** task definition with **0** scheduled instances |
 
-> (Plain) recurring tasks are **never dormant** — a `RecurringTask` implements `OnStartup` and
-> reschedules itself, so a registered recurring definition always has ≥1 scheduled instance. (A
-> recurring task with 0 scheduled instances is an error/abnormal state, not a normal "dormant"
-> row — out of scope here.) Note `RecurringTaskWithPersistentSchedule` is **not** a plain
-> recurring task here (see §Recurring detection): it does not auto-schedule, so 0 instances ⇒ a
-> normal dormant row in the one-time/dynamic/custom section.
+> Recurring tasks are **never dormant** — a recurring task always reschedules itself, so a
+> registered recurring definition always has ≥1 scheduled instance. (A recurring task with 0
+> scheduled instances is an error/abnormal state, not a normal "dormant" row — out of scope here.)
 
 ### Sub-line rules
 
@@ -90,9 +87,9 @@ Severity order **failing > running > scheduled > dormant**. Multi-instance row s
   while picked). The NEXT RUN column still shows `running now`; the duration lives only here.
 - **scheduled / dormant:** status word only.
 - **Instance count:** recurring rows **omit** it (one schedule ⇒ `· 1 instance` is noise).
-  One-time/dynamic/custom rows **append** `· N instance(s)`.
-- **Multi-instance** (one-time/dynamic/custom): worst-status dot + per-state breakdown instead of
-  a single duration, e.g. `100 instances · 3 failing · 2 running · 95 scheduled`.
+  One-time/custom rows **append** `· N instance(s)`.
+- **Multi-instance** (one-time/custom): worst-status dot + per-state breakdown instead of a
+  single duration, e.g. `100 instances · 3 failing · 2 running · 95 scheduled`.
 
 ### Next-run column
 
@@ -121,8 +118,7 @@ non-null instance, not the most recent). One object per task name, suggestion:
 ```
 OverviewTask {
   taskName: string
-  recurring: boolean | null      // true iff `instanceof RecurringTask` (NOT persistent-schedule);
-                                 // null = could not determine (degraded mode)
+  recurring: boolean | null      // null = could not determine (degraded mode)
   instanceCount: int
   counts: { failing: int, running: int, scheduled: int }
   worstStatus: "FAILING" | "RUNNING" | "SCHEDULED" | "DORMANT"
@@ -157,24 +153,17 @@ per-task-name: `instanceCount`, `counts`, soonest `nextExecutionTime`, most-rece
 ### Recurring detection
 
 A task name is recurring iff its registered definition is `instanceof RecurringTask`
-(`com.github.kagkarlsson.scheduler.task.helper.RecurringTask`) **and nothing else**. Inject
-registered `Task<?>` beans into `UiApiAutoConfiguration` to build the recurring-name set.
+(`com.github.kagkarlsson.scheduler.task.helper.RecurringTask`). Inject registered `Task<?>`
+beans into `UiApiAutoConfiguration` to build the recurring-name set.
 
-- Prefer this over the `taskInstance == "recurring"` string heuristic (wrong for multi-instance
-  recurring or custom instance ids).
-- **`RecurringTaskWithPersistentSchedule` is intentionally *not* recurring here** — it belongs in
-  the **one-time/dynamic/custom** section. Unlike `RecurringTask`, it does **not** implement
-  `OnStartup`, so it never auto-schedules; instances are created at runtime with their schedule
-  carried in `task_data` (dynamic, not code-defined), a single definition can back **many**
-  instances, and with **0** instances it is genuinely **dormant**. That is instance-oriented
-  behavior — the one-time/dynamic/custom family — not a fixed perpetual singleton.
+- Prefer this over the `taskInstance == "recurring"` string heuristic (wrong for
+  multi-instance recurring, `RecurringTaskWithPersistentSchedule`, or custom instance ids).
 
 ### Dormant tasks
 
-Show **one-time/dynamic/custom** task definitions with 0 scheduled executions, flagged `dormant`
-— this includes `RecurringTaskWithPersistentSchedule` (it does not auto-schedule). Requires the
-registered task list (same source as recurring detection). Plain `RecurringTask` definitions are
-**never** shown as dormant (see Status table note).
+Show **one-time/custom** task definitions with 0 scheduled executions, flagged `dormant`.
+Requires the registered task list (same source as recurring detection). Recurring definitions
+are **never** shown as dormant (see Status table note).
 
 ### Graceful degradation
 

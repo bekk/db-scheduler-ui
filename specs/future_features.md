@@ -66,11 +66,3 @@ Append items here as they come up during implementation (date · note):
 - 2026-05-29 · instance-panel **presentation form left open** in the spec (side panel /
   slide-over / popover / inline / dedicated route) — to be settled by prototyping variants;
   only the information set + behaviour are locked.
-- 2026-06-01 · Overview recurring-detection **corrected**: a task is recurring iff
-  `instanceof RecurringTask` **only**. `RecurringTaskWithPersistentSchedule` is reclassified into
-  the one-time/dynamic/custom section — it does not implement `OnStartup` (no auto-scheduling),
-  is multi-instance with its schedule in `task_data`, and is dormant-eligible at 0 instances.
-  This reverses the earlier dual-`instanceof` plan and supersedes the spec note that had listed
-  `RecurringTaskWithPersistentSchedule` as a should-be-recurring case.
-- 2026-06-01 · Overview second section **renamed** `ONE-TIME / CUSTOM` → `ONE-TIME, DYNAMIC &
-  CUSTOM` to reflect that it holds one-time, custom, and dynamic (persistent-schedule) tasks.

@@ -15,15 +15,12 @@ package no.bekk.dbscheduler.ui.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class ConfigResponse {
   private boolean showHistory;
   private boolean readOnly;
-  private boolean showOverview;
 }

@@ -19,10 +19,8 @@ import static no.bekk.dbscheduler.uistarter.config.DbSchedulerUiUtil.normalizePa
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
-import com.github.kagkarlsson.scheduler.task.Task;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.ConfigController;
 import no.bekk.dbscheduler.ui.controller.IndexHtmlController;
@@ -81,12 +79,8 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  TaskLogic taskLogic(
-      Scheduler scheduler,
-      Caching caching,
-      DbSchedulerUiProperties properties,
-      List<Task<?>> registeredTasks) {
-    return new TaskLogic(scheduler, caching, properties.isTaskData(), registeredTasks);
+  TaskLogic taskLogic(Scheduler scheduler, Caching caching, DbSchedulerUiProperties properties) {
+    return new TaskLogic(scheduler, caching, properties.isTaskData());
   }
 
   @Bean
@@ -162,8 +156,7 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   ConfigController configController(DbSchedulerUiProperties properties) {
-    return new ConfigController(
-        properties.isHistory(), properties::isReadOnly, properties.isOverview());
+    return new ConfigController(properties.isHistory(), properties::isReadOnly);
   }
 
   @Bean

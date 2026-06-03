@@ -13,9 +13,7 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
-import java.util.List;
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
-import no.bekk.dbscheduler.ui.model.OverviewTask;
 import no.bekk.dbscheduler.ui.model.PollResponse;
 import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
 import no.bekk.dbscheduler.ui.model.TaskRequestParams;
@@ -24,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -51,11 +48,5 @@ public class TaskController {
   @GetMapping("/poll")
   public PollResponse pollForUpdates(TaskDetailsRequestParams params) {
     return taskLogic.pollTasks(params);
-  }
-
-  @GetMapping("/overview")
-  public List<OverviewTask> getOverview(
-      @RequestParam(value = "refresh", defaultValue = "false") boolean refresh) {
-    return taskLogic.getOverview(refresh);
   }
 }

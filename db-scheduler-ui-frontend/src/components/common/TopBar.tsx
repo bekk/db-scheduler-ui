@@ -16,7 +16,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogoIcon } from 'src/assets/icons/Logo';
 import colors from 'src/styles/colors';
-import { getShowHistory, getShowOverview } from 'src/utils/config';
+import { getShowHistory } from 'src/utils/config';
 
 interface TopBarProps {
   title: string;
@@ -25,10 +25,6 @@ interface TopBarProps {
 export const TopBar: React.FC<TopBarProps> = ({ title }) => {
   const navigate = useNavigate();
   const showHistory = getShowHistory();
-  const showOverview = getShowOverview();
-  const location = window.location.toString();
-  const onHistory = location.includes('history');
-  const onOverview = location.includes('overview');
 
   return (
     <Box
@@ -50,31 +46,8 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
         {title}
       </Text>
       <Box>
-        {(showOverview || showHistory) && (
+        {showHistory && (
           <>
-            {showOverview && (
-              <Button
-                _hover={{
-                  bgColor: colors.primary['100'],
-                  borderColor: colors.dbBlue,
-                  color: colors.primary['400'],
-                }}
-                _active={{
-                  borderColor: colors.primary['200'],
-                  color: colors.primary['300'],
-                }}
-                bgColor={colors.primary['100']}
-                color={colors.dbBlue}
-                borderBottom="2px"
-                borderRadius={'0'}
-                borderColor={onOverview ? colors.dbBlue : colors.primary['300']}
-                onClick={() => navigate('/overview')}
-                aria-label={'Overview button'}
-                marginRight={12}
-              >
-                Overview
-              </Button>
-            )}
             <Button
               _hover={{
                 bgColor: colors.primary['100'],
@@ -90,38 +63,40 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
               borderBottom="2px"
               borderRadius={'0'}
               borderColor={
-                !onHistory && !onOverview
+                !window.location.toString().includes('db-scheduler/history/')
                   ? colors.dbBlue
                   : colors.primary['300']
               }
-              onClick={() => navigate(showOverview ? '/scheduled' : '/')}
+              onClick={() => navigate('/')}
               aria-label={'Home button'}
               marginRight={12}
             >
               Scheduled
             </Button>
-            {showHistory && (
-              <Button
-                _hover={{
-                  bgColor: colors.primary['100'],
-                  borderColor: colors.dbBlue,
-                  color: colors.primary['400'],
-                }}
-                _active={{
-                  borderColor: colors.running['200'],
-                  color: colors.primary['300'],
-                }}
-                bgColor={colors.primary['100']}
-                color={colors.dbBlue}
-                borderBottom="2px"
-                borderRadius={'0'}
-                borderColor={onHistory ? colors.dbBlue : colors.primary['300']}
-                onClick={() => navigate(`/history/all`)}
-                aria-label={'History button'}
-              >
-                History
-              </Button>
-            )}
+            <Button
+              _hover={{
+                bgColor: colors.primary['100'],
+                borderColor: colors.dbBlue,
+                color: colors.primary['400'],
+              }}
+              _active={{
+                borderColor: colors.running['200'],
+                color: colors.primary['300'],
+              }}
+              bgColor={colors.primary['100']}
+              color={colors.dbBlue}
+              borderBottom="2px"
+              borderRadius={'0'}
+              borderColor={
+                window.location.toString().includes('history')
+                  ? colors.dbBlue
+                  : colors.primary['300']
+              }
+              onClick={() => navigate(`/history/all`)}
+              aria-label={'History button'}
+            >
+              History
+            </Button>
           </>
         )}
       </Box>

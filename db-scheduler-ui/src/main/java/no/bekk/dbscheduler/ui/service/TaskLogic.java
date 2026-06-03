@@ -17,28 +17,21 @@ import static no.bekk.dbscheduler.ui.util.QueryUtils.filterExecutions;
 
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.Scheduler;
-import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
-import com.github.kagkarlsson.scheduler.task.helper.RecurringTask;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
-import no.bekk.dbscheduler.ui.model.OverviewCounts;
-import no.bekk.dbscheduler.ui.model.OverviewTask;
 import no.bekk.dbscheduler.ui.model.PollResponse;
 import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
 import no.bekk.dbscheduler.ui.model.TaskModel;
 import no.bekk.dbscheduler.ui.model.TaskRequestParams;
-import no.bekk.dbscheduler.ui.model.WorstStatus;
 import no.bekk.dbscheduler.ui.util.Caching;
 import no.bekk.dbscheduler.ui.util.QueryUtils;
-import no.bekk.dbscheduler.ui.util.mapper.OverviewMapper;
 import no.bekk.dbscheduler.ui.util.mapper.TaskMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,28 +42,10 @@ public class TaskLogic {
   private final Caching caching;
   private final boolean showData;
 
-  /** Names of registered definitions that are {@code instanceof RecurringTask}. */
-  private final Set<String> recurringTaskNames;
-
-  /** All registered task-definition names. Empty ⇒ degraded mode (no definitions available). */
-  private final Set<String> registeredTaskNames;
-
   public TaskLogic(Scheduler scheduler, Caching caching, boolean showData) {
-    this(scheduler, caching, showData, List.of());
-  }
-
-  public TaskLogic(
-      Scheduler scheduler, Caching caching, boolean showData, List<Task<?>> registeredTasks) {
     this.scheduler = scheduler;
     this.caching = caching;
     this.showData = showData;
-    this.registeredTaskNames =
-        registeredTasks.stream().map(Task::getName).collect(Collectors.toSet());
-    this.recurringTaskNames =
-        registeredTasks.stream()
-            .filter(task -> task instanceof RecurringTask)
-            .map(Task::getName)
-            .collect(Collectors.toSet());
   }
 
   public void runTaskNow(String taskId, String taskName, Instant scheduleTime) {
@@ -194,51 +169,6 @@ public class TaskLogic {
     List<TaskModel> pagedTasks =
         QueryUtils.paginate(tasks, params.getPageNumber(), params.getSize());
     return new GetTasksResponse(tasks.size(), pagedTasks, params.getSize());
-  }
-
-  /**
-   * Task-centric Overview: one {@link OverviewTask} per task name, name-sorted. Aggregates over the
-   * scheduled executions (Java-side group-by via {@link OverviewMapper}) and overlays the {@code
-   * recurring} flag plus dormant rows from the registered task definitions. When no task
-   * definitions are available (degraded mode), {@code recurring} is left {@code null} and no
-   * dormant rows are emitted.
-   */
-  public List<OverviewTask> getOverview(boolean refresh) {
-    List<ScheduledExecution<Object>> executions =
-        caching.getExecutionsFromCacheOrDB(refresh, scheduler);
-
-    List<OverviewTask> tasks = OverviewMapper.aggregate(executions);
-
-    boolean degraded = registeredTaskNames.isEmpty();
-    if (!degraded) {
-      Set<String> namesWithExecutions = new HashSet<>();
-      for (OverviewTask task : tasks) {
-        task.setRecurring(recurringTaskNames.contains(task.getTaskName()));
-        namesWithExecutions.add(task.getTaskName());
-      }
-      // Dormant rows: registered one-time/dynamic/custom definitions with no scheduled executions.
-      // Recurring (RecurringTask) definitions are never shown as dormant — a recurring task with 0
-      // executions is an abnormal state, out of scope here.
-      for (String name : registeredTaskNames) {
-        if (!namesWithExecutions.contains(name) && !recurringTaskNames.contains(name)) {
-          tasks.add(dormantTask(name));
-        }
-      }
-    }
-
-    tasks.sort(Comparator.comparing(OverviewTask::getTaskName));
-    return tasks;
-  }
-
-  private static OverviewTask dormantTask(String taskName) {
-    return OverviewTask.builder()
-        .taskName(taskName)
-        .recurring(false)
-        .instanceCount(0)
-        .counts(new OverviewCounts(0, 0, 0))
-        .worstStatus(WorstStatus.DORMANT)
-        .maxConsecutiveFailures(0)
-        .build();
   }
 
   public PollResponse pollTasks(TaskDetailsRequestParams params) {
