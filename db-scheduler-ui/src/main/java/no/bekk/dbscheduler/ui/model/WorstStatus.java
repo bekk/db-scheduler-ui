@@ -13,15 +13,14 @@
  */
 package no.bekk.dbscheduler.ui.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-@AllArgsConstructor
-public class ConfigResponse {
-  private boolean showHistory;
-  private boolean readOnly;
-  private boolean showOverview;
+/**
+ * Worst (most severe) state present among the instances of a task on the Overview page.
+ *
+ * <p>Severity order, most to least severe: {@code FAILING > RUNNING > SCHEDULED > DORMANT}.
+ */
+public enum WorstStatus {
+  FAILING,
+  RUNNING,
+  SCHEDULED,
+  DORMANT
 }

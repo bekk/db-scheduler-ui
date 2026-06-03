@@ -13,15 +13,5 @@
  */
 package no.bekk.dbscheduler.ui.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-@AllArgsConstructor
-public class ConfigResponse {
-  private boolean showHistory;
-  private boolean readOnly;
-  private boolean showOverview;
-}
+/** Per-state instance counts for one task name on the Overview page. */
+public record OverviewCounts(int failing, int running, int scheduled) {}

@@ -13,34 +13,28 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
-import java.util.function.Supplier;
-import no.bekk.dbscheduler.ui.model.ConfigResponse;
+import java.util.List;
+import no.bekk.dbscheduler.ui.model.OverviewTask;
+import no.bekk.dbscheduler.ui.service.OverviewLogic;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/** Read-only, navigation-only endpoint backing the task-centric Overview page. */
 @RestController
 @CrossOrigin
-@RequestMapping("/db-scheduler-api/config")
-public class ConfigController {
+@RequestMapping("/db-scheduler-api/tasks/overview")
+public class OverviewController {
 
-  private final boolean showHistory;
-  private final Supplier<Boolean> readOnly;
-  private final boolean showOverview;
+  private final OverviewLogic overviewLogic;
 
-  public ConfigController(boolean showHistory, Supplier<Boolean> readOnly) {
-    this(showHistory, readOnly, false);
-  }
-
-  public ConfigController(boolean showHistory, Supplier<Boolean> readOnly, boolean showOverview) {
-    this.showHistory = showHistory;
-    this.readOnly = readOnly;
-    this.showOverview = showOverview;
+  public OverviewController(OverviewLogic overviewLogic) {
+    this.overviewLogic = overviewLogic;
   }
 
   @GetMapping
-  public ConfigResponse getConfig() {
-    return new ConfigResponse(showHistory, readOnly.get(), showOverview);
+  public List<OverviewTask> getOverview() {
+    return overviewLogic.getOverview();
   }
 }

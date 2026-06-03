@@ -17,24 +17,29 @@ import static no.bekk.dbscheduler.uistarter.config.DbSchedulerUiUtil.normalizePa
 import static no.bekk.dbscheduler.uistarter.config.DbSchedulerUiUtil.normalizePaths;
 
 import com.github.kagkarlsson.scheduler.Scheduler;
+import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
+import com.github.kagkarlsson.scheduler.task.Task;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.ConfigController;
 import no.bekk.dbscheduler.ui.controller.IndexHtmlController;
 import no.bekk.dbscheduler.ui.controller.LogController;
+import no.bekk.dbscheduler.ui.controller.OverviewController;
 import no.bekk.dbscheduler.ui.controller.SpaFallbackMvc;
 import no.bekk.dbscheduler.ui.controller.TaskAdminController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
 import no.bekk.dbscheduler.ui.service.LogLogic;
+import no.bekk.dbscheduler.ui.service.OverviewLogic;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
 import no.bekk.dbscheduler.ui.util.Caching;
 import no.bekk.dbscheduler.uistarter.config.DbSchedulerUiProperties;
 import no.bekk.dbscheduler.uistarter.config.DbSchedulerUiWebConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -156,7 +161,22 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   ConfigController configController(DbSchedulerUiProperties properties) {
-    return new ConfigController(properties.isHistory(), properties::isReadOnly);
+    return new ConfigController(
+        properties.isHistory(), properties::isReadOnly, properties.isOverview());
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "overview", havingValue = "true")
+  OverviewLogic overviewLogic(SchedulerClient schedulerClient, ObjectProvider<Task<?>> tasks) {
+    return new OverviewLogic(schedulerClient, tasks.stream().toList());
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "overview", havingValue = "true")
+  OverviewController overviewController(OverviewLogic overviewLogic) {
+    return new OverviewController(overviewLogic);
   }
 
   @Bean

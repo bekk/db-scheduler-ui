@@ -25,5 +25,9 @@ const showHistory =
 
 const readOnly = 'readOnly' in config ? Boolean(config.readOnly) : false;
 
+const showOverview =
+  'showOverview' in config ? Boolean(config.showOverview) : false;
+
 export const getShowHistory = (): boolean => showHistory;
 export const getReadonly = (): boolean => readOnly;
+export const getShowOverview = (): boolean => showOverview;

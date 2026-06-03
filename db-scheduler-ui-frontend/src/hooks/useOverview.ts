@@ -11,17 +11,13 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package no.bekk.dbscheduler.ui.model;
+import { useQuery } from '@tanstack/react-query';
+import { OverviewTask } from 'src/models/Overview';
+import { getOverview, OVERVIEW_QUERY_KEY } from 'src/services/getOverview';
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-@AllArgsConstructor
-public class ConfigResponse {
-  private boolean showHistory;
-  private boolean readOnly;
-  private boolean showOverview;
-}
+/** Polls the Overview endpoint. The global QueryClient already refetches every 2s. */
+export const useOverview = () =>
+  useQuery<OverviewTask[]>({
+    queryKey: [OVERVIEW_QUERY_KEY],
+    queryFn: getOverview,
+  });

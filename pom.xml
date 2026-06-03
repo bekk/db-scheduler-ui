@@ -73,9 +73,9 @@
         <maven.compiler.release>17</maven.compiler.release>
         <spring-boot.version>3.4.7</spring-boot.version>
         <lombok.version>1.18.38</lombok.version>
-        <db-scheduler.version>15.6.0</db-scheduler.version>
+        <db-scheduler.version>16.12.0</db-scheduler.version>
         <spring-boot-4.version>4.0.2</spring-boot-4.version>
-        <db-scheduler-boot4.version>16.7.0</db-scheduler-boot4.version>
+        <db-scheduler-boot4.version>16.12.0</db-scheduler-boot4.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
