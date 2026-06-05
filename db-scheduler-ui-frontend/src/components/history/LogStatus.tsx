@@ -13,6 +13,7 @@
  */
 import { Box } from '@chakra-ui/react';
 import colors from 'src/styles/colors';
+
 interface LogStatusProps {
   succeeded: boolean;
 }

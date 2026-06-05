@@ -11,21 +11,23 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Box, Button } from '@chakra-ui/react';
-import { RepeatIcon } from '@chakra-ui/icons';
+
 import React from 'react';
-import colors from 'src/styles/colors';
+
+import { RepeatIcon } from '@chakra-ui/icons';
+import { Box, Button } from '@chakra-ui/react';
 import {
   InfiniteData,
   QueryObserverResult,
   useQuery,
 } from '@tanstack/react-query';
-import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
-import { InfiniteScrollResponse } from 'src/models/TasksResponse';
 import { RefreshCircle } from 'src/components/common/RefreshCircle';
 import { Log } from 'src/models/Log';
-import { Task } from 'src/models/Task';
 import { PollResponse } from 'src/models/PollResponse';
+import { Task } from 'src/models/Task';
+import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
+import { InfiniteScrollResponse } from 'src/models/TasksResponse';
+import colors from 'src/styles/colors';
 
 interface RefreshButtonProps {
   refetch?: () => Promise<
@@ -72,7 +74,6 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
         taskNameExactMatch: params.taskNameExactMatch,
       }),
   );
-
 
   return (
     <Box position="relative" display="inline-block">

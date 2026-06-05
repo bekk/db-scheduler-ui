@@ -11,7 +11,8 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { PlayIcon } from './PlayIcon';
+
 export { DoubleChevronIcon } from './DoubleChevronIcon';
 export { IoEllipsisVerticalIcon } from './IoEllipsisVerticalIcon';
+export { PlayIcon } from './PlayIcon';
 export { RepeatIcon } from './RepeatIcon';

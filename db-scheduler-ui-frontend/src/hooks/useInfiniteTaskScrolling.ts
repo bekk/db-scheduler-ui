@@ -11,13 +11,14 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useCallback, useState, useRef, useMemo } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
+
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { InfiniteScrollResponse } from 'src/models/TasksResponse';
-import { FilterBy, SortBy } from 'src/models/QueryParams';
-import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 import { Log } from 'src/models/Log';
+import { FilterBy, SortBy } from 'src/models/QueryParams';
 import { Task } from 'src/models/Task';
+import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
+import { InfiniteScrollResponse } from 'src/models/TasksResponse';
 
 interface UseInfiniteScrollingProps<
   T extends InfiniteScrollResponse<Task | Log>,
@@ -65,8 +66,8 @@ export const useInfiniteScrolling = <
       currentFilter,
       currentSort,
       sortAsc,
-      ...(startTime ? [ startTime ] : []),
-      ...(endTime ? [ endTime ] : []),
+      ...(startTime ? [startTime] : []),
+      ...(endTime ? [endTime] : []),
       ...(taskName ? [taskName] : []),
       ...(taskInstance ? [taskInstance] : []),
       searchTermTaskName,
@@ -79,7 +80,9 @@ export const useInfiniteScrolling = <
       currentFilter,
       currentSort,
       sortAsc,
-      startTime, endTime, taskName,
+      startTime,
+      endTime,
+      taskName,
       taskInstance,
       searchTermTaskName,
       searchTermTaskInstance,
@@ -166,7 +169,8 @@ export const useInfiniteScrolling = <
       fetchDataFunction,
       taskNameExactMatch,
       taskInstanceExactMatch,
-      startTime, endTime
+      startTime,
+      endTime,
     ],
   );
 

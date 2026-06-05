@@ -11,6 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import React from 'react';
+
+import { CalendarIcon, DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import {
   AlertDialog,
   AlertDialogBody,
@@ -26,13 +30,11 @@ import {
   MenuItem,
   MenuList,
 } from '@chakra-ui/react';
-import deleteTask from 'src/services/deleteTask';
-import React from 'react';
-import { CalendarIcon, DeleteIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-import { IoEllipsisVerticalIcon } from '../../assets/icons';
 import { useNavigate } from 'react-router-dom';
-import { ScheduleRunAlert } from './ScheduleRunAlert';
+import deleteTask from 'src/services/deleteTask';
 import { getReadonly } from 'src/utils/config';
+import { IoEllipsisVerticalIcon } from '../../assets/icons';
+import { ScheduleRunAlert } from './ScheduleRunAlert';
 
 interface TaskProps {
   taskName: string;

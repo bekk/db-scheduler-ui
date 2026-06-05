@@ -12,8 +12,9 @@
  * limitations under the License.
  */
 import { AccordionPanel, Box, Divider, Text, VStack } from '@chakra-ui/react';
-import colors from 'src/styles/colors';
 import { LogDataRow } from 'src/components/history/LogDataRow';
+import colors from 'src/styles/colors';
+
 interface LogAccordionItemProps {
   taskData: object | null;
   stackTrace: string | null;

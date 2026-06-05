@@ -11,10 +11,12 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Box, Button } from '@chakra-ui/react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { DoubleChevronIcon } from 'src/assets/icons/DoubleChevronIcon';
+
 import React from 'react';
+
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { Box, Button } from '@chakra-ui/react';
+import { DoubleChevronIcon } from 'src/assets/icons/DoubleChevronIcon';
 
 interface PaginationButtonsProps {
   page: number;

@@ -12,30 +12,31 @@
  * limitations under the License.
  */
 import React from 'react';
+
 import {
   Box,
+  Button,
   Checkbox,
   HStack,
   Input,
   Text,
   VStack,
-  Button,
 } from '@chakra-ui/react';
-import { FilterBy } from 'src/models/QueryParams';
+import { InfiniteData, QueryObserverResult } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
+import { PlayIcon, RepeatIcon } from 'src/assets/icons';
 import { FilterBox } from 'src/components/input/FilterBox';
 import { RefreshButton } from 'src/components/input/RefreshButton';
-import { QueryObserverResult, InfiniteData } from '@tanstack/react-query';
-import { InfiniteScrollResponse } from 'src/models/TasksResponse';
+import { RunAllAlert } from 'src/components/scheduled/RunAllAlert';
+import { useDebouncedCallback } from 'src/hooks/useDebouncedCallback';
 import { Log } from 'src/models/Log';
+import { FilterBy } from 'src/models/QueryParams';
 import { Task } from 'src/models/Task';
+import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
+import { InfiniteScrollResponse } from 'src/models/TasksResponse';
 import { POLL_LOGS_QUERY_KEY, pollLogs } from 'src/services/pollLogs';
 import { POLL_TASKS_QUERY_KEY, pollTasks } from 'src/services/pollTasks';
-import { PlayIcon, RepeatIcon } from 'src/assets/icons';
 import colors from 'src/styles/colors';
-import { RunAllAlert } from 'src/components/scheduled/RunAllAlert';
-import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
-import { useParams } from 'react-router-dom';
-import { useDebouncedCallback } from 'src/hooks/useDebouncedCallback';
 
 interface HeaderBarProps {
   params: TaskDetailsRequestParams;

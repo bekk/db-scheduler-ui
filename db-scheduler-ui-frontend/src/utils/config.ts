@@ -13,12 +13,10 @@
  */
 
 const API_BASE_URL: string =
-    (import.meta.env.VITE_API_BASE_URL as string) ??
-    window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
+  (import.meta.env.VITE_API_BASE_URL as string) ??
+  window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
 
-const config = await fetch(`${API_BASE_URL}/config`).then((res) =>
-  res.json(),
-);
+const config = await fetch(`${API_BASE_URL}/config`).then((res) => res.json());
 
 const showHistory =
   'showHistory' in config ? Boolean(config.showHistory) : false;

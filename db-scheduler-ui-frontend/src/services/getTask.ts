@@ -11,8 +11,9 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TasksResponse } from 'src/models/TasksResponse';
+
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
+import { TasksResponse } from 'src/models/TasksResponse';
 
 const API_BASE_URL: string =
   (import.meta.env.VITE_API_BASE_URL as string) ??

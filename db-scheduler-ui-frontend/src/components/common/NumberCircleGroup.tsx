@@ -12,10 +12,11 @@
  * limitations under the License.
  */
 import React from 'react';
-import { Task } from 'src/models/Task';
-import { NumberCircle } from './NumberCircle';
+
 import { Box } from '@chakra-ui/react';
+import { Task } from 'src/models/Task';
 import colors from 'src/styles/colors';
+import { NumberCircle } from './NumberCircle';
 
 export const NumberCircleGroup: React.FC<Task> = ({
   pickedBy,

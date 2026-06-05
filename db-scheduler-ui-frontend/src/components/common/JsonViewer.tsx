@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 import React from 'react';
+
 import colors from 'src/styles/colors';
 
 type JsonViewerProps = {

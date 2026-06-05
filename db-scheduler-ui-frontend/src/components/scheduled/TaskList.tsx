@@ -12,18 +12,19 @@
  * limitations under the License.
  */
 import React from 'react';
+
 import { Accordion, Box, Button, Flex } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
-import { isStatus } from 'src/utils/determineStatus';
-import TaskCard from 'src/components/scheduled/TaskCard';
-import TaskGroupCard from './TaskGroupCard';
-import TitleRow from 'src/components/common/TitleRow';
-import { useInfiniteScrolling } from 'src/hooks/useInfiniteTaskScrolling';
-import { TASK_DETAILS_QUERY_KEY, getTask } from 'src/services/getTask';
-import { TASK_QUERY_KEY, getTasks } from 'src/services/getTasks';
-import colors from 'src/styles/colors';
 import { HeaderBar } from 'src/components/common/HeaderBar';
+import TitleRow from 'src/components/common/TitleRow';
+import TaskCard from 'src/components/scheduled/TaskCard';
+import { useInfiniteScrolling } from 'src/hooks/useInfiniteTaskScrolling';
 import { TasksResponse } from 'src/models/TasksResponse';
+import { getTask, TASK_DETAILS_QUERY_KEY } from 'src/services/getTask';
+import { getTasks, TASK_QUERY_KEY } from 'src/services/getTasks';
+import colors from 'src/styles/colors';
+import { isStatus } from 'src/utils/determineStatus';
+import TaskGroupCard from './TaskGroupCard';
 
 const TaskList: React.FC = () => {
   const { taskName } = useParams<{ taskName?: string }>();
@@ -117,8 +118,8 @@ const TaskList: React.FC = () => {
           {isFetchingNextPage
             ? 'Loading...'
             : hasNextPage
-            ? 'Load More'
-            : 'Nothing more to load'}
+              ? 'Load More'
+              : 'Nothing more to load'}
         </Button>
       </Flex>
     </Box>

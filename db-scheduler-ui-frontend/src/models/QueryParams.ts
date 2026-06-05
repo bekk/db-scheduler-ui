@@ -12,19 +12,19 @@
  * limitations under the License.
  */
 export enum FilterBy {
-    All = 'All',
-    Failed = 'Failed',
-    Running = 'Running',
-    Scheduled = 'Scheduled',
-    Succeeded = 'Succeeded',
-  }
-  
+  All = 'All',
+  Failed = 'Failed',
+  Running = 'Running',
+  Scheduled = 'Scheduled',
+  Succeeded = 'Succeeded',
+}
+
 export interface PaginationParams {
-pageNumber: number;
-limit: number;
+  pageNumber: number;
+  limit: number;
 }
 
 export enum SortBy {
-Default = 'Default',
-Name = 'Name',
+  Default = 'Default',
+  Name = 'Name',
 }

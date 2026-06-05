@@ -11,10 +11,11 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+
+import { Box } from '@chakra-ui/react';
 import { Task } from 'src/models/Task';
 import TaskCard from './TaskCard';
-import { Box } from '@chakra-ui/react';
 
 interface TaskCardProps extends Task {
   refetch: () => void;
