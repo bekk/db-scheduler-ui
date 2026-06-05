@@ -13,7 +13,6 @@
  */
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import eslintPlugin from 'vite-plugin-eslint';
 
 const BASE_URL: string =
   process.env.NODE_ENV === 'production' ? '/db-scheduler' : '/';
@@ -32,7 +31,7 @@ export default defineConfig({
   build: {
     target: 'es2022',
   },
-  plugins: [react(), eslintPlugin()],
+  plugins: [react()],
   resolve: {
     alias: {
       src: '/src',
