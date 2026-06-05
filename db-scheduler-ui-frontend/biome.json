@@ -157,6 +157,19 @@
   ],
   "assist": {
     "enabled": true,
-    "actions": { "source": { "organizeImports": "on" } }
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              ["react", "react-dom", "react-dom/**"],
+              ":BLANK_LINE:",
+              ["**"]
+            ]
+          }
+        }
+      }
+    }
   }
 }
