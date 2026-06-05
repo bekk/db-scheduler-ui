@@ -11,17 +11,26 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package no.bekk.dbscheduler.ui.model;
+export type OverviewTaskStatus =
+  | 'FAILING'
+  | 'RUNNING'
+  | 'SCHEDULED'
+  | 'DORMANT';
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+export type OverviewTaskCounts = {
+  failing: number;
+  running: number;
+  scheduled: number;
+};
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class ConfigResponse {
-  private boolean showHistory;
-  private boolean showOverview;
-  private boolean readOnly;
-}
+export type OverviewTask = {
+  taskName: string;
+  recurring: boolean | null;
+  instanceCount: number;
+  counts: OverviewTaskCounts;
+  worstStatus: OverviewTaskStatus;
+  nextExecutionTime: string | null;
+  lastSuccess: string | null;
+  lastFailure: string | null;
+  maxConsecutiveFailures: number;
+};

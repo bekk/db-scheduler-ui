@@ -13,15 +13,24 @@
  */
 package no.bekk.dbscheduler.ui.model;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class ConfigResponse {
-  private boolean showHistory;
-  private boolean showOverview;
-  private boolean readOnly;
+public class OverviewTask {
+  private String taskName;
+  private Boolean recurring;
+  private int instanceCount;
+  private OverviewTaskCounts counts;
+  private OverviewTaskStatus worstStatus;
+  private Instant nextExecutionTime;
+  private Instant lastSuccess;
+  private Instant lastFailure;
+  private int maxConsecutiveFailures;
 }

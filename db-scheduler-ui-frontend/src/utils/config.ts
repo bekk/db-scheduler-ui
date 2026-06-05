@@ -23,7 +23,11 @@ const config = await fetch(`${API_BASE_URL}/config`).then((res) =>
 const showHistory =
   'showHistory' in config ? Boolean(config.showHistory) : false;
 
+const showOverview =
+  'showOverview' in config ? Boolean(config.showOverview) : false;
+
 const readOnly = 'readOnly' in config ? Boolean(config.readOnly) : false;
 
 export const getShowHistory = (): boolean => showHistory;
+export const getShowOverview = (): boolean => showOverview;
 export const getReadonly = (): boolean => readOnly;

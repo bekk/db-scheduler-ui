@@ -105,7 +105,8 @@ class SmokeSpringSecurityTest {
 
     @Bean
     ConfigController configController(DbSchedulerUiProperties properties) {
-      return new ConfigController(properties.history(), readOnly(properties));
+      return new ConfigController(
+          properties.history(), properties.overview(), readOnly(properties));
     }
 
     private Supplier<Boolean> readOnly(DbSchedulerUiProperties properties) {

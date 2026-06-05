@@ -4,6 +4,7 @@ import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.ONE_TIME_TASK;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
+import no.bekk.dbscheduler.ui.model.OverviewTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,18 @@ class SmokeTest {
     result.getBody().getItems().forEach(t -> System.out.println(t.getTaskName()));
     assertThat(result.getBody().getItems())
         .anyMatch(taskModel -> taskModel.getTaskName().equals(ONE_TIME_TASK.getTaskName()));
+  }
+
+  @Test
+  void testGetOverviewReturnsExampleOneTimeTask() {
+    ResponseEntity<OverviewTask[]> result =
+        this.restTemplate.getForEntity(
+            baseUrl + "/db-scheduler-api/tasks/overview", OverviewTask[].class);
+
+    assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(result.getBody()).isNotNull();
+    assertThat(result.getBody())
+        .anyMatch(task -> task.getTaskName().equals(ONE_TIME_TASK.getTaskName()));
   }
 
   @Test

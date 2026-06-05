@@ -13,8 +13,9 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
-import java.util.function.Supplier;
-import no.bekk.dbscheduler.ui.model.ConfigResponse;
+import java.util.List;
+import no.bekk.dbscheduler.ui.model.OverviewTask;
+import no.bekk.dbscheduler.ui.service.OverviewService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,21 +23,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/db-scheduler-api/config")
-public class ConfigController {
+@RequestMapping("/db-scheduler-api/tasks")
+public class OverviewController {
 
-  private final boolean showHistory;
-  private final boolean showOverview;
-  private final Supplier<Boolean> readOnly;
+  private final OverviewService overviewService;
 
-  public ConfigController(boolean showHistory, boolean showOverview, Supplier<Boolean> readOnly) {
-    this.showHistory = showHistory;
-    this.showOverview = showOverview;
-    this.readOnly = readOnly;
+  public OverviewController(OverviewService overviewService) {
+    this.overviewService = overviewService;
   }
 
-  @GetMapping
-  public ConfigResponse getConfig() {
-    return new ConfigResponse(showHistory, showOverview, readOnly.get());
+  @GetMapping("/overview")
+  public List<OverviewTask> getOverviewTasks() {
+    return overviewService.getOverviewTasks();
   }
 }
