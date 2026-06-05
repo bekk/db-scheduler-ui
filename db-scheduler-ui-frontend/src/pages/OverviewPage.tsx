@@ -77,9 +77,9 @@ export const OverviewPage: React.FC = () => {
           size="md"
           sx={{ borderCollapse: 'separate', borderSpacing: '0 8px' }}
         >
-          <Thead>
+          <Thead sx={{ th: { borderBottomColor: colors.primary['300'] } }}>
             <Tr>
-              <Th borderBottomColor={colors.primary['300']}>Task</Th>
+              <Th>Task</Th>
               <Th width="18%">Next run</Th>
               <Th width="18%">Last run</Th>
               <Th width="10%"></Th>
