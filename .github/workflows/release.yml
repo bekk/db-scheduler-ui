@@ -25,6 +25,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
           cache-dependency-path: db-scheduler-ui-frontend/pnpm-lock.yaml
 
