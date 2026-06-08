@@ -66,10 +66,9 @@ public class UiApiAutoConfiguration {
   private final String dbSchedulerContextPath;
 
   UiApiAutoConfiguration(
-    @Value("${server.servlet.context-path:}") String servletContextPath,
-    @Value("${spring.mvc.servlet.path:}") String mvcServletPath,
-    @Value("${db-scheduler-ui.context-path:}") String dbSchedulerContextPath
-  ) {
+      @Value("${server.servlet.context-path:}") String servletContextPath,
+      @Value("${spring.mvc.servlet.path:}") String mvcServletPath,
+      @Value("${db-scheduler-ui.context-path:}") String dbSchedulerContextPath) {
     logger.info("UiApiAutoConfiguration created");
     this.servletContextPath = normalizePaths(servletContextPath);
     this.dbSchedulerContextPath = normalizePaths(dbSchedulerContextPath);
@@ -90,34 +89,45 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "overview",
+      havingValue = "true",
+      matchIfMissing = false)
   OverviewService overviewLogic(Scheduler scheduler, ObjectProvider<Task<?>> taskDefinitions) {
     return new OverviewService(scheduler, taskDefinitions.stream().toList());
   }
 
   @Bean
   @ConditionalOnMissingBean
-  @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "history", havingValue = "true", matchIfMissing = false)
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "history",
+      havingValue = "true",
+      matchIfMissing = false)
   LogLogic logLogic(
-    DataSource dataSource,
-    Caching caching,
-    DbSchedulerCustomizer customizer,
-    DbSchedulerUiProperties properties,
-    @Value("${db-scheduler-ui.log.table-name:scheduled_execution_logs}") String logTableName,
-    @Value("${db-scheduler-ui.log-limit:0}") int logLimit
-  ) {
+      DataSource dataSource,
+      Caching caching,
+      DbSchedulerCustomizer customizer,
+      DbSchedulerUiProperties properties,
+      @Value("${db-scheduler-ui.log.table-name:scheduled_execution_logs}") String logTableName,
+      @Value("${db-scheduler-ui.log-limit:0}") int logLimit) {
     return new LogLogic(
-      customizer.dataSource().orElse(dataSource),
-      customizer.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
-      caching,
-      properties.taskData(),
-      logTableName,
-      logLimit
-    );
+        customizer.dataSource().orElse(dataSource),
+        customizer.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
+        caching,
+        properties.taskData(),
+        logTableName,
+        logLimit);
   }
 
   @Bean
   @ConditionalOnMissingBean
-  @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "read-only", havingValue = "false", matchIfMissing = true)
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "read-only",
+      havingValue = "false",
+      matchIfMissing = true)
   TaskAdminController taskAdminController(TaskLogic taskLogic) {
     return new TaskAdminController(taskLogic);
   }
@@ -130,13 +140,22 @@ public class UiApiAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "overview",
+      havingValue = "true",
+      matchIfMissing = false)
   OverviewController overviewController(OverviewService overviewService) {
     return new OverviewController(overviewService);
   }
 
   @Bean
   @ConditionalOnMissingBean
-  @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "history", havingValue = "true", matchIfMissing = false)
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "history",
+      havingValue = "true",
+      matchIfMissing = false)
   LogController logController(LogLogic logLogic) {
     return new LogController(logLogic);
   }
@@ -145,20 +164,19 @@ public class UiApiAutoConfiguration {
   @ConditionalOnWebApplication(type = Type.SERVLET)
   @ConditionalOnMissingBean
   SpaFallbackMvc spaFallbackMvc(
-    @Value("${db-scheduler-ui.context-path:}") String contextPath,
-    @Qualifier("indexHtml") String indexHtml
-  ) {
+      @Value("${db-scheduler-ui.context-path:}") String contextPath,
+      @Qualifier("indexHtml") String indexHtml) {
     return new SpaFallbackMvc(normalizePath(contextPath), indexHtml);
   }
 
   @Bean
   @ConditionalOnWebApplication(type = Type.REACTIVE)
   @ConditionalOnMissingBean
-  public RouterFunction<ServerResponse> dbSchedulerRouter(@Qualifier("indexHtml") String indexHtml) {
+  public RouterFunction<ServerResponse> dbSchedulerRouter(
+      @Qualifier("indexHtml") String indexHtml) {
     return RouterFunctions.route(
-      RequestPredicates.GET("/db-scheduler/**").and(request -> !request.path().contains(".")),
-      request -> ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(indexHtml)
-    );
+        RequestPredicates.GET("/db-scheduler/**").and(request -> !request.path().contains(".")),
+        request -> ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(indexHtml));
   }
 
   @Bean
@@ -170,17 +188,14 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   IndexHtmlController indexHtmlController(
-    @Qualifier("indexHtml") String indexHtml,
-    @Qualifier("contextPath") String contextPath
-  ) {
+      @Qualifier("indexHtml") String indexHtml, @Qualifier("contextPath") String contextPath) {
     return new IndexHtmlController(indexHtml, contextPath);
   }
 
   @Bean
   @ConditionalOnProperty(prefix = "db-scheduler-ui", name = "context-path")
   DbSchedulerUiWebConfiguration dbSchedulerUiWebConfiguration(
-    @Value("${db-scheduler-ui.context-path:}") String contextPath
-  ) {
+      @Value("${db-scheduler-ui.context-path:}") String contextPath) {
     return new DbSchedulerUiWebConfiguration(normalizePath(contextPath));
   }
 
@@ -191,17 +206,19 @@ public class UiApiAutoConfiguration {
 
   @Bean(name = "indexHtml")
   public String indexHtml(@Qualifier("contextPath") String contextPath) throws IOException {
-    String indexHtml = new ClassPathResource(SpaFallbackMvc.DEFAULT_STARTING_PAGE).getContentAsString(
-      StandardCharsets.UTF_8
-    );
+    String indexHtml =
+        new ClassPathResource(SpaFallbackMvc.DEFAULT_STARTING_PAGE)
+            .getContentAsString(StandardCharsets.UTF_8);
 
     String contextPathScript = contextPath + "/db-scheduler/js/context-path.js";
 
-    return indexHtml.replaceAll("/db-scheduler", contextPath + "/db-scheduler").replaceAll(
-      "<head>",
-      """
+    return indexHtml
+        .replaceAll("/db-scheduler", contextPath + "/db-scheduler")
+        .replaceAll(
+            "<head>",
+            """
       <head>
-          <script src='%s'></script>""".formatted(contextPathScript)
-    );
+          <script src='%s'></script>"""
+                .formatted(contextPathScript));
   }
 }
