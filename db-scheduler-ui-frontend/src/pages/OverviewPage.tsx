@@ -14,7 +14,6 @@
 import {
   Box,
   HStack,
-  Link,
   Table,
   TableContainer,
   Tbody,
@@ -24,7 +23,6 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
 import { OverviewTask, OverviewTaskStatus } from 'src/models/OverviewTask';
 import {
@@ -38,7 +36,7 @@ import {
   formatDistanceToNowStrict,
   isBefore,
 } from 'date-fns';
-import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const statusText: Record<OverviewTaskStatus, string> = {
   FAILING: 'failing',
@@ -82,7 +80,6 @@ export const OverviewPage: React.FC = () => {
               <Th>Task</Th>
               <Th width="18%">Next run</Th>
               <Th width="18%">Last run</Th>
-              <Th width="10%"></Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -132,14 +129,15 @@ const SectionHeader: React.FC<{ title: string; count: number }> = ({
 );
 
 const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
-  const drillDownTarget =
-    task.instanceCount === 1
-      ? `/scheduled/${encodeURIComponent(task.taskName)}`
-      : `/scheduled/${encodeURIComponent(task.taskName)}`;
-  const drillDownLabel = task.instanceCount === 1 ? 'instance' : 'list';
+  const navigate = useNavigate();
+  const drillDownTarget = `/scheduled/${encodeURIComponent(task.taskName)}`;
 
   return (
-    <Tr sx={rowSx(task)}>
+    <Tr
+      sx={rowSx(task, task.instanceCount > 0)}
+      onClick={() => task.instanceCount > 0 && navigate(drillDownTarget)}
+      cursor={task.instanceCount > 0 ? 'pointer' : 'default'}
+    >
       <Td>
         <HStack align="start" spacing={3}>
           <Box
@@ -179,19 +177,6 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
         </Text>
       </Td>
       <Td>{lastRunText(task)}</Td>
-      <Td textAlign="right">
-        {task.instanceCount > 0 && (
-          <Link
-            as={RouterLink}
-            to={drillDownTarget}
-            color={colors.dbBlue}
-            fontWeight="semibold"
-            whiteSpace="nowrap"
-          >
-            <ArrowForwardIcon aria-hidden="true" /> {drillDownLabel}
-          </Link>
-        )}
-      </Td>
     </Tr>
   );
 };
@@ -334,6 +319,16 @@ function rowBackground(task: OverviewTask): string | undefined {
   return colors.primary['100'];
 }
 
+function rowHoverBackground(task: OverviewTask): string {
+  if (task.worstStatus === 'FAILING') {
+    return '#e5b0b0';
+  }
+  if (task.worstStatus === 'RUNNING') {
+    return colors.running['200'];
+  }
+  return colors.primary['200'];
+}
+
 function rowBorderColor(task: OverviewTask): string {
   if (task.worstStatus === 'FAILING') {
     return '#f7b8b8';
@@ -351,7 +346,7 @@ function dotColor(status: OverviewTaskStatus): string {
   return statusColors[status];
 }
 
-function rowSx(task: OverviewTask) {
+function rowSx(task: OverviewTask, clickable = false) {
   return {
     '& > td': {
       bgColor: rowBackground(task),
@@ -360,6 +355,7 @@ function rowSx(task: OverviewTask) {
       borderTop: '1px solid',
       borderTopColor: rowBorderColor(task),
       py: 4,
+      transition: 'background-color 0.12s ease',
     },
     '& > td:first-of-type': {
       borderLeft: '1px solid',
@@ -373,5 +369,10 @@ function rowSx(task: OverviewTask) {
       borderBottomRightRadius: '8px',
       borderTopRightRadius: '8px',
     },
+    ...(clickable && {
+      transition: 'filter 0.12s ease',
+      '&:hover > td': { bgColor: rowHoverBackground(task) },
+      '&:hover': { filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.12))' },
+    }),
   };
 }
