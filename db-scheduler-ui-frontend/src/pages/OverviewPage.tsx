@@ -115,7 +115,7 @@ const SectionHeader: React.FC<{ title: string; count: number }> = ({
   count,
 }) => (
   <Tr>
-    <Td colSpan={4} borderBottom="none" pb={0} pt={3}>
+    <Td colSpan={3} borderBottom="none" pb={0} pt={3}>
       <Text
         textTransform="uppercase"
         color={colors.primary['500']}
@@ -183,7 +183,7 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
 
 const MessageRow: React.FC<{ message: string }> = ({ message }) => (
   <Tr>
-    <Td colSpan={4}>
+    <Td colSpan={3}>
       <Text color={colors.primary['400']}>{message}</Text>
     </Td>
   </Tr>
