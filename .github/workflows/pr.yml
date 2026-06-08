@@ -26,3 +26,31 @@ jobs:
 
       - name: Run spotless check
         run: mvn -B spotless:check
+
+  frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: db-scheduler-ui-frontend/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: db-scheduler-ui-frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: db-scheduler-ui-frontend
+
+      - name: Lint
+        run: pnpm lint
+        working-directory: db-scheduler-ui-frontend
+
+      - name: Build (includes typecheck)
+        run: pnpm build
+        working-directory: db-scheduler-ui-frontend
