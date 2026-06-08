@@ -29,7 +29,7 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
   const showOverview = getShowOverview();
   const showNavigation = showOverview || showHistory;
   const isHistory = location.pathname.startsWith('/history');
-  const isOverview = showOverview && location.pathname === '/';
+  const isOverview = showOverview && location.pathname === '/overview';
   const isScheduled = !isHistory && !isOverview;
   const scheduledPath = showOverview ? '/scheduled' : '/';
 
@@ -113,7 +113,7 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
                 borderBottom="2px"
                 borderRadius={'0'}
                 borderColor={isOverview ? colors.dbBlue : colors.primary['300']}
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/overview')}
                 aria-label={'Overview button'}
               >
                 Overview

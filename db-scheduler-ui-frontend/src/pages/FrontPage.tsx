@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 import { Box } from '@chakra-ui/react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { TopBar } from 'src/components/common/TopBar';
 import { LogList } from 'src/components/history/LogList';
 import TaskList from 'src/components/scheduled/TaskList';
@@ -29,10 +29,11 @@ export const FrontPage: React.FC = () => {
         <Routes>
           <Route
             index
-            element={showOverview ? <OverviewPage /> : <TaskList />}
+            element={showOverview ? <Navigate to="/overview" replace /> : <TaskList />}
           ></Route>
           {showOverview && (
             <>
+              <Route path="/overview" element={<OverviewPage />}></Route>
               <Route path="/scheduled" element={<TaskList />}></Route>
               <Route path="/scheduled/:taskName" element={<TaskList />}></Route>
               <Route
