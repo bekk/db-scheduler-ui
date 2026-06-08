@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 export interface PollResponse {
-    newFailures: number;
-    newRunning: number;
-    newTasks: number;
-    newSucceeded?: number;
-    stoppedFailing: number;
-    finishedRunning: number;
-  }
+  newFailures: number;
+  newRunning: number;
+  newTasks: number;
+  newSucceeded?: number;
+  stoppedFailing: number;
+  finishedRunning: number;
+}

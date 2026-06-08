@@ -30,7 +30,7 @@ export const pollLogs = async (
     queryParams.append('pageNumber', params.pageNumber.toString());
   params.size && queryParams.append('size', params.size.toString());
   params.sorting && queryParams.append('sorting', params.sorting.toUpperCase());
-  params.asc!==undefined && queryParams.append('asc', params.asc.toString());
+  params.asc !== undefined && queryParams.append('asc', params.asc.toString());
   params.searchTermTaskName &&
     queryParams.append('searchTermTaskName', params.searchTermTaskName.trim());
   params.searchTermTaskInstance &&
@@ -41,7 +41,8 @@ export const pollLogs = async (
   params.startTime &&
     queryParams.append('startTime', params.startTime.toISOString());
   params.endTime && queryParams.append('endTime', params.endTime.toISOString());
-  params.refresh!==undefined && queryParams.append('refresh', params.refresh.toString());
+  params.refresh !== undefined &&
+    queryParams.append('refresh', params.refresh.toString());
   params.taskNameExactMatch !== undefined &&
     queryParams.append(
       'taskNameExactMatch',

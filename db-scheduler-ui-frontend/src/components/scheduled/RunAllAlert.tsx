@@ -11,6 +11,9 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import React from 'react';
+
 import {
   AlertDialog,
   AlertDialogBody,
@@ -20,7 +23,6 @@ import {
   AlertDialogOverlay,
   Button,
 } from '@chakra-ui/react';
-import React from 'react';
 import runTaskGroup from 'src/services/runTaskGroup';
 import colors from 'src/styles/colors';
 

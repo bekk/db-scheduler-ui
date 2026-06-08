@@ -11,11 +11,13 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Text } from '@chakra-ui/react';
+
 import React from 'react';
+
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import colors from 'src/styles/colors';
+import { Text } from '@chakra-ui/react';
 import { SortBy } from 'src/models/QueryParams';
+import colors from 'src/styles/colors';
 
 export const SortButton: React.FC<{
   title: string;

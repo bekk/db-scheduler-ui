@@ -14,10 +14,10 @@
 export type Task = {
   taskName: string;
   taskInstance: string[];
-  taskData: (object|null)[];
+  taskData: (object | null)[];
   executionTime: Date[];
   picked: boolean;
-  pickedBy: (string|null)[];
+  pickedBy: (string | null)[];
   lastSuccess: Date[] | null;
   lastFailure: Date | null;
   consecutiveFailures: number[];

@@ -15,24 +15,20 @@ const API_BASE_URL: string =
   (import.meta.env.VITE_API_BASE_URL as string) ??
   window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
 
-const runTask = async (id: string, name: string, scheduleTime?:Date) => {
-
+const runTask = async (id: string, name: string, scheduleTime?: Date) => {
   const queryParams = new URLSearchParams();
 
   queryParams.append('id', id);
   queryParams.append('name', name);
   if (scheduleTime) {
-      queryParams.append('scheduleTime', scheduleTime.toISOString());
+    queryParams.append('scheduleTime', scheduleTime.toISOString());
   } else {
-      queryParams.append('scheduleTime', new Date().toISOString());
+    queryParams.append('scheduleTime', new Date().toISOString());
   }
 
-  const response = await fetch(
-    `${API_BASE_URL}/tasks/rerun?${queryParams}`,
-    {
-      method: 'POST',
-    },
-  );
+  const response = await fetch(`${API_BASE_URL}/tasks/rerun?${queryParams}`, {
+    method: 'POST',
+  });
 
   if (response.status == 401) {
     document.location.href = '/db-scheduler';

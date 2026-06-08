@@ -11,8 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createIcon } from '@chakra-ui/icons';
+
 import React from 'react';
+
+import { createIcon } from '@chakra-ui/icons';
 
 export const PlayIcon = createIcon({
   displayName: 'Play',

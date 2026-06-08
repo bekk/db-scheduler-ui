@@ -14,8 +14,8 @@
 export {};
 
 declare global {
-    interface Window {
-        /** Path to prepended to API calls and the router basename (optional). */
-        CONTEXT_PATH: string;
-    }
+  interface Window {
+    /** Path to prepended to API calls and the router basename (optional). */
+    CONTEXT_PATH: string;
+  }
 }

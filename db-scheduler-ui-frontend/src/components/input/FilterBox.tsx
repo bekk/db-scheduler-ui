@@ -11,6 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import React from 'react';
+
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -19,10 +23,8 @@ import {
   MenuItem,
   MenuList,
 } from '@chakra-ui/react';
-import React from 'react';
-import { ChevronDownIcon } from '@chakra-ui/icons';
-import colors from 'src/styles/colors';
 import { FilterBy } from 'src/models/QueryParams';
+import colors from 'src/styles/colors';
 
 export const FilterBox: React.FC<{
   currentFilter: FilterBy;

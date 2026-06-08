@@ -11,24 +11,27 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Task } from "src/models/Task";
+import { Task } from 'src/models/Task';
 
 export const status = ['Failed', 'Running', 'Scheduled', 'Group'] as const;
-type StatusType = typeof status[number];
+type StatusType = (typeof status)[number];
 
 export function determineStatus(task: Task): StatusType;
 export function determineStatus(
-  taskInstance: Task["taskInstance"],
-  pickedBy: Task["pickedBy"],
-  consecutiveFailures: Task["consecutiveFailures"]
+  taskInstance: Task['taskInstance'],
+  pickedBy: Task['pickedBy'],
+  consecutiveFailures: Task['consecutiveFailures'],
 ): StatusType;
 
 export function determineStatus(
-  taskOrTaskInstance: Task | Task["taskInstance"],
-  pickedBy?: Task["pickedBy"],
-  consecutiveFailures?: Task["consecutiveFailures"]
+  taskOrTaskInstance: Task | Task['taskInstance'],
+  pickedBy?: Task['pickedBy'],
+  consecutiveFailures?: Task['consecutiveFailures'],
 ): StatusType {
-  if (typeof taskOrTaskInstance === "object" && 'taskName' in taskOrTaskInstance) {
+  if (
+    typeof taskOrTaskInstance === 'object' &&
+    'taskName' in taskOrTaskInstance
+  ) {
     const task = taskOrTaskInstance;
 
     if (task.taskInstance.length > 1) return status[3];
@@ -48,20 +51,26 @@ export function determineStatus(
 export function isStatus(givenStatus: StatusType, task: Task): boolean;
 export function isStatus(
   givenStatus: StatusType,
-  taskInstance: Task["taskInstance"],
-  pickedBy: Task["pickedBy"],
-  consecutiveFailures: Task["consecutiveFailures"]
+  taskInstance: Task['taskInstance'],
+  pickedBy: Task['pickedBy'],
+  consecutiveFailures: Task['consecutiveFailures'],
 ): boolean;
 
 export function isStatus(
   givenStatus: StatusType,
-  taskInstanceOrTask: Task["taskInstance"] | Task,
-  pickedBy?: Task["pickedBy"],
-  consecutiveFailures?: Task["consecutiveFailures"]
+  taskInstanceOrTask: Task['taskInstance'] | Task,
+  pickedBy?: Task['pickedBy'],
+  consecutiveFailures?: Task['consecutiveFailures'],
 ): boolean {
-  if (typeof taskInstanceOrTask === "object" && 'taskName' in taskInstanceOrTask) {
+  if (
+    typeof taskInstanceOrTask === 'object' &&
+    'taskName' in taskInstanceOrTask
+  ) {
     return givenStatus === determineStatus(taskInstanceOrTask);
   } else {
-    return givenStatus === determineStatus(taskInstanceOrTask, pickedBy!, consecutiveFailures!);
+    return (
+      givenStatus ===
+      determineStatus(taskInstanceOrTask, pickedBy!, consecutiveFailures!)
+    );
   }
 }

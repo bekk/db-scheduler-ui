@@ -11,6 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import React from 'react';
+
+import { AttachmentIcon } from '@chakra-ui/icons';
 import {
   AccordionButton,
   AccordionIcon,
@@ -19,18 +23,16 @@ import {
   HStack,
   Text,
 } from '@chakra-ui/react';
-import { StatusBox } from 'src/components/common/StatusBox';
-import { TaskRunButton } from 'src/components/input/TaskRunButton';
-import React from 'react';
-import { DotButton } from 'src/components/input/DotButton';
-import { dateFormatText } from 'src/utils/dateFormatText';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Task } from 'src/models/Task';
 import { NumberCircleGroup } from 'src/components/common/NumberCircleGroup';
-import { AttachmentIcon } from '@chakra-ui/icons';
-import { determineStatus, isStatus } from 'src/utils/determineStatus';
+import { StatusBox } from 'src/components/common/StatusBox';
+import { DotButton } from 'src/components/input/DotButton';
+import { TaskRunButton } from 'src/components/input/TaskRunButton';
+import { Task } from 'src/models/Task';
 import colors from 'src/styles/colors';
 import { getReadonly } from 'src/utils/config';
+import { dateFormatText } from 'src/utils/dateFormatText';
+import { determineStatus, isStatus } from 'src/utils/determineStatus';
 
 interface TaskAccordionButtonProps extends Task {
   refetch: () => void;

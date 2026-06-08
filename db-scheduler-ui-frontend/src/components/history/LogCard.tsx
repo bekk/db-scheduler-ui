@@ -11,10 +11,11 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Log } from 'src/models/Log';
+
 import { AccordionItem, Divider } from '@chakra-ui/react';
 import { LogAccordionButton } from 'src/components/history/LogAccordionButton';
 import { LogAccordionItem } from 'src/components/history/LogAccordionItem';
+import { Log } from 'src/models/Log';
 import colors from 'src/styles/colors';
 
 interface LogCardProps {

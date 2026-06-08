@@ -11,8 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Box, Button, Text } from '@chakra-ui/react';
+
 import React from 'react';
+
+import { Box, Button, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { LogoIcon } from 'src/assets/icons/Logo';
 import colors from 'src/styles/colors';

@@ -11,10 +11,11 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+
+import { Box } from '@chakra-ui/react';
 import { Task } from 'src/models/Task';
 import TaskCard from './TaskCard';
-import { Box } from '@chakra-ui/react';
 
 interface TaskCardProps extends Task {
   refetch: () => void;
@@ -24,12 +25,12 @@ const TaskGroupCard: React.FC<TaskCardProps> = (taskProps) => {
   const [marginBottom, setMarginBottom] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
-  const updateRef = () => {
+  const updateRef = useCallback(() => {
     if (ref.current) {
       const el = ref.current;
       setMarginBottom(-(el.clientHeight * 1.8));
     }
-  };
+  }, []);
 
   useEffect(() => {
     updateRef();
@@ -37,7 +38,7 @@ const TaskGroupCard: React.FC<TaskCardProps> = (taskProps) => {
     return () => {
       window.removeEventListener('resize', updateRef);
     };
-  }, []);
+  }, [updateRef]);
 
   return (
     <Box mb={`${marginBottom}px`}>

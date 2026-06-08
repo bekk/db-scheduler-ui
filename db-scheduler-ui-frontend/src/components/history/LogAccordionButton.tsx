@@ -11,12 +11,14 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import React from 'react';
+
+import { AttachmentIcon } from '@chakra-ui/icons';
 import { AccordionButton, AccordionIcon, Box, HStack } from '@chakra-ui/react';
+import { useParams } from 'react-router-dom';
 import { LogStatus } from 'src/components/history/LogStatus';
 import { dateFormatText } from 'src/utils/dateFormatText';
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { AttachmentIcon } from '@chakra-ui/icons';
 
 interface LogAccordionButtonProps {
   succeeded: boolean;

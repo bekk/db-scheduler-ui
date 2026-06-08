@@ -11,17 +11,15 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Task } from "src/models/Task";
-import { Log } from "./Log";
-
+import { Task } from 'src/models/Task';
+import { Log } from './Log';
 
 export interface InfiniteScrollResponse<ItemType> {
-    items: ItemType[];
-    numberOfItems: number;
-    numberOfPages: number;
-  }
-  
-  export type TasksResponse = InfiniteScrollResponse<Task>;
+  items: ItemType[];
+  numberOfItems: number;
+  numberOfPages: number;
+}
 
-  export type LogResponse = InfiniteScrollResponse<Log>;
-  
+export type TasksResponse = InfiniteScrollResponse<Task>;
+
+export type LogResponse = InfiniteScrollResponse<Log>;

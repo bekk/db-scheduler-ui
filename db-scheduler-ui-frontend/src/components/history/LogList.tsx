@@ -11,8 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Accordion, Box, Button, Flex, HStack, Text } from '@chakra-ui/react';
+
 import React, { useEffect } from 'react';
+
+import { Accordion, Box, Button, Flex, HStack, Text } from '@chakra-ui/react';
 import { useLocation } from 'react-router-dom';
 import { LogCard } from 'src/components/history/LogCard';
 import { DateTimeInput } from 'src/components/input/DateTimeInput';
@@ -163,8 +165,8 @@ export const LogList: React.FC = () => {
           {isFetchingNextPage
             ? 'Loading...'
             : hasNextPage
-            ? 'Load More'
-            : 'Nothing more to load'}
+              ? 'Load More'
+              : 'Nothing more to load'}
         </Button>
       </Flex>
     </Box>

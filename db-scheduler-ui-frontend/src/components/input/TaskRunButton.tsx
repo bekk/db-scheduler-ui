@@ -11,15 +11,17 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button } from '@chakra-ui/react';
-import runTask from 'src/services/runTask';
-import { PlayIcon, RepeatIcon } from '../../assets/icons';
+
 import React from 'react';
+
+import { ArrowRightIcon } from '@chakra-ui/icons';
+import { Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { Task } from 'src/models/Task';
-import { isStatus } from 'src/utils/determineStatus';
+import runTask from 'src/services/runTask';
 import colors from 'src/styles/colors';
-import { ArrowRightIcon } from '@chakra-ui/icons';
+import { isStatus } from 'src/utils/determineStatus';
+import { PlayIcon, RepeatIcon } from '../../assets/icons';
 
 interface TaskRunButtonProps extends Task {
   style?: React.CSSProperties;
@@ -48,15 +50,15 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = (props) => {
             isStatus('Group', props)
               ? 'transparent'
               : isStatus('Failed', props)
-              ? colors.running['300']
-              : colors.running['100']
+                ? colors.running['300']
+                : colors.running['100']
           }
           textColor={
             isStatus('Group', props)
               ? colors.primary['600']
               : isStatus('Failed', props)
-              ? colors.primary['100']
-              : colors.running['500']
+                ? colors.primary['100']
+                : colors.running['500']
           }
           _hover={{
             bgColor: !isStatus('Group', props)
@@ -70,8 +72,8 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = (props) => {
             bgColor: isStatus('Group', props)
               ? colors.primary['100']
               : isStatus('Failed', props)
-              ? colors.running['300']
-              : colors.running['100'],
+                ? colors.running['300']
+                : colors.running['100'],
             textColor: isStatus('Group', props) && colors.primary['500'],
           }}
           fontWeight="normal"
@@ -91,8 +93,8 @@ export const TaskRunButton: React.FC<TaskRunButtonProps> = (props) => {
           {isStatus('Group', props)
             ? 'Show all'
             : isStatus('Failed', props)
-            ? 'Rerun'
-            : 'Run'}
+              ? 'Rerun'
+              : 'Run'}
         </Button>
       )}
     </>

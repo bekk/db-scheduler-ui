@@ -14,12 +14,11 @@
 import React from 'react';
 
 import { AccordionItem, AccordionItemProps, Divider } from '@chakra-ui/react';
-import { Task } from 'src/models/Task';
-
 import { TaskAccordionButton } from 'src/components/scheduled/TaskAccordionButton';
 import { TaskAccordionItem } from 'src/components/scheduled/TaskAccordionItem';
-import { isStatus } from 'src/utils/determineStatus';
+import { Task } from 'src/models/Task';
 import colors from 'src/styles/colors';
+import { isStatus } from 'src/utils/determineStatus';
 
 interface TaskCardProps extends Task {
   refetch: () => void;

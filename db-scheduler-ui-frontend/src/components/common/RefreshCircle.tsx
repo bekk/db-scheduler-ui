@@ -11,8 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Box } from '@chakra-ui/react';
+
 import { useState } from 'react';
+
+import { Box } from '@chakra-ui/react';
 import { NumberCircle } from './NumberCircle';
 
 type RefreshCircleProps = {

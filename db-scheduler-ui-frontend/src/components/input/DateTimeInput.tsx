@@ -11,8 +11,9 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import DatePicker from 'react-datepicker';
+
 import { Box } from '@chakra-ui/react';
+import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import colors from 'src/styles/colors';
 
