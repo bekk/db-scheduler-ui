@@ -49,81 +49,80 @@ public class OverviewService {
     this.scheduler = scheduler;
     this.taskDefinitionsAvailable = taskDefinitions != null && !taskDefinitions.isEmpty();
     this.taskDefinitions =
-      taskDefinitions == null
-        ? List.of()
-        : taskDefinitions.stream().sorted(Comparator.comparing(Task::getName)).collect(Collectors.toList());
+        taskDefinitions == null
+            ? List.of()
+            : taskDefinitions.stream()
+                .sorted(Comparator.comparing(Task::getName))
+                .collect(Collectors.toList());
   }
 
   public List<OverviewTask> getOverviewTasks() {
     List<TaskSummary> summaries = scheduler.getScheduledExecutionsSummaryByTask();
 
-    Set<String> recurringTaskNames = taskDefinitions
-      .stream()
-      .filter(this::isRecurringTaskDefinition)
-      .map(Task::getName)
-      .collect(Collectors.toSet());
-    Set<String> summarizedTaskNames = summaries.stream().map(TaskSummary::taskName).collect(Collectors.toSet());
+    Set<String> recurringTaskNames =
+        taskDefinitions.stream()
+            .filter(this::isRecurringTaskDefinition)
+            .map(Task::getName)
+            .collect(Collectors.toSet());
+    Set<String> summarizedTaskNames =
+        summaries.stream().map(TaskSummary::taskName).collect(Collectors.toSet());
 
     List<OverviewTask> overviewTasks = new ArrayList<>();
     summaries.forEach(summary -> overviewTasks.add(toOverviewTask(summary, recurringTaskNames)));
 
     if (taskDefinitionsAvailable) {
-      taskDefinitions
-        .stream()
-        .filter(task -> !recurringTaskNames.contains(task.getName()))
-        .filter(task -> !summarizedTaskNames.contains(task.getName()))
-        .map(this::dormantTask)
-        .forEach(overviewTasks::add);
+      taskDefinitions.stream()
+          .filter(task -> !recurringTaskNames.contains(task.getName()))
+          .filter(task -> !summarizedTaskNames.contains(task.getName()))
+          .map(this::dormantTask)
+          .forEach(overviewTasks::add);
     }
 
-    overviewTasks.sort(Comparator.comparing(OverviewTask::getTaskName));
+    overviewTasks.sort(Comparator.comparing(OverviewTask::taskName));
     return overviewTasks;
   }
 
   private OverviewTask toOverviewTask(TaskSummary summary, Set<String> recurringTaskNames) {
-    OverviewTaskCounts counts = new OverviewTaskCounts(
-      summary.failingCount(),
-      summary.runningCount(),
-      summary.scheduledCount()
-    );
+    OverviewTaskCounts counts =
+        new OverviewTaskCounts(
+            summary.failingCount(), summary.runningCount(), summary.scheduledCount());
     return new OverviewTask(
-      summary.taskName(),
-      taskDefinitionsAvailable ? recurringTaskNames.contains(summary.taskName()) : null,
-      summary.instanceCount(),
-      counts,
-      worstStatus(counts),
-      summary.earliestExecutionTime(),
-      summary.latestLastSuccess(),
-      summary.latestLastFailure(),
-      summary.maxConsecutiveFailures()
-    );
+        summary.taskName(),
+        taskDefinitionsAvailable ? recurringTaskNames.contains(summary.taskName()) : null,
+        summary.instanceCount(),
+        counts,
+        worstStatus(counts),
+        summary.earliestExecutionTime(),
+        summary.latestLastSuccess(),
+        summary.latestLastFailure(),
+        summary.maxConsecutiveFailures());
   }
 
   private OverviewTask dormantTask(Task<?> task) {
     return new OverviewTask(
-      task.getName(),
-      false,
-      0,
-      new OverviewTaskCounts(0, 0, 0),
-      OverviewTaskStatus.DORMANT,
-      null,
-      null,
-      null,
-      0
-    );
+        task.getName(),
+        false,
+        0,
+        new OverviewTaskCounts(0, 0, 0),
+        OverviewTaskStatus.DORMANT,
+        null,
+        null,
+        null,
+        0);
   }
 
   private OverviewTaskStatus worstStatus(OverviewTaskCounts counts) {
-    if (counts.getFailing() > 0) {
+    if (counts.failing() > 0) {
       return OverviewTaskStatus.FAILING;
     }
-    if (counts.getRunning() > 0) {
+    if (counts.running() > 0) {
       return OverviewTaskStatus.RUNNING;
     }
     return OverviewTaskStatus.SCHEDULED;
   }
 
   private boolean isRecurringTaskDefinition(Task<?> task) {
-    return task instanceof RecurringTask<?> || task instanceof RecurringTaskWithPersistentSchedule<?>;
+    return task instanceof RecurringTask<?>
+        || task instanceof RecurringTaskWithPersistentSchedule<?>;
   }
 }

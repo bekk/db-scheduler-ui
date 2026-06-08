@@ -76,7 +76,7 @@ class SmokeTest {
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(result.getBody()).isNotNull();
     assertThat(result.getBody())
-        .anyMatch(task -> task.getTaskName().equals(ONE_TIME_TASK.getTaskName()));
+        .anyMatch(task -> task.taskName().equals(ONE_TIME_TASK.getTaskName()));
   }
 
   @Test

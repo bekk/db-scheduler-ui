@@ -14,23 +14,14 @@
 package no.bekk.dbscheduler.ui.model;
 
 import java.time.Instant;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class OverviewTask {
-  private String taskName;
-  private Boolean recurring;
-  private int instanceCount;
-  private OverviewTaskCounts counts;
-  private OverviewTaskStatus worstStatus;
-  private Instant nextExecutionTime;
-  private Instant lastSuccess;
-  private Instant lastFailure;
-  private int maxConsecutiveFailures;
-}
+public record OverviewTask(
+    String taskName,
+    Boolean recurring,
+    int instanceCount,
+    OverviewTaskCounts counts,
+    OverviewTaskStatus worstStatus,
+    Instant nextExecutionTime,
+    Instant lastSuccess,
+    Instant lastFailure,
+    int maxConsecutiveFailures) {}

@@ -13,17 +13,4 @@
  */
 package no.bekk.dbscheduler.ui.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class OverviewTaskCounts {
-  private int failing;
-  private int running;
-  private int scheduled;
-}
+public record OverviewTaskCounts(int failing, int running, int scheduled) {}

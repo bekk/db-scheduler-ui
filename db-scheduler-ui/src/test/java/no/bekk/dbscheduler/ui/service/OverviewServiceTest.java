@@ -34,111 +34,109 @@ class OverviewServiceTest {
 
   @Test
   void getOverviewTasks_mapsSummariesAndSortsByTaskName() {
-    StubSchedulerClient scheduler = new StubSchedulerClient(
-      List.of(
-        summary(
-          "email",
-          2,
-          1,
-          1,
-          0,
-          NOW.plus(Duration.ofHours(1)),
-          NOW.minus(Duration.ofHours(2)),
-          NOW.minus(Duration.ofDays(1)),
-          2
-        ),
-        summary("billing", 1, 0, 0, 1, NOW.plus(Duration.ofHours(2)), null, null, 0)
-      )
-    );
+    StubSchedulerClient scheduler =
+        new StubSchedulerClient(
+            List.of(
+                summary(
+                    "email",
+                    2,
+                    1,
+                    1,
+                    0,
+                    NOW.plus(Duration.ofHours(1)),
+                    NOW.minus(Duration.ofHours(2)),
+                    NOW.minus(Duration.ofDays(1)),
+                    2),
+                summary("billing", 1, 0, 0, 1, NOW.plus(Duration.ofHours(2)), null, null, 0)));
 
     List<OverviewTask> tasks = new OverviewService(scheduler, List.of()).getOverviewTasks();
 
-    assertThat(tasks).extracting(OverviewTask::getTaskName).containsExactly("billing", "email");
+    assertThat(tasks).extracting(OverviewTask::taskName).containsExactly("billing", "email");
     assertThat(tasks)
-      .filteredOn(task -> task.getTaskName().equals("email"))
-      .singleElement()
-      .satisfies(task -> {
-        assertThat(task.getWorstStatus()).isEqualTo(OverviewTaskStatus.FAILING);
-        assertThat(task.getInstanceCount()).isEqualTo(2);
-        assertThat(task.getCounts().getFailing()).isEqualTo(1);
-        assertThat(task.getCounts().getRunning()).isEqualTo(1);
-        assertThat(task.getCounts().getScheduled()).isZero();
-        assertThat(task.getNextExecutionTime()).isEqualTo(NOW.plus(Duration.ofHours(1)));
-        assertThat(task.getLastSuccess()).isEqualTo(NOW.minus(Duration.ofHours(2)));
-        assertThat(task.getLastFailure()).isEqualTo(NOW.minus(Duration.ofDays(1)));
-        assertThat(task.getMaxConsecutiveFailures()).isEqualTo(2);
-      });
+        .filteredOn(task -> task.taskName().equals("email"))
+        .singleElement()
+        .satisfies(
+            task -> {
+              assertThat(task.worstStatus()).isEqualTo(OverviewTaskStatus.FAILING);
+              assertThat(task.instanceCount()).isEqualTo(2);
+              assertThat(task.counts().failing()).isEqualTo(1);
+              assertThat(task.counts().running()).isEqualTo(1);
+              assertThat(task.counts().scheduled()).isZero();
+              assertThat(task.nextExecutionTime()).isEqualTo(NOW.plus(Duration.ofHours(1)));
+              assertThat(task.lastSuccess()).isEqualTo(NOW.minus(Duration.ofHours(2)));
+              assertThat(task.lastFailure()).isEqualTo(NOW.minus(Duration.ofDays(1)));
+              assertThat(task.maxConsecutiveFailures()).isEqualTo(2);
+            });
   }
 
   @Test
   void getOverviewTasks_marksRecurringFromTaskDefinitions() {
-    StubSchedulerClient scheduler = new StubSchedulerClient(
-      List.of(summary("heartbeat", 1, 0, 0, 1, NOW, null, null, 0))
-    );
+    StubSchedulerClient scheduler =
+        new StubSchedulerClient(List.of(summary("heartbeat", 1, 0, 0, 1, NOW, null, null, 0)));
 
-    List<OverviewTask> tasks = new OverviewService(scheduler, List.of(recurringTask("heartbeat"))).getOverviewTasks();
+    List<OverviewTask> tasks =
+        new OverviewService(scheduler, List.of(recurringTask("heartbeat"))).getOverviewTasks();
 
     assertThat(tasks)
-      .singleElement()
-      .satisfies(task -> {
-        assertThat(task.getTaskName()).isEqualTo("heartbeat");
-        assertThat(task.getRecurring()).isTrue();
-        assertThat(task.getWorstStatus()).isEqualTo(OverviewTaskStatus.SCHEDULED);
-      });
+        .singleElement()
+        .satisfies(
+            task -> {
+              assertThat(task.taskName()).isEqualTo("heartbeat");
+              assertThat(task.recurring()).isTrue();
+              assertThat(task.worstStatus()).isEqualTo(OverviewTaskStatus.SCHEDULED);
+            });
   }
 
   @Test
   void getOverviewTasks_addsDormantRowsForUnscheduledOneTimeDefinitionsOnly() {
     StubSchedulerClient scheduler = new StubSchedulerClient(List.of());
 
-    List<OverviewTask> tasks = new OverviewService(
-      scheduler,
-      List.of(oneTimeTask("manual"), recurringTask("heartbeat"))
-    ).getOverviewTasks();
+    List<OverviewTask> tasks =
+        new OverviewService(scheduler, List.of(oneTimeTask("manual"), recurringTask("heartbeat")))
+            .getOverviewTasks();
 
     assertThat(tasks)
-      .singleElement()
-      .satisfies(task -> {
-        assertThat(task.getTaskName()).isEqualTo("manual");
-        assertThat(task.getRecurring()).isFalse();
-        assertThat(task.getInstanceCount()).isZero();
-        assertThat(task.getWorstStatus()).isEqualTo(OverviewTaskStatus.DORMANT);
-      });
+        .singleElement()
+        .satisfies(
+            task -> {
+              assertThat(task.taskName()).isEqualTo("manual");
+              assertThat(task.recurring()).isFalse();
+              assertThat(task.instanceCount()).isZero();
+              assertThat(task.worstStatus()).isEqualTo(OverviewTaskStatus.DORMANT);
+            });
   }
 
   @Test
   void getOverviewTasks_omitsDormantRowsForRecurringTasksWithPersistentSchedule() {
     StubSchedulerClient scheduler = new StubSchedulerClient(List.of());
 
-    List<OverviewTask> tasks = new OverviewService(
-      scheduler,
-      List.of(recurringWithPersistentScheduleTask("dynamic"))
-    ).getOverviewTasks();
+    List<OverviewTask> tasks =
+        new OverviewService(scheduler, List.of(recurringWithPersistentScheduleTask("dynamic")))
+            .getOverviewTasks();
 
     assertThat(tasks).isEmpty();
   }
 
   @Test
   void getOverviewTasks_degradesWhenTaskDefinitionsAreUnavailable() {
-    StubSchedulerClient scheduler = new StubSchedulerClient(
-      List.of(summary("unknown", 1, 0, 0, 1, NOW, null, null, 0))
-    );
+    StubSchedulerClient scheduler =
+        new StubSchedulerClient(List.of(summary("unknown", 1, 0, 0, 1, NOW, null, null, 0)));
 
     List<OverviewTask> tasks = new OverviewService(scheduler).getOverviewTasks();
 
     assertThat(tasks)
-      .singleElement()
-      .satisfies(task -> {
-        assertThat(task.getTaskName()).isEqualTo("unknown");
-        assertThat(task.getRecurring()).isNull();
-        assertThat(task.getWorstStatus()).isEqualTo(OverviewTaskStatus.SCHEDULED);
-      });
+        .singleElement()
+        .satisfies(
+            task -> {
+              assertThat(task.taskName()).isEqualTo("unknown");
+              assertThat(task.recurring()).isNull();
+              assertThat(task.worstStatus()).isEqualTo(OverviewTaskStatus.SCHEDULED);
+            });
   }
 
   private static Task<Void> recurringTask(String name) {
-    return Tasks.recurring(name, Schedules.fixedDelay(Duration.ofHours(1))).execute(
-      (taskInstance, executionContext) -> {}
-    );
+    return Tasks.recurring(name, Schedules.fixedDelay(Duration.ofHours(1)))
+        .execute((taskInstance, executionContext) -> {});
   }
 
   private static Task<Void> oneTimeTask(String name) {
@@ -146,32 +144,29 @@ class OverviewServiceTest {
   }
 
   private static Task<ScheduleAndData> recurringWithPersistentScheduleTask(String name) {
-    return Tasks.recurringWithPersistentSchedule(name, ScheduleAndData.class).execute(
-      (taskInstance, executionContext) -> {}
-    );
+    return Tasks.recurringWithPersistentSchedule(name, ScheduleAndData.class)
+        .execute((taskInstance, executionContext) -> {});
   }
 
   private static TaskSummary summary(
-    String taskName,
-    int instanceCount,
-    int runningCount,
-    int failingCount,
-    int scheduledCount,
-    Instant earliestExecutionTime,
-    Instant latestLastSuccess,
-    Instant latestLastFailure,
-    int maxConsecutiveFailures
-  ) {
+      String taskName,
+      int instanceCount,
+      int runningCount,
+      int failingCount,
+      int scheduledCount,
+      Instant earliestExecutionTime,
+      Instant latestLastSuccess,
+      Instant latestLastFailure,
+      int maxConsecutiveFailures) {
     return new TaskSummary(
-      taskName,
-      instanceCount,
-      runningCount,
-      failingCount,
-      scheduledCount,
-      earliestExecutionTime,
-      latestLastSuccess,
-      latestLastFailure,
-      maxConsecutiveFailures
-    );
+        taskName,
+        instanceCount,
+        runningCount,
+        failingCount,
+        scheduledCount,
+        earliestExecutionTime,
+        latestLastSuccess,
+        latestLastFailure,
+        maxConsecutiveFailures);
   }
 }
