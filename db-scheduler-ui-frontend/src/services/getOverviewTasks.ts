@@ -27,7 +27,7 @@ export const getOverviewTasks = async (): Promise<OverviewTask[]> => {
     },
   });
 
-  if (response.status == 401) {
+  if (response.status === 401) {
     document.location.href = '/db-scheduler';
   } else if (!response.ok) {
     throw new Error(

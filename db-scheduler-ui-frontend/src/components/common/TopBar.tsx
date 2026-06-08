@@ -28,7 +28,7 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
   const showHistory = getShowHistory();
   const showOverview = getShowOverview();
   const showNavigation = showOverview || showHistory;
-  const isHistory = location.pathname.includes('/history');
+  const isHistory = location.pathname.startsWith('/history');
   const isOverview = showOverview && location.pathname === '/';
   const isScheduled = !isHistory && !isOverview;
   const scheduledPath = showOverview ? '/scheduled' : '/';
