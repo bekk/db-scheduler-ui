@@ -19,22 +19,26 @@ import static no.bekk.dbscheduler.uistarter.config.DbSchedulerUiUtil.normalizePa
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
+import com.github.kagkarlsson.scheduler.task.Task;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.ConfigController;
 import no.bekk.dbscheduler.ui.controller.IndexHtmlController;
 import no.bekk.dbscheduler.ui.controller.LogController;
+import no.bekk.dbscheduler.ui.controller.OverviewController;
 import no.bekk.dbscheduler.ui.controller.SpaFallbackMvc;
 import no.bekk.dbscheduler.ui.controller.TaskAdminController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
 import no.bekk.dbscheduler.ui.service.LogLogic;
+import no.bekk.dbscheduler.ui.service.OverviewService;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
 import no.bekk.dbscheduler.ui.util.Caching;
 import no.bekk.dbscheduler.uistarter.config.DbSchedulerUiProperties;
 import no.bekk.dbscheduler.uistarter.config.DbSchedulerUiWebConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -87,6 +91,17 @@ public class UiApiAutoConfiguration {
   @ConditionalOnMissingBean
   @ConditionalOnProperty(
       prefix = "db-scheduler-ui",
+      name = "overview",
+      havingValue = "true",
+      matchIfMissing = false)
+  OverviewService overviewLogic(Scheduler scheduler, ObjectProvider<Task<?>> taskDefinitions) {
+    return new OverviewService(scheduler, taskDefinitions.stream().toList());
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
       name = "history",
       havingValue = "true",
       matchIfMissing = false)
@@ -127,6 +142,17 @@ public class UiApiAutoConfiguration {
   @ConditionalOnMissingBean
   @ConditionalOnProperty(
       prefix = "db-scheduler-ui",
+      name = "overview",
+      havingValue = "true",
+      matchIfMissing = false)
+  OverviewController overviewController(OverviewService overviewService) {
+    return new OverviewController(overviewService);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
       name = "history",
       havingValue = "true",
       matchIfMissing = false)
@@ -156,7 +182,7 @@ public class UiApiAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean
   ConfigController configController(DbSchedulerUiProperties properties) {
-    return new ConfigController(properties.history(), properties::readOnly);
+    return new ConfigController(properties.history(), properties.overview(), properties::readOnly);
   }
 
   @Bean
@@ -191,8 +217,8 @@ public class UiApiAutoConfiguration {
         .replaceAll(
             "<head>",
             """
-                <head>
-                    <script src='%s'></script>"""
+      <head>
+          <script src='%s'></script>"""
                 .formatted(contextPathScript));
   }
 }

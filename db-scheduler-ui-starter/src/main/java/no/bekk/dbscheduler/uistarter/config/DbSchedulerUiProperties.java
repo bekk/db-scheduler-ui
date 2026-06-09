@@ -23,6 +23,7 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  * @param readOnly when true, disables mutating endpoints (rerun, delete, reschedule)
  * @param taskData whether to surface serialized task data in API responses
  * @param history whether the UI exposes task execution history (requires the log writer)
+ * @param overview whether the UI exposes the task-centric overview page
  * @param logLimit cap on the number of history rows fetched per request; 0 applies no explicit
  *     {@code LIMIT} clause, but the result set is still capped at 500 rows by the query layer
  */
@@ -32,4 +33,5 @@ public record DbSchedulerUiProperties(
     @DefaultValue("false") boolean readOnly,
     @DefaultValue("true") boolean taskData,
     @DefaultValue("false") boolean history,
+    @DefaultValue("false") boolean overview,
     @DefaultValue("0") int logLimit) {}

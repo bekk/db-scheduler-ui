@@ -29,7 +29,7 @@ dashboard for monitoring and basic administration of tasks.
 ### Prerequisites
 
 * An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
-* Minimum db-scheduler version 15
+* Minimum db-scheduler version 16.12.0
 * Minimum Java 17 and SpringBoot 3.4 (or SpringBoot 4.0 for the Spring Boot 4 starter)
 
 ## Getting started
@@ -177,7 +177,7 @@ additionally you might want to hide delete, run, ... buttons in the UI. To achie
 ```java
 @Bean
 ConfigController configController(DbSchedulerUiProperties properties) {
-  return new ConfigController(properties.isHistory(), readOnly(properties));
+  return new ConfigController(properties.isHistory(), properties.isOverview(), readOnly(properties));
 }
 
 private Supplier<Boolean> readOnly(DbSchedulerUiProperties properties) {

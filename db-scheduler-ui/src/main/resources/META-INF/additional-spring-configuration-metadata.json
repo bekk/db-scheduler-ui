@@ -4,6 +4,11 @@
       "name": "db-scheduler-ui.context-path",
       "type": "java.lang.String",
       "description": "Add a prefix for the UI context path."
+    },
+    {
+      "name": "db-scheduler-ui.overview",
+      "type": "java.lang.Boolean",
+      "description": "Expose the task-centric overview page in the UI."
     }
   ]
 }
