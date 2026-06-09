@@ -139,14 +139,13 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
       cursor={task.instanceCount > 0 ? 'pointer' : 'default'}
     >
       <Td>
-        <HStack align="start" spacing={3}>
+        <HStack align="center" spacing={3}>
           <Box
             aria-hidden="true"
             bgColor={dotColor(task.worstStatus)}
             borderRadius="50%"
             flexShrink={0}
             height="0.75rem"
-            mt={2}
             width="0.75rem"
           />
           <Box minW={0}>
