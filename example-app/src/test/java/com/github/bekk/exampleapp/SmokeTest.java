@@ -92,6 +92,17 @@ class SmokeTest {
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
   }
 
+  // Regression test for
+  // issue #149: the ByteArrayResource fallback threw FileNotFoundException on lastModified(),
+  // returning 500 instead of the SPA shell.
+  @Test
+  void unknownSpaRouteServesIndexHtml() {
+    ResponseEntity<String> result =
+        this.restTemplate.getForEntity(baseUrl + "/db-scheduler/some-spa-route", String.class);
+    assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(result.getBody()).contains("/db-scheduler");
+  }
+
   @BeforeEach
   void setUp() {
     baseUrl = "http://localhost:" + serverPort;

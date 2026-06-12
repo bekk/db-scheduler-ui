@@ -62,7 +62,14 @@ public class SpaFallbackMvc implements WebMvcConfigurer {
         return requestedResource;
       }
 
-      return new ByteArrayResource(indexHtml.getBytes(StandardCharsets.UTF_8));
+      // ByteArrayResource has no backing file, so override lastModified() to avoid
+      // FileNotFoundException
+      return new ByteArrayResource(indexHtml.getBytes(StandardCharsets.UTF_8)) {
+        @Override
+        public long lastModified() {
+          return -1;
+        }
+      };
     }
   }
 }
