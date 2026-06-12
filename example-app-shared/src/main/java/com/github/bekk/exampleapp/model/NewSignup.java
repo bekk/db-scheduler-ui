@@ -14,39 +14,19 @@
 package com.github.bekk.exampleapp.model;
 
 import java.io.Serializable;
+import java.time.Instant;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-public class TestObject implements Serializable {
-  private String name;
-  private int id;
+/** Payload for the {@code send-welcome-email} task: a customer who just signed up. */
+@Setter
+@Getter
+@AllArgsConstructor
+public class NewSignup implements Serializable {
+
+  private long userId;
   private String email;
-
-  public String getName() {
-    return name;
-  }
-
-  public TestObject(String initialName, int id, String email) {
-    this.id = id;
-    this.name = initialName;
-    this.email = email;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
+  private String customerName;
+  private Instant signedUpAt;
 }

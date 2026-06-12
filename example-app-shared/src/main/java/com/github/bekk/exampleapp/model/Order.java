@@ -14,17 +14,17 @@
 package com.github.bekk.exampleapp.model;
 
 import java.io.Serializable;
-import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Payload carried through the order chain: {@code order-capture-payment -> order-ship-package}. */
 @Setter
 @Getter
 @AllArgsConstructor
-public class TaskData implements Serializable {
+public class Order implements Serializable {
 
-  private long id;
-  private String data;
-  private Instant time;
+  private String orderId;
+  private String customerName;
+  private double amount;
 }

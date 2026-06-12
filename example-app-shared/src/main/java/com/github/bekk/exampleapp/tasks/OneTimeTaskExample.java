@@ -13,7 +13,7 @@
  */
 package com.github.bekk.exampleapp.tasks;
 
-import com.github.bekk.exampleapp.model.TaskData;
+import com.github.bekk.exampleapp.model.NewSignup;
 import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
@@ -23,17 +23,23 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OneTimeTaskExample {
 
-  public static final TaskDescriptor<TaskData> SEND_WELCOME_EMAIL =
-      TaskDescriptor.of("send-welcome-email", TaskData.class);
+  public static final TaskDescriptor<NewSignup> SEND_WELCOME_EMAIL =
+      TaskDescriptor.of("send-welcome-email", NewSignup.class);
 
   @Bean
-  public Task<TaskData> sendWelcomeEmail() {
+  public Task<NewSignup> sendWelcomeEmail() {
     return Tasks.oneTime(SEND_WELCOME_EMAIL)
         .execute(
             (inst, ctx) -> {
-              System.out.println("Sending welcome email to: " + inst.getId());
+              final NewSignup data = inst.getData();
               System.out.println(
-                  "With data id: " + inst.getData().getId() + " data: " + inst.getData().getData());
+                  "Sending welcome email to "
+                      + data.getCustomerName()
+                      + " <"
+                      + data.getEmail()
+                      + "> (user "
+                      + data.getUserId()
+                      + ")");
             });
   }
 }

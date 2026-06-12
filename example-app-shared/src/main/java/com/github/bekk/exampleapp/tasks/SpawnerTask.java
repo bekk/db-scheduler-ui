@@ -15,7 +15,7 @@ package com.github.bekk.exampleapp.tasks;
 
 import static utils.Utils.sleep;
 
-import com.github.bekk.exampleapp.model.TaskData;
+import com.github.bekk.exampleapp.model.NewsletterEmail;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
@@ -33,24 +33,32 @@ public class SpawnerTask {
   public static final TaskDescriptor<Void> ENQUEUE_DAILY_NEWSLETTER_BATCH =
       TaskDescriptor.of("enqueue-daily-newsletter-batch");
 
-  public static final TaskDescriptor<TaskData> SEND_NEWSLETTER_EMAIL =
-      TaskDescriptor.of("send-newsletter-email", TaskData.class);
+  public static final TaskDescriptor<NewsletterEmail> SEND_NEWSLETTER_EMAIL =
+      TaskDescriptor.of("send-newsletter-email", NewsletterEmail.class);
 
   @Bean
   public Task<?> enqueueDailyNewsletterBatch() {
-    return Tasks.recurring(ENQUEUE_DAILY_NEWSLETTER_BATCH, Schedules.cron("0 0 9 * * *"))
+    return Tasks.recurring(ENQUEUE_DAILY_NEWSLETTER_BATCH, Schedules.cron("0 */5 * * * *"))
         .execute(
             (inst, ctx) -> {
               final SchedulerClient client = ctx.getSchedulerClient();
-              final String today = LocalDate.now().toString();
+              // Namespace each batch by its run so repeated batches actually spawn new instances
+              // instead of being deduplicated against an earlier batch on the same day.
+              final String edition = LocalDate.now().toString();
+              final String batch = edition + "-" + Instant.now().getEpochSecond();
               final Random random = new Random();
 
               for (int userId = 1; userId <= 30; userId++) {
-                int spreadSeconds = random.nextInt(600);
+                int spreadSeconds = random.nextInt(120);
                 client.scheduleIfNotExists(
                     SEND_NEWSLETTER_EMAIL
-                        .instance(today + "-user-" + userId)
-                        .data(new TaskData(userId, "{newsletter: weekly-digest}", Instant.now()))
+                        .instance(batch + "-user-" + userId)
+                        .data(
+                            new NewsletterEmail(
+                                userId,
+                                "subscriber" + userId + "@example.com",
+                                edition,
+                                "weekly-digest"))
                         .build(),
                     Instant.now().plusSeconds(spreadSeconds));
               }
@@ -58,7 +66,7 @@ public class SpawnerTask {
   }
 
   @Bean
-  public Task<TaskData> sendNewsletterEmail() {
+  public Task<NewsletterEmail> sendNewsletterEmail() {
     return Tasks.oneTime(SEND_NEWSLETTER_EMAIL)
         .execute(
             (inst, ctx) -> {

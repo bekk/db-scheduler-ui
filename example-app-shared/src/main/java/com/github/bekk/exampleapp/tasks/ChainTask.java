@@ -15,7 +15,7 @@ package com.github.bekk.exampleapp.tasks;
 
 import static utils.Utils.sleep;
 
-import com.github.bekk.exampleapp.model.TestObject;
+import com.github.bekk.exampleapp.model.Order;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
@@ -27,30 +27,28 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ChainTask {
 
-  public static final TaskDescriptor<TestObject> ORDER_CAPTURE_PAYMENT =
-      TaskDescriptor.of("order-capture-payment", TestObject.class);
+  public static final TaskDescriptor<Order> ORDER_CAPTURE_PAYMENT =
+      TaskDescriptor.of("order-capture-payment", Order.class);
 
-  public static final TaskDescriptor<TestObject> ORDER_SHIP_PACKAGE =
-      TaskDescriptor.of("order-ship-package", TestObject.class);
+  public static final TaskDescriptor<Order> ORDER_SHIP_PACKAGE =
+      TaskDescriptor.of("order-ship-package", Order.class);
 
   @Bean
-  public Task<TestObject> orderCapturePayment() {
+  public Task<Order> orderCapturePayment() {
     return Tasks.oneTime(ORDER_CAPTURE_PAYMENT)
         .execute(
             (inst, ctx) -> {
               sleep(2000);
               final SchedulerClient client = ctx.getSchedulerClient();
               System.out.println("Captured payment for order: " + inst.getId());
-              TestObject data = inst.getData();
-              data.setId(data.getId() + 1);
               client.scheduleIfNotExists(
-                  ORDER_SHIP_PACKAGE.instance(inst.getId()).data(data).build(),
+                  ORDER_SHIP_PACKAGE.instance(inst.getId()).data(inst.getData()).build(),
                   Instant.now().plusSeconds(5));
             });
   }
 
   @Bean
-  public Task<TestObject> orderShipPackage() {
+  public Task<Order> orderShipPackage() {
     return Tasks.oneTime(ORDER_SHIP_PACKAGE)
         .execute(
             (inst, ctx) -> {
