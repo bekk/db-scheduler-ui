@@ -16,6 +16,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest(
@@ -101,6 +102,8 @@ class SmokeTest {
         this.restTemplate.getForEntity(baseUrl + "/db-scheduler/some-spa-route", String.class);
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(result.getBody()).contains("/db-scheduler");
+    assertThat(result.getHeaders().getContentType()).isNotNull();
+    assertThat(result.getHeaders().getContentType().isCompatibleWith(MediaType.TEXT_HTML)).isTrue();
   }
 
   @BeforeEach

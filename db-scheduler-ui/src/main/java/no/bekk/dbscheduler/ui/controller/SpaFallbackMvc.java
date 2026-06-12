@@ -69,6 +69,11 @@ public class SpaFallbackMvc implements WebMvcConfigurer {
         public long lastModified() {
           return -1;
         }
+
+        @Override
+        public String getFilename() {
+          return "index.html";
+        }
       };
     }
   }
