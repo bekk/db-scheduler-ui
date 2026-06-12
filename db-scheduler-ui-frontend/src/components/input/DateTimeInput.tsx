@@ -15,13 +15,11 @@ import DatePickerImport from 'react-datepicker';
 import { Box } from '@chakra-ui/react';
 import 'react-datepicker/dist/react-datepicker.css';
 import colors from 'src/styles/colors';
+import { interopDefault } from 'src/utils/interopDefault';
 
 // react-datepicker v4 is CommonJS; under Vite 8's interop the default import resolves to the
-// module namespace, leaving the component on `.default`. Fall back to the import itself in case
-// a future bundler hands back the component directly.
-const DatePicker =
-  (DatePickerImport as { default?: typeof DatePickerImport }).default ??
-  DatePickerImport;
+// module namespace rather than the component. See interopDefault.
+const DatePicker = interopDefault(DatePickerImport);
 
 interface DateTimeInputProps {
   selectedDate: Date | null;
