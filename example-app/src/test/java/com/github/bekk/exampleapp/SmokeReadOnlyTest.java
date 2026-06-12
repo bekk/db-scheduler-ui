@@ -1,6 +1,6 @@
 package com.github.bekk.exampleapp;
 
-import static com.github.bekk.exampleapp.tasks.FailingTask.FAILING_ONETIME_TASK;
+import static com.github.bekk.exampleapp.tasks.FailingTask.CHARGE_CREDIT_CARD;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
@@ -60,7 +60,7 @@ class SmokeReadOnlyTest {
         restTemplate.postForEntity(
             baseUrl
                 + "/db-scheduler-api/tasks/delete?id=%d&name=%s"
-                    .formatted(6, FAILING_ONETIME_TASK.getTaskName()),
+                    .formatted(6, CHARGE_CREDIT_CARD.getTaskName()),
             null,
             Void.class);
 

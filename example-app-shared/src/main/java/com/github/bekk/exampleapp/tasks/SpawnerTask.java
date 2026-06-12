@@ -20,49 +20,51 @@ import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
-import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
+import com.github.kagkarlsson.scheduler.task.schedule.Schedules;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Random;
-import java.util.UUID;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SpawnerTask {
 
-  public static final TaskDescriptor<Void> RECURRING_SPAWNER_TASK =
-      TaskDescriptor.of("recurring-spawner-task");
+  public static final TaskDescriptor<Void> ENQUEUE_DAILY_NEWSLETTER_BATCH =
+      TaskDescriptor.of("enqueue-daily-newsletter-batch");
 
-  public static final TaskDescriptor<TaskData> ONE_TIME_SPAWNER_TASK =
-      TaskDescriptor.of("onetime-spawned-task", TaskData.class);
+  public static final TaskDescriptor<TaskData> SEND_NEWSLETTER_EMAIL =
+      TaskDescriptor.of("send-newsletter-email", TaskData.class);
 
   @Bean
-  public Task<?> runSpawner() {
-    return Tasks.recurring(RECURRING_SPAWNER_TASK, FixedDelay.ofSeconds(180))
+  public Task<?> enqueueDailyNewsletterBatch() {
+    return Tasks.recurring(ENQUEUE_DAILY_NEWSLETTER_BATCH, Schedules.cron("0 0 9 * * *"))
         .execute(
             (inst, ctx) -> {
               final SchedulerClient client = ctx.getSchedulerClient();
-              final long randomUUID = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
+              final String today = LocalDate.now().toString();
+              final Random random = new Random();
 
-              for (int i = 0; i < 100; i++) {
+              for (int userId = 1; userId <= 30; userId++) {
+                int spreadSeconds = random.nextInt(600);
                 client.scheduleIfNotExists(
-                    ONE_TIME_SPAWNER_TASK
-                        .instance("spawned " + randomUUID + " loopnr: " + i)
-                        .data(new TaskData(123, "{data: MASSIVEDATA}", Instant.now()))
+                    SEND_NEWSLETTER_EMAIL
+                        .instance(today + "-user-" + userId)
+                        .data(new TaskData(userId, "{newsletter: weekly-digest}", Instant.now()))
                         .build(),
-                    Instant.now().plusSeconds(60));
+                    Instant.now().plusSeconds(spreadSeconds));
               }
             });
   }
 
   @Bean
-  public Task<TaskData> runOneTimeSpawned() {
-    return Tasks.oneTime(ONE_TIME_SPAWNER_TASK)
+  public Task<TaskData> sendNewsletterEmail() {
+    return Tasks.oneTime(SEND_NEWSLETTER_EMAIL)
         .execute(
             (inst, ctx) -> {
-              sleep(10000);
+              sleep(2000);
               if (new Random().nextInt(100) < 20) {
-                throw new RuntimeException("Simulated failure");
+                throw new RuntimeException("SMTP relay rejected message");
               }
             });
   }

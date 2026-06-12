@@ -13,32 +13,27 @@
  */
 package com.github.bekk.exampleapp.tasks;
 
-import static utils.Utils.sleep;
-
+import com.github.bekk.exampleapp.model.TaskData;
+import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
-import com.github.kagkarlsson.scheduler.task.helper.RecurringTask;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
-import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
-import java.util.Random;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RecurringTaskExample {
+public class OneTimeTaskExample {
 
-  public static final TaskDescriptor<Void> RECURRING_TASK = TaskDescriptor.of("recurring-task");
+  public static final TaskDescriptor<TaskData> SEND_WELCOME_EMAIL =
+      TaskDescriptor.of("send-welcome-email", TaskData.class);
 
   @Bean
-  public RecurringTask<Void> getExample() {
-    return Tasks.recurring(RECURRING_TASK, FixedDelay.ofSeconds(6))
+  public Task<TaskData> sendWelcomeEmail() {
+    return Tasks.oneTime(SEND_WELCOME_EMAIL)
         .execute(
             (inst, ctx) -> {
-              sleep(5000);
-              if (new Random().nextInt(100) < 30) {
-                throw new RuntimeException("Simulated failure in example recurring task");
-              }
-
-              System.out.println("Executed recurring task: " + inst.getTaskName());
+              System.out.println("Sending welcome email to: " + inst.getId());
+              System.out.println(
+                  "With data id: " + inst.getData().getId() + " data: " + inst.getData().getData());
             });
   }
 }

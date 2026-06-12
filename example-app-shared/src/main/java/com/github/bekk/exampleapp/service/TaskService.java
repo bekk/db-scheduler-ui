@@ -13,10 +13,11 @@
  */
 package com.github.bekk.exampleapp.service;
 
-import static com.github.bekk.exampleapp.tasks.ChainTask.CHAINED_STEP_1_TASK;
-import static com.github.bekk.exampleapp.tasks.FailingTask.FAILING_ONETIME_TASK;
-import static com.github.bekk.exampleapp.tasks.LongRunningTask.LONG_RUNNING_ONETIME_TASK;
-import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.ONE_TIME_TASK;
+import static com.github.bekk.exampleapp.tasks.ChainTask.ORDER_CAPTURE_PAYMENT;
+import static com.github.bekk.exampleapp.tasks.FailingTask.CHARGE_CREDIT_CARD;
+import static com.github.bekk.exampleapp.tasks.FailingTask.DELIVER_OUTGOING_WEBHOOK;
+import static com.github.bekk.exampleapp.tasks.LongRunningTask.GENERATE_MONTHLY_INVOICE_PDF;
+import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.SEND_WELCOME_EMAIL;
 
 import com.github.bekk.exampleapp.model.TaskData;
 import com.github.bekk.exampleapp.model.TestObject;
@@ -35,29 +36,41 @@ public class TaskService {
 
   public void runManuallyTriggeredTasks() {
     scheduler.schedule(
-        ONE_TIME_TASK.instance("1").data(new TaskData(1, "test data", Instant.now())).build(),
-        Instant.now());
-
-    scheduler.schedule(
-        CHAINED_STEP_1_TASK
-            .instance("3")
-            .data(new TestObject("Ole Nordman", 1, "ole.nordman@mail.com"))
+        SEND_WELCOME_EMAIL
+            .instance("user-10472")
+            .data(new TaskData(10472, "ole.nordman@mail.com", Instant.now()))
             .build(),
         Instant.now());
 
     scheduler.schedule(
-        LONG_RUNNING_ONETIME_TASK.instance("5").build(), Instant.now().plusSeconds(2));
-    scheduler.schedule(FAILING_ONETIME_TASK.instance("6").build(), Instant.now().plusSeconds(2));
+        ORDER_CAPTURE_PAYMENT
+            .instance("order-88314")
+            .data(new TestObject("Ole Nordman", 1, "ole.nordman@mail.com"))
+            .build(),
+        Instant.now());
+
+    for (int i = 1; i <= 5; i++) {
+      scheduler.schedule(
+          GENERATE_MONTHLY_INVOICE_PDF.instance("invoice-2026-05-acme-" + i).build(),
+          Instant.now().plusSeconds(i * 10L));
+    }
 
     scheduler.schedule(
-        ONE_TIME_TASK
+        CHARGE_CREDIT_CARD.instance("order-2026-05-22-8831").build(), Instant.now().plusSeconds(2));
+
+    scheduler.schedule(
+        DELIVER_OUTGOING_WEBHOOK.instance("evt_3PqL9k2a-customer-created").build(),
+        Instant.now().plusSeconds(2));
+
+    scheduler.schedule(
+        SEND_WELCOME_EMAIL
             .instance("delete-1")
             .data(new TaskData(-1, "task 1 to delete", Instant.now()))
             .build(),
         Instant.now());
 
     scheduler.schedule(
-        ONE_TIME_TASK
+        SEND_WELCOME_EMAIL
             .instance("delete-2")
             .data(new TaskData(-2, "task 2 to delete", Instant.now()))
             .build(),

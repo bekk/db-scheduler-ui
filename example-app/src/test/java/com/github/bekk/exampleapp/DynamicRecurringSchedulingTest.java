@@ -1,6 +1,6 @@
 package com.github.bekk.exampleapp;
 
-import static com.github.bekk.exampleapp.tasks.DynamicRecurringTaskExample.DYNAMIC_RECURRING_TASK;
+import static com.github.bekk.exampleapp.tasks.DynamicRecurringTaskExample.CUSTOMER_SCHEDULED_REPORT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.bekk.exampleapp.model.TaskScheduleAndNoData;
@@ -42,7 +42,7 @@ class DynamicRecurringSchedulingTest {
     TaskScheduleAndNoData data = new TaskScheduleAndNoData(cron);
 
     schedulerClient.scheduleIfNotExists(
-        DYNAMIC_RECURRING_TASK.instance("single_instance").data(data).build(),
+        CUSTOMER_SCHEDULED_REPORT.instance("single_instance").data(data).build(),
         cron.getInitialExecutionTime(Instant.now()));
 
     // When
@@ -50,7 +50,7 @@ class DynamicRecurringSchedulingTest {
         this.restTemplate.getForEntity(
             baseUrl
                 + "/db-scheduler-api/tasks/all?filter=ALL&pageNumber=0&size=10&sorting=DEFAULT&asc=true&searchTerm="
-                + DYNAMIC_RECURRING_TASK.getTaskName(),
+                + CUSTOMER_SCHEDULED_REPORT.getTaskName(),
             GetTasksResponse.class);
 
     // Then
@@ -58,7 +58,7 @@ class DynamicRecurringSchedulingTest {
     result.getBody().getItems().forEach(t -> System.out.println(t.getTaskName()));
     assertThat(result.getBody().getItems())
         .anyMatch(
-            taskModel -> taskModel.getTaskName().equals(DYNAMIC_RECURRING_TASK.getTaskName()));
+            taskModel -> taskModel.getTaskName().equals(CUSTOMER_SCHEDULED_REPORT.getTaskName()));
   }
 
   @BeforeEach

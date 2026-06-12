@@ -15,30 +15,39 @@ package com.github.bekk.exampleapp.tasks;
 
 import static utils.Utils.sleep;
 
+import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
-import com.github.kagkarlsson.scheduler.task.helper.RecurringTask;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
-import java.util.Random;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RecurringTaskExample {
+public class LongRunningTask {
 
-  public static final TaskDescriptor<Void> RECURRING_TASK = TaskDescriptor.of("recurring-task");
+  public static final TaskDescriptor<Void> GENERATE_MONTHLY_INVOICE_PDF =
+      TaskDescriptor.of("generate-monthly-invoice-pdf");
+
+  public static final TaskDescriptor<Void> REBUILD_SEARCH_INDEX =
+      TaskDescriptor.of("rebuild-search-index");
 
   @Bean
-  public RecurringTask<Void> getExample() {
-    return Tasks.recurring(RECURRING_TASK, FixedDelay.ofSeconds(6))
+  public Task<?> generateMonthlyInvoicePdf() {
+    return Tasks.oneTime(GENERATE_MONTHLY_INVOICE_PDF)
         .execute(
             (inst, ctx) -> {
-              sleep(5000);
-              if (new Random().nextInt(100) < 30) {
-                throw new RuntimeException("Simulated failure in example recurring task");
-              }
+              System.out.println("Generating monthly invoice PDF: " + inst.getId());
+              sleep(10000);
+            });
+  }
 
-              System.out.println("Executed recurring task: " + inst.getTaskName());
+  @Bean
+  public Task<?> rebuildSearchIndex() {
+    return Tasks.recurring(REBUILD_SEARCH_INDEX, FixedDelay.ofMinutes(5))
+        .execute(
+            (inst, ctx) -> {
+              System.out.println("Rebuilding search index");
+              sleep(30000);
             });
   }
 }

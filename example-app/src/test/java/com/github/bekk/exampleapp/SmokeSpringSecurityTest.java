@@ -1,6 +1,6 @@
 package com.github.bekk.exampleapp;
 
-import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.ONE_TIME_TASK;
+import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.SEND_WELCOME_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.BOOLEAN;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -180,7 +180,7 @@ class SmokeSpringSecurityTest {
         userRestTemplate.postForEntity(
             baseUrl
                 + "/db-scheduler-api/tasks/delete?id=%s&name=%s"
-                    .formatted("delete-2", ONE_TIME_TASK.getTaskName()),
+                    .formatted("delete-2", SEND_WELCOME_EMAIL.getTaskName()),
             null,
             Void.class);
 
@@ -193,7 +193,7 @@ class SmokeSpringSecurityTest {
         adminRestTemplate.postForEntity(
             baseUrl
                 + "/db-scheduler-api/tasks/delete?id=%s&name=%s"
-                    .formatted("delete-2", ONE_TIME_TASK.getTaskName()),
+                    .formatted("delete-2", SEND_WELCOME_EMAIL.getTaskName()),
             null,
             Void.class);
 

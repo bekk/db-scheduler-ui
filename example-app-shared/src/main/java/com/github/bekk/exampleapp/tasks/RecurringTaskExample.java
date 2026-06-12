@@ -13,27 +13,33 @@
  */
 package com.github.bekk.exampleapp.tasks;
 
-import com.github.bekk.exampleapp.model.TaskScheduleAndNoData;
+import static utils.Utils.sleep;
+
 import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
-import com.github.kagkarlsson.scheduler.task.helper.RecurringTaskWithPersistentSchedule;
+import com.github.kagkarlsson.scheduler.task.helper.RecurringTask;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
+import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
+import java.util.Random;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import utils.Utils;
 
 @Configuration
-public class DynamicRecurringTaskExample {
+public class RecurringTaskExample {
 
-  public static final TaskDescriptor<TaskScheduleAndNoData> DYNAMIC_RECURRING_TASK =
-      TaskDescriptor.of("dynamic-recurring-task", TaskScheduleAndNoData.class);
+  public static final TaskDescriptor<Void> SYNC_STRIPE_PAYMENT_STATUS =
+      TaskDescriptor.of("sync-stripe-payment-status");
 
   @Bean
-  public RecurringTaskWithPersistentSchedule<TaskScheduleAndNoData> runDynamicRecurringTask() {
-    return Tasks.recurringWithPersistentSchedule(DYNAMIC_RECURRING_TASK)
+  public RecurringTask<Void> syncStripePaymentStatus() {
+    return Tasks.recurring(SYNC_STRIPE_PAYMENT_STATUS, FixedDelay.ofSeconds(30))
         .execute(
             (inst, ctx) -> {
-              Utils.sleep(500);
-              System.out.println("Executed dynamic recurring task: " + inst.getTaskName());
+              sleep(1500);
+              if (new Random().nextInt(100) < 10) {
+                throw new RuntimeException("Stripe API returned 503");
+              }
+
+              System.out.println("Synced payment status from Stripe");
             });
   }
 }

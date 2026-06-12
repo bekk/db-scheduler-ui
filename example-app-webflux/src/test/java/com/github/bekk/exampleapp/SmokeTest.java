@@ -1,6 +1,6 @@
 package com.github.bekk.exampleapp;
 
-import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.ONE_TIME_TASK;
+import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.SEND_WELCOME_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import no.bekk.dbscheduler.ui.controller.TaskAdminController;
@@ -39,7 +39,7 @@ public class SmokeTest {
         this.restTemplate.getForEntity(
             baseUrl
                 + "/db-scheduler-api/tasks/all?filter=ALL&pageNumber=0&size=10&sorting=DEFAULT&asc=true&searchTerm="
-                + ONE_TIME_TASK.getTaskName(),
+                + SEND_WELCOME_EMAIL.getTaskName(),
             GetTasksResponse.class);
     Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
     assertThat(result.getBody().getItems()).hasSizeGreaterThan(0);
@@ -51,12 +51,12 @@ public class SmokeTest {
         this.restTemplate.getForEntity(
             baseUrl
                 + "/db-scheduler-api/tasks/all?filter=ALL&pageNumber=0&size=10&sorting=DEFAULT&asc=true&searchTerm="
-                + ONE_TIME_TASK.getTaskName(),
+                + SEND_WELCOME_EMAIL.getTaskName(),
             GetTasksResponse.class);
     Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
     result.getBody().getItems().forEach(t -> System.out.println(t.getTaskName()));
     assertThat(result.getBody().getItems())
-        .anyMatch(taskModel -> taskModel.getTaskName().equals(ONE_TIME_TASK.getTaskName()));
+        .anyMatch(taskModel -> taskModel.getTaskName().equals(SEND_WELCOME_EMAIL.getTaskName()));
   }
 
   @BeforeEach

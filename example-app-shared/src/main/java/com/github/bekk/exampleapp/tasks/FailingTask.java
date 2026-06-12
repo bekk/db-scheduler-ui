@@ -19,47 +19,47 @@ import com.github.kagkarlsson.scheduler.task.FailureHandler;
 import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
-import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
+import com.github.kagkarlsson.scheduler.task.schedule.Schedules;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FailingTask {
 
-  public static final TaskDescriptor<Void> FAILING_ONETIME_TASK =
-      TaskDescriptor.of("failing-one-time-task");
+  public static final TaskDescriptor<Void> CHARGE_CREDIT_CARD =
+      TaskDescriptor.of("charge-credit-card");
 
-  public static final TaskDescriptor<Void> FAILING_RECURRING_TASK =
-      TaskDescriptor.of("failing-recurring-task");
+  public static final TaskDescriptor<Void> RECONCILE_LEDGER_WITH_BANK =
+      TaskDescriptor.of("reconcile-ledger-with-bank");
 
-  public static final TaskDescriptor<Void> FAILING_ONETIME_TASK_BACKOFF =
-      TaskDescriptor.of("failing-one-time-with-backoff-task");
+  public static final TaskDescriptor<Void> DELIVER_OUTGOING_WEBHOOK =
+      TaskDescriptor.of("deliver-outgoing-webhook");
 
   @Bean
-  public Task<?> runOneTimeFailing() {
-    return Tasks.oneTime(FAILING_ONETIME_TASK)
+  public Task<?> chargeCreditCard() {
+    return Tasks.oneTime(CHARGE_CREDIT_CARD)
         .execute(
             (inst, ctx) -> {
-              throw new RuntimeException("Simulated task failure");
+              throw new RuntimeException("Card declined: insufficient_funds");
             });
   }
 
   @Bean
-  public Task<?> runRecurringFailing() {
-    return Tasks.recurring(FAILING_RECURRING_TASK, FixedDelay.ofSeconds(6))
+  public Task<?> reconcileLedgerWithBank() {
+    return Tasks.recurring(RECONCILE_LEDGER_WITH_BANK, Schedules.cron("0 */5 * * * *"))
         .execute(
             (inst, ctx) -> {
-              throw new RuntimeException("Simulated task failure");
+              throw new RuntimeException("Bank statement endpoint timed out");
             });
   }
 
   @Bean
-  public Task<?> runOneTimeFailingWithBackoff() {
-    return Tasks.oneTime(FAILING_ONETIME_TASK_BACKOFF)
-        .onFailure(new FailureHandler.ExponentialBackoffFailureHandler<>(ofSeconds(1)))
+  public Task<?> deliverOutgoingWebhook() {
+    return Tasks.oneTime(DELIVER_OUTGOING_WEBHOOK)
+        .onFailure(new FailureHandler.ExponentialBackoffFailureHandler<>(ofSeconds(2)))
         .execute(
             (inst, ctx) -> {
-              throw new RuntimeException("Simulated task failure");
+              throw new RuntimeException("Subscriber returned HTTP 500");
             });
   }
 }

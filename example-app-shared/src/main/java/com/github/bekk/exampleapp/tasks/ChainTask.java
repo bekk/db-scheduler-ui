@@ -27,49 +27,35 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ChainTask {
 
-  public static final TaskDescriptor<TestObject> CHAINED_STEP_1_TASK =
-      TaskDescriptor.of("chained-step-1", TestObject.class);
+  public static final TaskDescriptor<TestObject> ORDER_CAPTURE_PAYMENT =
+      TaskDescriptor.of("order-capture-payment", TestObject.class);
 
-  public static final TaskDescriptor<TestObject> CHAINED_STEP_2_TASK =
-      TaskDescriptor.of("chained-step-2", TestObject.class);
+  public static final TaskDescriptor<TestObject> ORDER_SHIP_PACKAGE =
+      TaskDescriptor.of("order-ship-package", TestObject.class);
 
   @Bean
-  public Task<TestObject> chainTaskStepOne() {
-    return Tasks.oneTime(CHAINED_STEP_1_TASK)
+  public Task<TestObject> orderCapturePayment() {
+    return Tasks.oneTime(ORDER_CAPTURE_PAYMENT)
         .execute(
             (inst, ctx) -> {
-              sleep(5000);
+              sleep(2000);
               final SchedulerClient client = ctx.getSchedulerClient();
-              System.out.println(
-                  "Executed chained onetime task step 1: "
-                      + inst.getTaskName()
-                      + " "
-                      + inst.getId());
+              System.out.println("Captured payment for order: " + inst.getId());
               TestObject data = inst.getData();
               data.setId(data.getId() + 1);
               client.scheduleIfNotExists(
-                  CHAINED_STEP_2_TASK.instance(inst.getId()).data(data).build(),
-                  Instant.now().plusSeconds(10));
+                  ORDER_SHIP_PACKAGE.instance(inst.getId()).data(data).build(),
+                  Instant.now().plusSeconds(5));
             });
   }
 
   @Bean
-  public Task<TestObject> chainTaskStepTwo() {
-    return Tasks.oneTime(CHAINED_STEP_2_TASK)
+  public Task<TestObject> orderShipPackage() {
+    return Tasks.oneTime(ORDER_SHIP_PACKAGE)
         .execute(
             (inst, ctx) -> {
-              sleep(5000);
-              final SchedulerClient client = ctx.getSchedulerClient();
-              System.out.println(
-                  "Executed chained onetime task step 2: "
-                      + inst.getTaskName()
-                      + " "
-                      + inst.getId());
-              TestObject data = inst.getData();
-              data.setId(data.getId() + 1);
-              client.scheduleIfNotExists(
-                  CHAINED_STEP_1_TASK.instance(inst.getId()).data(data).build(),
-                  Instant.now().plusSeconds(20));
+              sleep(2000);
+              System.out.println("Shipped package for order: " + inst.getId());
             });
   }
 }

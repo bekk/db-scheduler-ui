@@ -46,6 +46,7 @@
         <module>db-scheduler-ui</module>
         <module>db-scheduler-ui-starter</module>
         <module>db-scheduler-ui-spring-boot-4-starter</module>
+        <module>example-app-shared</module>
         <module>example-app</module>
         <module>example-app-boot4</module>
         <module>example-app-webflux</module>

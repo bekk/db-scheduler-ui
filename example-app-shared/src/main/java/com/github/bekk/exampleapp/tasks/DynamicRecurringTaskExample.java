@@ -13,32 +13,27 @@
  */
 package com.github.bekk.exampleapp.tasks;
 
-import static utils.Utils.sleep;
-
+import com.github.bekk.exampleapp.model.TaskScheduleAndNoData;
 import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
-import com.github.kagkarlsson.scheduler.task.helper.RecurringTask;
+import com.github.kagkarlsson.scheduler.task.helper.RecurringTaskWithPersistentSchedule;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
-import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
-import java.util.Random;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import utils.Utils;
 
 @Configuration
-public class RecurringTaskExample {
+public class DynamicRecurringTaskExample {
 
-  public static final TaskDescriptor<Void> RECURRING_TASK = TaskDescriptor.of("recurring-task");
+  public static final TaskDescriptor<TaskScheduleAndNoData> CUSTOMER_SCHEDULED_REPORT =
+      TaskDescriptor.of("customer-scheduled-report", TaskScheduleAndNoData.class);
 
   @Bean
-  public RecurringTask<Void> getExample() {
-    return Tasks.recurring(RECURRING_TASK, FixedDelay.ofSeconds(6))
+  public RecurringTaskWithPersistentSchedule<TaskScheduleAndNoData> customerScheduledReport() {
+    return Tasks.recurringWithPersistentSchedule(CUSTOMER_SCHEDULED_REPORT)
         .execute(
             (inst, ctx) -> {
-              sleep(5000);
-              if (new Random().nextInt(100) < 30) {
-                throw new RuntimeException("Simulated failure in example recurring task");
-              }
-
-              System.out.println("Executed recurring task: " + inst.getTaskName());
+              Utils.sleep(500);
+              System.out.println("Delivered scheduled report to customer: " + inst.getId());
             });
   }
 }
