@@ -11,10 +11,17 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import DatePicker from 'react-datepicker';
+import DatePickerImport from 'react-datepicker';
 import { Box } from '@chakra-ui/react';
 import 'react-datepicker/dist/react-datepicker.css';
 import colors from 'src/styles/colors';
+
+// react-datepicker v4 is CommonJS; under Vite 8's interop the default import resolves to the
+// module namespace, leaving the component on `.default`. Fall back to the import itself in case
+// a future bundler hands back the component directly.
+const DatePicker =
+  (DatePickerImport as { default?: typeof DatePickerImport }).default ??
+  DatePickerImport;
 
 interface DateTimeInputProps {
   selectedDate: Date | null;
