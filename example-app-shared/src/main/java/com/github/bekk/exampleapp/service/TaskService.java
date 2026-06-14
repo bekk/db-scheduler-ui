@@ -25,16 +25,14 @@ import com.github.kagkarlsson.scheduler.Scheduler;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class TaskService {
 
   private final Scheduler scheduler;
-
-  public TaskService(Scheduler scheduler) {
-    this.scheduler = scheduler;
-  }
 
   public void runManuallyTriggeredTasks() {
     scheduler.schedule(

@@ -42,8 +42,8 @@ public class SpawnerTask {
         .execute(
             (inst, ctx) -> {
               final SchedulerClient client = ctx.getSchedulerClient();
-              // Namespace each batch by its run so repeated batches actually spawn new instances
-              // instead of being deduplicated against an earlier batch on the same day.
+              // Namespace the instance ids by the run timestamp so every invocation enqueues a
+              // fresh batch of demo emails rather than colliding with a previous run's instances.
               final String edition = LocalDate.now().toString();
               final String batch = edition + "-" + Instant.now().getEpochSecond();
               final Random random = new Random();

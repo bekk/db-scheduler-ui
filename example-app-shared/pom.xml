@@ -15,14 +15,6 @@
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
-    <!--
-        Demo code shared by example-app, example-app-boot4 and example-app-webflux.
-        Dependencies are 'provided' so each consuming app supplies its own runtime
-        versions of db-scheduler and Spring (Boot 3, Boot 4 or WebFlux); this module
-        only needs them on the compile classpath. db-scheduler is unified to a single
-        version (see db-scheduler.version in the root pom) so the compiled artifact is
-        binary-compatible across all three apps.
-    -->
     <dependencies>
         <dependency>
             <groupId>com.github.kagkarlsson</groupId>
