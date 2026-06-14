@@ -185,6 +185,8 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
             flexShrink={0}
             height="0.75rem"
             width="0.75rem"
+            // No status dot for empty tasks; hidden (not removed) keeps names aligned.
+            visibility={task.instanceCount === 0 ? 'hidden' : 'visible'}
           />
           <Box minW={0}>
             <Text fontWeight="bold">{task.taskName}</Text>
