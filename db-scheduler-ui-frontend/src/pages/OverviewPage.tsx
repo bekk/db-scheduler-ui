@@ -19,11 +19,11 @@ import {
   Tbody,
   Td,
   Text,
-  Th,
-  Thead,
   Tr,
 } from '@chakra-ui/react';
+import { HamburgerIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
+import { RepeatIcon } from 'src/assets/icons';
 import { OverviewTask, OverviewTaskStatus } from 'src/models/OverviewTask';
 import {
   getOverviewTasks,
@@ -61,46 +61,36 @@ export const OverviewPage: React.FC = () => {
     isError,
   } = useQuery([OVERVIEW_TASKS_QUERY_KEY], getOverviewTasks);
 
-  const recurringTasks = sorted(data.filter((task) => task.recurring === true));
-  const customTasks = sorted(data.filter((task) => task.recurring !== true));
+  const recurringTasks = sortedByName(
+    data.filter((task) => task.recurring === true),
+  );
+  const customTasks = sortedByName(
+    data.filter((task) => task.recurring !== true),
+  );
 
   return (
     <Box>
-      <Text ml={1} mb={7} fontSize={'3xl'} fontWeight={'semibold'}>
-        All tasks
-      </Text>
       <TableContainer overflowX="auto">
         <Table
           variant="simple"
           size="md"
           sx={{ borderCollapse: 'separate', borderSpacing: '0 8px' }}
         >
-          <Thead sx={{ th: { borderBottomColor: colors.primary['300'] } }}>
-            <Tr>
-              <Th>Task</Th>
-              <Th width="18%">Next run</Th>
-              <Th width="18%">Last run</Th>
-            </Tr>
-          </Thead>
           <Tbody>
             {isLoading && <MessageRow message="Loading tasks" />}
             {isError && <MessageRow message="Could not load tasks" />}
             {!isLoading && !isError && (
               <>
-                <SectionHeader
+                <Section
                   title="Recurring"
-                  count={recurringTasks.length}
+                  icon={<RepeatIcon boxSize={6} />}
+                  tasks={recurringTasks}
                 />
-                {recurringTasks.map((task) => (
-                  <OverviewRow key={task.taskName} task={task} />
-                ))}
-                <SectionHeader
+                <Section
                   title="One-time / custom"
-                  count={customTasks.length}
+                  icon={<HamburgerIcon boxSize={5} />}
+                  tasks={customTasks}
                 />
-                {customTasks.map((task) => (
-                  <OverviewRow key={task.taskName} task={task} />
-                ))}
               </>
             )}
           </Tbody>
@@ -110,20 +100,68 @@ export const OverviewPage: React.FC = () => {
   );
 };
 
-const SectionHeader: React.FC<{ title: string; count: number }> = ({
-  title,
-  count,
-}) => (
+const Section: React.FC<{
+  title: string;
+  icon: React.ReactNode;
+  tasks: OverviewTask[];
+}> = ({ title, icon, tasks }) => (
+  <>
+    <SectionHeader title={title} icon={icon} count={tasks.length} />
+    {tasks.length > 0 && <ColumnLabels />}
+    {tasks.map((task) => (
+      <OverviewRow key={task.taskName} task={task} />
+    ))}
+  </>
+);
+
+const SectionHeader: React.FC<{
+  title: string;
+  icon: React.ReactNode;
+  count: number;
+}> = ({ title, icon, count }) => (
   <Tr>
-    <Td colSpan={3} borderBottom="none" pb={0} pt={3}>
-      <Text
-        textTransform="uppercase"
-        color={colors.primary['500']}
-        fontWeight="bold"
-        fontSize="sm"
-      >
-        {title} · {count}
-      </Text>
+    <Td colSpan={3} border="none" pt={10} pb={1}>
+      <HStack spacing={3} align="center">
+        <Box
+          aria-hidden="true"
+          display="flex"
+          alignItems="center"
+          color={colors.primary['400']}
+        >
+          {icon}
+        </Box>
+        <Text fontSize="2xl" fontWeight="semibold" color={colors.primary['600']}>
+          {title}
+        </Text>
+        <Text fontSize="lg" color={colors.primary['400']} fontWeight="normal">
+          {count}
+        </Text>
+      </HStack>
+    </Td>
+  </Tr>
+);
+
+const columnLabelSx = {
+  textTransform: 'uppercase' as const,
+  letterSpacing: 'wider',
+  fontSize: 'xs',
+  fontWeight: 'bold',
+  color: colors.primary['400'],
+  border: 'none',
+  borderBottom: '1px solid',
+  borderBottomColor: colors.primary['300'],
+  pt: 1,
+  pb: 2,
+};
+
+const ColumnLabels: React.FC = () => (
+  <Tr>
+    <Td sx={columnLabelSx}>Task</Td>
+    <Td sx={columnLabelSx} width="18%">
+      Next run
+    </Td>
+    <Td sx={columnLabelSx} width="18%">
+      Last run
     </Td>
   </Tr>
 );
@@ -149,15 +187,7 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
             width="0.75rem"
           />
           <Box minW={0}>
-            <HStack spacing={2}>
-              <Text fontWeight="bold">{task.taskName}</Text>
-              <Text
-                color={statusColors[task.worstStatus]}
-                fontWeight="semibold"
-              >
-                {statusText[task.worstStatus]}
-              </Text>
-            </HStack>
+            <Text fontWeight="bold">{task.taskName}</Text>
             <Box color={colors.primary['400']} fontSize="sm">
               {subLine(task)}
             </Box>
@@ -165,18 +195,39 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
         </HStack>
       </Td>
       <Td>
-        <Text
-          title={absoluteTitle(task.nextExecutionTime)}
-          color={isOverdue(task) ? overdueColor : colors.primary['500']}
-          fontWeight={
-            isOverdue(task) || task.counts.running > 0 ? 'semibold' : 'normal'
-          }
-        >
-          {nextRunText(task)}
-        </Text>
+        <HStack spacing={2}>
+          <ProximityDot task={task} />
+          <Text
+            title={absoluteTitle(task.nextExecutionTime)}
+            color={isOverdue(task) ? overdueColor : colors.primary['500']}
+            fontWeight={
+              isOverdue(task) || task.counts.running > 0 ? 'semibold' : 'normal'
+            }
+          >
+            {nextRunText(task)}
+          </Text>
+        </HStack>
       </Td>
       <Td>{lastRunText(task)}</Td>
     </Tr>
+  );
+};
+
+// A dot whose opacity grows as the next run approaches — full for imminent/running,
+// faint for the far future. Rendered invisible (but space-preserving) when there is no
+// upcoming run, so the next-run text stays aligned across rows.
+const ProximityDot: React.FC<{ task: OverviewTask }> = ({ task }) => {
+  const opacity = proximityOpacity(task);
+  return (
+    <Box
+      aria-hidden="true"
+      bgColor={colors.primary['600']}
+      borderRadius="50%"
+      flexShrink={0}
+      height="0.5rem"
+      width="0.5rem"
+      opacity={opacity ?? 0}
+    />
   );
 };
 
@@ -188,8 +239,28 @@ const MessageRow: React.FC<{ message: string }> = ({ message }) => (
   </Tr>
 );
 
-function sorted(tasks: OverviewTask[]): OverviewTask[] {
+// Stable alphabetical order, independent of run times — proximity is conveyed by the
+// next-run dot, not by row position (see proximityOpacity).
+function sortedByName(tasks: OverviewTask[]): OverviewTask[] {
   return [...tasks].sort((a, b) => a.taskName.localeCompare(b.taskName));
+}
+
+// 1 (imminent/overdue/running) → ~0.15 (far future); null when there is no upcoming run.
+// Logarithmic over seconds so the dot fades legibly across the ranges that matter here:
+// ~10s→1.0, 1min→0.8, 10min→0.56, 1h→0.36, ≥1d→0.15.
+function proximityOpacity(task: OverviewTask): number | null {
+  if (task.worstStatus === 'DORMANT' || !task.nextExecutionTime) {
+    return null;
+  }
+  if (task.counts.running > 0) {
+    return 1;
+  }
+  const secondsUntil =
+    (new Date(task.nextExecutionTime).getTime() - Date.now()) / 1000;
+  if (secondsUntil <= 10) {
+    return 1;
+  }
+  return Math.min(1, Math.max(0.15, 1 - (Math.log10(secondsUntil) - 1) / 4));
 }
 
 function subLine(task: OverviewTask) {
@@ -204,9 +275,13 @@ function subLine(task: OverviewTask) {
     );
   }
 
-  const base = statusText[task.worstStatus];
   const duration = statusDuration(task);
-  const parts = [duration ? `${base} for ${duration}` : base];
+  const parts: string[] = [];
+
+  if (task.worstStatus !== 'DORMANT') {
+    const base = statusText[task.worstStatus];
+    parts.push(duration ? `${base} for ${duration}` : base);
+  }
 
   if (task.recurring !== true) {
     parts.push(instancesText(task.instanceCount));
@@ -246,11 +321,15 @@ function nextRunText(task: OverviewTask): string {
 }
 
 function lastRunText(task: OverviewTask) {
+  if (task.worstStatus === 'DORMANT') {
+    return <Text color={colors.primary['400']}>-</Text>;
+  }
+
   const lastSuccess = parseDate(task.lastSuccess);
   const lastFailure = parseDate(task.lastFailure);
 
   if (!lastSuccess && !lastFailure) {
-    return <Text color={colors.primary['400']}>never run</Text>;
+    return <Text color={colors.primary['400']}>-</Text>;
   }
 
   const lastWasFailure =
@@ -258,14 +337,14 @@ function lastRunText(task: OverviewTask) {
   const date = lastWasFailure ? lastFailure : lastSuccess;
 
   if (!date) {
-    return <Text color={colors.primary['400']}>never run</Text>;
+    return <Text color={colors.primary['400']}>-</Text>;
   }
 
   return (
     <Text
       title={dateFormatText(date)}
       color={lastWasFailure ? colors.failed['200'] : colors.success['200']}
-      fontWeight="semibold"
+      fontWeight={lastWasFailure ? 'semibold' : 'normal'}
     >
       {lastWasFailure ? 'last failure' : 'last success'}{' '}
       {formatDistanceToNowStrict(date, { addSuffix: true })}
@@ -310,37 +389,49 @@ function countPart(count: number, label: string, color: string) {
 
 function rowBackground(task: OverviewTask): string | undefined {
   if (task.worstStatus === 'FAILING') {
-    return colors.failed['100'];
+    return '#fcf3f3';
   }
   if (task.worstStatus === 'RUNNING') {
-    return colors.running['100'];
+    return '#f6f8fd';
+  }
+  if (task.worstStatus === 'DORMANT') {
+    return '#f8f9fa';
   }
   return colors.primary['100'];
 }
 
 function rowHoverBackground(task: OverviewTask): string {
   if (task.worstStatus === 'FAILING') {
-    return '#e5b0b0';
+    return '#f7e8e8';
   }
   if (task.worstStatus === 'RUNNING') {
-    return colors.running['200'];
+    return '#eef2fc';
+  }
+  if (task.worstStatus === 'DORMANT') {
+    return '#f1f2f3';
   }
   return colors.primary['200'];
 }
 
 function rowBorderColor(task: OverviewTask): string {
   if (task.worstStatus === 'FAILING') {
-    return '#f7b8b8';
+    return '#f3dede';
   }
   if (task.worstStatus === 'RUNNING') {
-    return colors.running['200'];
+    return '#e7edf9';
+  }
+  if (task.worstStatus === 'DORMANT') {
+    return '#eceef0';
   }
   return colors.primary['300'];
 }
 
 function dotColor(status: OverviewTaskStatus): string {
-  if (status === 'SCHEDULED') {
+  if (status === 'DORMANT') {
     return '#cfd6dc';
+  }
+  if (status === 'SCHEDULED') {
+    return colors.primary['400'];
   }
   return statusColors[status];
 }
