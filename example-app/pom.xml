@@ -31,6 +31,11 @@
             <artifactId>db-scheduler-ui-starter</artifactId>
             <version>main-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>no.bekk.db-scheduler-ui</groupId>
+            <artifactId>example-app-shared</artifactId>
+            <version>main-SNAPSHOT</version>
+        </dependency>
 
         <dependency>
             <groupId>org.flywaydb</groupId>

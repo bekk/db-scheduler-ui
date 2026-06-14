@@ -28,6 +28,11 @@
             <version>main-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>no.bekk.db-scheduler-ui</groupId>
+            <artifactId>example-app-shared</artifactId>
+            <version>main-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
         </dependency>
