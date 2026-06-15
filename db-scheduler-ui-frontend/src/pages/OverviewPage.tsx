@@ -198,13 +198,11 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
       </Td>
       <Td>
         <HStack spacing={2}>
-          <ProximityDot task={task} />
+          <ProximityPillar task={task} />
           <Text
             title={absoluteTitle(task.nextExecutionTime)}
-            color={isOverdue(task) ? overdueColor : colors.primary['500']}
-            fontWeight={
-              isOverdue(task) || task.counts.running > 0 ? 'semibold' : 'normal'
-            }
+            color={nextRunColor(task)}
+            fontWeight={nextRunFontWeight(task)}
           >
             {nextRunText(task)}
           </Text>
@@ -215,23 +213,59 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
   );
 };
 
-// A dot whose opacity grows as the next run approaches — full for imminent/running,
-// faint for the far future. Rendered invisible (but space-preserving) when there is no
-// upcoming run, so the next-run text stays aligned across rows.
-const ProximityDot: React.FC<{ task: OverviewTask }> = ({ task }) => {
-  const opacity = proximityOpacity(task);
+// A pillar whose height grows as the next run approaches — tall for imminent/running,
+// short for the far future, over a faint full-height track that keeps the level readable
+// even when short. Bottom-anchored like a level gauge; a vertical bar reads distinctly
+// from the round status dot beside the task name. Rendered as an empty (space-preserving)
+// slot when there is no upcoming run, so the next-run text stays aligned across rows.
+const PILLAR_SLOT_HEIGHT = '0.9375rem'; // 15px
+
+const ProximityPillar: React.FC<{ task: OverviewTask }> = ({ task }) => {
+  const level = proximityLevel(task);
+  if (level === null) {
+    return (
+      <Box aria-hidden="true" flexShrink={0} width="4px" height={PILLAR_SLOT_HEIGHT} />
+    );
+  }
   return (
     <Box
       aria-hidden="true"
-      bgColor={colors.primary['600']}
-      borderRadius="50%"
+      position="relative"
       flexShrink={0}
-      height="0.5rem"
-      width="0.5rem"
-      opacity={opacity ?? 0}
-    />
+      width="4px"
+      height={PILLAR_SLOT_HEIGHT}
+    >
+      <Box
+        position="absolute"
+        left="1px"
+        top={0}
+        bottom={0}
+        width="2px"
+        borderRadius="1px"
+        bgColor={colors.primary['200']}
+      />
+      <Box
+        position="absolute"
+        left={0}
+        bottom={0}
+        width="4px"
+        borderRadius="2px"
+        height={`${(3 + level * 12).toFixed(1)}px`}
+        bgColor={pillarColor(task)}
+      />
+    </Box>
   );
 };
+
+function pillarColor(task: OverviewTask): string {
+  if (task.counts.running > 0) {
+    return colors.running['300'];
+  }
+  if (isOverdue(task)) {
+    return overdueColor;
+  }
+  return colors.primary['600'];
+}
 
 const MessageRow: React.FC<{ message: string }> = ({ message }) => (
   <Tr>
@@ -242,15 +276,15 @@ const MessageRow: React.FC<{ message: string }> = ({ message }) => (
 );
 
 // Stable alphabetical order, independent of run times — proximity is conveyed by the
-// next-run dot, not by row position (see proximityOpacity).
+// next-run pillar and text shade, not by row position (see proximityLevel).
 function sortedByName(tasks: OverviewTask[]): OverviewTask[] {
   return [...tasks].sort((a, b) => a.taskName.localeCompare(b.taskName));
 }
 
 // 1 (imminent/overdue/running) → ~0.15 (far future); null when there is no upcoming run.
-// Logarithmic over seconds so the dot fades legibly across the ranges that matter here:
-// ~10s→1.0, 1min→0.8, 10min→0.56, 1h→0.36, ≥1d→0.15.
-function proximityOpacity(task: OverviewTask): number | null {
+// Logarithmic over seconds so the pillar/text grade legibly across the ranges that matter
+// here: ~10s→1.0, 1min→0.8, 10min→0.56, 1h→0.36, ≥1d→0.15.
+function proximityLevel(task: OverviewTask): number | null {
   if (task.worstStatus === 'DORMANT' || !task.nextExecutionTime) {
     return null;
   }
@@ -320,6 +354,34 @@ function nextRunText(task: OverviewTask): string {
   const date = new Date(task.nextExecutionTime);
   const distance = formatDistanceToNowStrict(date);
   return isBefore(date, new Date()) ? `due ${distance} ago` : `in ${distance}`;
+}
+
+// Next-run text shade reinforces the pillar: light gray when the run is far off, deepening
+// toward near-black as it approaches. Overdue keeps its amber; dormant rows stay muted.
+function nextRunColor(task: OverviewTask): string {
+  if (isOverdue(task)) {
+    return overdueColor;
+  }
+  const level = proximityLevel(task);
+  if (level === null) {
+    return colors.primary['400'];
+  }
+  return gradedGray(level);
+}
+
+function nextRunFontWeight(task: OverviewTask): 'semibold' | 'normal' {
+  const level = proximityLevel(task);
+  return isOverdue(task) || task.counts.running > 0 || (level ?? 0) >= 0.9
+    ? 'semibold'
+    : 'normal';
+}
+
+// Linear blend from light gray (level 0, far) to near-black (level 1, imminent).
+function gradedGray(level: number): string {
+  const far = [201, 206, 212];
+  const near = [31, 31, 31];
+  const [r, g, b] = far.map((f, i) => Math.round(f + (near[i] - f) * level));
+  return `rgb(${r}, ${g}, ${b})`;
 }
 
 function lastRunText(task: OverviewTask) {
