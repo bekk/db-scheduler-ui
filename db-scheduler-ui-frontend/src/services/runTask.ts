@@ -11,20 +11,19 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const API_BASE_URL: string =
-  (import.meta.env.VITE_API_BASE_URL as string) ??
-  window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
+import { getApiBaseUrl, redirectToUi } from 'src/utils/runtimeConfig';
 
-const runTask = async (id: string, name: string, scheduleTime?:Date) => {
+const API_BASE_URL = getApiBaseUrl();
 
+const runTask = async (id: string, name: string, scheduleTime?: Date) => {
   const queryParams = new URLSearchParams();
 
   queryParams.append('id', id);
   queryParams.append('name', name);
   if (scheduleTime) {
-      queryParams.append('scheduleTime', scheduleTime.toISOString());
+    queryParams.append('scheduleTime', scheduleTime.toISOString());
   } else {
-      queryParams.append('scheduleTime', new Date().toISOString());
+    queryParams.append('scheduleTime', new Date().toISOString());
   }
 
   const response = await fetch(
@@ -35,7 +34,7 @@ const runTask = async (id: string, name: string, scheduleTime?:Date) => {
   );
 
   if (response.status == 401) {
-    document.location.href = '/db-scheduler';
+    redirectToUi();
   } else if (!response.ok) {
     throw new Error(`Error executing task. Status: ${response.statusText}`);
   }

@@ -37,6 +37,12 @@ class DbSchedulerUiUtilTest {
   }
 
   @Test
+  void testNormalizeRootPath() {
+    String path = DbSchedulerUiUtil.normalizePath("/");
+    assertThat(path).isEqualTo("");
+  }
+
+  @Test
   void testNormalizePaths() {
     String path = DbSchedulerUiUtil.normalizePaths("/api", "db-scheduler-ui");
     assertThat(path).isEqualTo("/api/db-scheduler-ui");
@@ -46,6 +52,12 @@ class DbSchedulerUiUtilTest {
   void testNormalizePathsExtraSlashes() {
     String path = DbSchedulerUiUtil.normalizePaths("/api/", "/db-scheduler-ui");
     assertThat(path).isEqualTo("/api/db-scheduler-ui");
+  }
+
+  @Test
+  void testNormalizePathsRootSegment() {
+    String path = DbSchedulerUiUtil.normalizePaths("/", "/db-scheduler-ui/");
+    assertThat(path).isEqualTo("/db-scheduler-ui");
   }
 
   @Test

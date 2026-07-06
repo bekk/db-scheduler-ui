@@ -12,11 +12,9 @@
  * limitations under the License.
  */
 
-const API_BASE_URL: string =
-    (import.meta.env.VITE_API_BASE_URL as string) ??
-    window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
+import { getApiBaseUrl } from './runtimeConfig';
 
-const config = await fetch(`${API_BASE_URL}/config`).then((res) =>
+const config = await fetch(`${getApiBaseUrl()}/config`).then((res) =>
   res.json(),
 );
 

@@ -13,10 +13,9 @@
  */
 import { TasksResponse } from 'src/models/TasksResponse';
 import { TaskRequestParams } from 'src/models/TaskRequestParams';
+import { getApiBaseUrl, redirectToUi } from 'src/utils/runtimeConfig';
 
-const API_BASE_URL: string =
-  (import.meta.env.VITE_API_BASE_URL as string) ??
-  window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
+const API_BASE_URL = getApiBaseUrl();
 
 export const TASK_QUERY_KEY = `tasks`;
 
@@ -59,7 +58,7 @@ export const getTasks = async (
   });
 
   if (response.status == 401) {
-    document.location.href = '/db-scheduler';
+    redirectToUi();
   } else if (!response.ok) {
     throw new Error(`Error fetching tasks. Status: ${response.statusText}`);
   }

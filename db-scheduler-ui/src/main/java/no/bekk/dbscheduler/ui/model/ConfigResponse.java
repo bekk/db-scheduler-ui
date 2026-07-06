@@ -24,4 +24,6 @@ public class ConfigResponse {
   private boolean showHistory;
   private boolean showOverview;
   private boolean readOnly;
+  private String uiPath;
+  private String apiPath;
 }

@@ -14,10 +14,9 @@
 
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
 import { LogResponse } from 'src/models/TasksResponse';
+import { getApiBaseUrl, redirectToUi } from 'src/utils/runtimeConfig';
 
-const API_BASE_URL: string =
-  (import.meta.env.VITE_API_BASE_URL as string) ??
-  window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
+const API_BASE_URL = getApiBaseUrl();
 
 export const ALL_LOG_QUERY_KEY = `logs/all`;
 
@@ -63,7 +62,7 @@ export const getLogs = async (
   });
 
   if (response.status == 401) {
-    document.location.href = '/db-scheduler';
+    redirectToUi();
   } else if (!response.ok) {
     throw new Error(`Error fetching logs. Status: ${response.statusText}`);
   }

@@ -28,8 +28,13 @@ public class DbSchedulerUiUtil {
       normalized = "/" + normalized;
     }
 
+    normalized = normalized.replaceAll("/+", "/");
+
     if (normalized.length() > 1 && normalized.endsWith("/")) {
       normalized = normalized.substring(0, normalized.length() - 1);
+    }
+    if ("/".equals(normalized)) {
+      return "";
     }
     return normalized;
   }

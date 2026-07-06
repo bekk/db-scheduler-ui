@@ -12,10 +12,9 @@
  * limitations under the License.
  */
 import { OverviewTask } from 'src/models/OverviewTask';
+import { getApiBaseUrl, redirectToUi } from 'src/utils/runtimeConfig';
 
-const API_BASE_URL: string =
-  (import.meta.env.VITE_API_BASE_URL as string) ??
-  window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
+const API_BASE_URL = getApiBaseUrl();
 
 export const OVERVIEW_TASKS_QUERY_KEY = 'overviewTasks';
 
@@ -28,7 +27,7 @@ export const getOverviewTasks = async (): Promise<OverviewTask[]> => {
   });
 
   if (response.status === 401) {
-    document.location.href = '/db-scheduler';
+    redirectToUi();
   } else if (!response.ok) {
     throw new Error(
       `Error fetching overview tasks. Status: ${response.statusText}`,

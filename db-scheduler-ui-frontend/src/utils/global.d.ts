@@ -16,6 +16,16 @@ export {};
 declare global {
     interface Window {
         /** Path to prepended to API calls and the router basename (optional). */
-        CONTEXT_PATH: string;
+        CONTEXT_PATH?: string;
+        /** Frontend SPA path used when DB_SCHEDULER_UI is not injected. */
+        UI_PATH?: string;
+        /** API path used when DB_SCHEDULER_UI is not injected. */
+        API_PATH?: string;
+        DB_SCHEDULER_UI?: {
+            contextPath: string;
+            routePath?: string;
+            uiBasePath: string;
+            apiBasePath: string;
+        };
     }
 }

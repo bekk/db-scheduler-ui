@@ -34,7 +34,7 @@ public class PrefixedRequestMappingHandlerMapping extends RequestMappingHandlerM
     final Package aPackage = method.getDeclaringClass().getPackage();
     RequestMappingInfo finalMapping = mapping;
 
-    if (ConfigController.class.getPackage().equals(aPackage)) {
+    if (!prefix.isEmpty() && ConfigController.class.getPackage().equals(aPackage)) {
       finalMapping = RequestMappingInfo.paths(prefix).build().combine(mapping);
     }
     super.registerHandlerMethod(handler, method, finalMapping);
