@@ -11,7 +11,7 @@ dashboard for monitoring and basic administration of tasks.
 * **View tasks** that are Scheduled, Running or Failed.
 * **Re-run or Run** your task directly from the User Interface
 * **Delete tasks**
-* **Uses SpringBoot** to launch a UI
+* **Runs on Spring Boot 3 & 4, Micronaut, or Ktor** to launch a UI
 * **View the history of all tasks** (optional)
 
 <img alt="Screenshot" src="Screenshot_Frontpage.png" width=700/>
@@ -21,6 +21,7 @@ dashboard for monitoring and basic administration of tasks.
 ## Table of contents
 
 * [Getting started](#getting-started)
+* [Using with Micronaut](#using-with-micronaut)
 * [Using with Ktor (non-Spring applications)](#using-with-ktor-non-spring-applications)
 * [Prerequisites](#prerequisites)
 * [How it works](#how-it-works)
@@ -28,9 +29,11 @@ dashboard for monitoring and basic administration of tasks.
 
 ### Prerequisites
 
-* An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
+* An existing application using [db-scheduler](https://github.com/kagkarlsson/db-scheduler) — Spring Boot,
+  Micronaut, or Ktor
 * Minimum db-scheduler version 16.12.0
-* Minimum Java 17 and SpringBoot 3.4 (or SpringBoot 4.0 for the Spring Boot 4 starter)
+* Minimum Java 17 and SpringBoot 3.4 (or SpringBoot 4.0 for the Spring Boot 4 starter); the Micronaut
+  starter targets Micronaut 4.x
 
 ## Getting started
 
@@ -57,6 +60,25 @@ dashboard for monitoring and basic administration of tasks.
 2. Read the [db-scheduler](https://github.com/kagkarlsson/db-scheduler) readme and follow the getting started guide. The
    most important is to create the `scheduled_tasks` table correctly.
 3. Start your application. The db-scheduler UI can be reached at `<your-app-url>/db-scheduler`
+
+## Using with Micronaut
+
+A Micronaut integration is available for non-Spring applications. Add the dependency:
+
+```xml
+<dependency>
+    <groupId>no.bekk.db-scheduler-ui</groupId>
+    <artifactId>db-scheduler-ui-micronaut-starter</artifactId>
+    <version>4.6.0</version>
+</dependency>
+```
+
+db-scheduler has no Micronaut auto-configuration, so your application must expose the
+`com.github.kagkarlsson.scheduler.Scheduler` and your `Task<?>` definitions as beans (e.g. from a
+`@Factory`) and start the scheduler yourself. Once those beans exist, the UI wires itself up and is
+reachable at `<your-app-url>/db-scheduler`. Configuration uses the same `db-scheduler-ui.*` keys as
+the Spring starters (`overview`, `read-only`, `task-data`, `context-path`); task history is not yet
+supported by the Micronaut integration. See `example-app-micronaut` for a complete working setup.
 
 ## Using with Ktor (non-Spring applications)
 
@@ -112,7 +134,8 @@ for full attribution.
 ## How it works
 
 db-scheduler-ui adds a REST-api package that has a bundled frontend application.
-Springboot is used to configure beans and handle dependencies within the library and your application.
+The framework-neutral core holds the services, models, and query logic; a thin adapter per framework
+(Spring Boot 3/4, Micronaut) wires the beans and exposes the controllers, so the same UI runs on each.
 The user interface makes calls to the scheduler-client, where it can fetch, delete, run, and reschedule tasks.
 These tasks are then shown in the web application.
 An optional log module can also be added, making it possible to view the history of all your task executions.

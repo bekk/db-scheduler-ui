@@ -13,8 +13,8 @@
  */
 package no.bekk.dbscheduler.uistarter.autoconfigure;
 
-import static no.bekk.dbscheduler.uistarter.config.DbSchedulerUiUtil.normalizePath;
-import static no.bekk.dbscheduler.uistarter.config.DbSchedulerUiUtil.normalizePaths;
+import static no.bekk.dbscheduler.ui.util.DbSchedulerUiUtil.normalizePath;
+import static no.bekk.dbscheduler.ui.util.DbSchedulerUiUtil.normalizePaths;
 
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.ConfigController;
+import no.bekk.dbscheduler.ui.controller.DbSchedulerUiExceptionHandler;
 import no.bekk.dbscheduler.ui.controller.IndexHtmlController;
 import no.bekk.dbscheduler.ui.controller.LogController;
 import no.bekk.dbscheduler.ui.controller.OverviewController;
@@ -177,6 +178,12 @@ public class UiApiAutoConfiguration {
     return RouterFunctions.route(
         RequestPredicates.GET("/db-scheduler/**").and(request -> !request.path().contains(".")),
         request -> ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(indexHtml));
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  DbSchedulerUiExceptionHandler dbSchedulerUiExceptionHandler() {
+    return new DbSchedulerUiExceptionHandler();
   }
 
   @Bean

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import no.bekk.dbscheduler.ui.exception.DbSchedulerUiNotFoundException;
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
 import no.bekk.dbscheduler.ui.model.PollResponse;
 import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
@@ -33,8 +34,6 @@ import no.bekk.dbscheduler.ui.model.TaskRequestParams;
 import no.bekk.dbscheduler.ui.util.Caching;
 import no.bekk.dbscheduler.ui.util.QueryUtils;
 import no.bekk.dbscheduler.ui.util.mapper.TaskMapper;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 public class TaskLogic {
 
@@ -57,8 +56,7 @@ public class TaskLogic {
           scheduledExecutionOpt.get().getTaskInstance(),
           scheduleTime != null ? scheduleTime : Instant.now());
     } else {
-      throw new ResponseStatusException(
-          HttpStatus.NOT_FOUND,
+      throw new DbSchedulerUiNotFoundException(
           "No ScheduledExecution found for taskName: " + taskName + ", taskId: " + taskId);
     }
   }
@@ -75,7 +73,7 @@ public class TaskLogic {
                       execution.getTaskInstance().getId(),
                       execution.getTaskInstance().getTaskName(),
                       Instant.now());
-                } catch (ResponseStatusException e) {
+                } catch (DbSchedulerUiNotFoundException e) {
                   System.out.println("Failed to run task: " + e.getMessage());
                 }
               }
@@ -90,8 +88,7 @@ public class TaskLogic {
       TaskInstanceId taskInstance = scheduledExecutionOpt.get().getTaskInstance();
       scheduler.cancel(taskInstance);
     } else {
-      throw new ResponseStatusException(
-          HttpStatus.NOT_FOUND,
+      throw new DbSchedulerUiNotFoundException(
           "No ScheduledExecution found for taskName: " + taskName + ", taskId: " + taskId);
     }
   }
@@ -140,8 +137,7 @@ public class TaskLogic {
                     })
                 .collect(Collectors.toList());
     if (tasks.isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.NOT_FOUND,
+      throw new DbSchedulerUiNotFoundException(
           "No tasks found for taskName: "
               + params.getTaskName()
               + ", taskId: "

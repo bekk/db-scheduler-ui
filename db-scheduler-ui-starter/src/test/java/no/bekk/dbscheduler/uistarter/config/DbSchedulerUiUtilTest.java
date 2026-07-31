@@ -2,6 +2,7 @@ package no.bekk.dbscheduler.uistarter.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import no.bekk.dbscheduler.ui.util.DbSchedulerUiUtil;
 import org.junit.jupiter.api.Test;
 
 class DbSchedulerUiUtilTest {

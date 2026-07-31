@@ -1,0 +1,10 @@
+micronaut:
+  application:
+    name: db-scheduler-ui-example
+  server:
+    port: ${PORT:8082}
+
+db-scheduler-ui:
+  overview: true
+  task-data: true
+  read-only: false

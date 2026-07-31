@@ -44,12 +44,15 @@
 
     <modules>
         <module>db-scheduler-ui</module>
+        <module>db-scheduler-ui-spring-web</module>
         <module>db-scheduler-ui-starter</module>
         <module>db-scheduler-ui-spring-boot-4-starter</module>
+        <module>db-scheduler-ui-micronaut-starter</module>
         <module>example-app-shared</module>
         <module>example-app</module>
         <module>example-app-boot4</module>
         <module>example-app-webflux</module>
+        <module>example-app-micronaut</module>
     </modules>
 
     <scm>
@@ -77,6 +80,8 @@
         <db-scheduler.version>16.12.0</db-scheduler.version>
         <spring-boot-4.version>4.0.2</spring-boot-4.version>
         <db-scheduler-boot4.version>16.12.0</db-scheduler-boot4.version>
+        <micronaut.version>4.7.6</micronaut.version>
+        <micronaut-core.version>4.7.14</micronaut-core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

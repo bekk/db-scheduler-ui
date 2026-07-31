@@ -11,7 +11,7 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package no.bekk.dbscheduler.uistarter.config;
+package no.bekk.dbscheduler.ui.util;
 
 public class DbSchedulerUiUtil {
 

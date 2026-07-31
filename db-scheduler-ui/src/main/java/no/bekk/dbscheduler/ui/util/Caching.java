@@ -24,9 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import no.bekk.dbscheduler.ui.model.LogModel;
 import no.bekk.dbscheduler.ui.model.TaskDetailsRequestParams;
 import no.bekk.dbscheduler.ui.service.LogLogic;
-import org.springframework.stereotype.Component;
 
-@Component
 public class Caching {
 
   private final Map<String, String> taskStatusCache = new ConcurrentHashMap<>();
