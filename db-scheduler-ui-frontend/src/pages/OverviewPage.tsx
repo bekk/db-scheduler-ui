@@ -21,7 +21,6 @@ import {
   Text,
   Tr,
 } from '@chakra-ui/react';
-import { HamburgerIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
 import { RepeatIcon } from 'src/assets/icons';
 import { OverviewTask, OverviewTaskStatus } from 'src/models/OverviewTask';
@@ -61,12 +60,7 @@ export const OverviewPage: React.FC = () => {
     isError,
   } = useQuery([OVERVIEW_TASKS_QUERY_KEY], getOverviewTasks);
 
-  const recurringTasks = sortedByName(
-    data.filter((task) => task.recurring === true),
-  );
-  const customTasks = sortedByName(
-    data.filter((task) => task.recurring !== true),
-  );
+  const tasks = sortedByName(data);
 
   return (
     <Box>
@@ -81,16 +75,11 @@ export const OverviewPage: React.FC = () => {
             {isError && <MessageRow message="Could not load tasks" />}
             {!isLoading && !isError && (
               <>
-                <Section
-                  title="Recurring"
-                  icon={<RepeatIcon boxSize={6} />}
-                  tasks={recurringTasks}
-                />
-                <Section
-                  title="One-time / custom"
-                  icon={<HamburgerIcon boxSize={5} />}
-                  tasks={customTasks}
-                />
+                <TableHeader tasks={tasks} />
+                {tasks.length > 0 && <ColumnLabels />}
+                {tasks.map((task) => (
+                  <OverviewRow key={task.taskName} task={task} />
+                ))}
               </>
             )}
           </Tbody>
@@ -100,46 +89,45 @@ export const OverviewPage: React.FC = () => {
   );
 };
 
-const Section: React.FC<{
-  title: string;
-  icon: React.ReactNode;
-  tasks: OverviewTask[];
-}> = ({ title, icon, tasks }) => (
-  <>
-    <SectionHeader title={title} icon={icon} count={tasks.length} />
-    {tasks.length > 0 && <ColumnLabels />}
-    {tasks.map((task) => (
-      <OverviewRow key={task.taskName} task={task} />
-    ))}
-  </>
-);
+// One heading for the whole table. The per-type breakdown is only shown when the server
+// could actually determine the types — see typeBreakdown.
+const TableHeader: React.FC<{ tasks: OverviewTask[] }> = ({ tasks }) => {
+  const breakdown = typeBreakdown(tasks);
+  return (
+    <Tr>
+      <Td colSpan={3} border="none" pt={10} pb={1}>
+        <HStack spacing={3} align="center">
+          <Text
+            fontSize="2xl"
+            fontWeight="semibold"
+            color={colors.primary['600']}
+          >
+            Tasks
+          </Text>
+          <Text fontSize="lg" color={colors.primary['400']} fontWeight="normal">
+            {tasks.length}
+          </Text>
+          {breakdown && (
+            <Text fontSize="md" color={colors.primary['400']}>
+              {breakdown}
+            </Text>
+          )}
+        </HStack>
+      </Td>
+    </Tr>
+  );
+};
 
-const SectionHeader: React.FC<{
-  title: string;
-  icon: React.ReactNode;
-  count: number;
-}> = ({ title, icon, count }) => (
-  <Tr>
-    <Td colSpan={3} border="none" pt={10} pb={1}>
-      <HStack spacing={3} align="center">
-        <Box
-          aria-hidden="true"
-          display="flex"
-          alignItems="center"
-          color={colors.primary['400']}
-        >
-          {icon}
-        </Box>
-        <Text fontSize="2xl" fontWeight="semibold" color={colors.primary['600']}>
-          {title}
-        </Text>
-        <Text fontSize="lg" color={colors.primary['400']} fontWeight="normal">
-          {count}
-        </Text>
-      </HStack>
-    </Td>
-  </Tr>
-);
+// `recurring` is null for every task when the app registers no Task<?> beans, in which case
+// the server cannot tell recurring from one-time (OverviewService#taskDefinitionsAvailable).
+// Claiming a split we do not have would be a lie, so the breakdown is omitted entirely.
+function typeBreakdown(tasks: OverviewTask[]): string | null {
+  if (tasks.length === 0 || tasks.some((task) => task.recurring === null)) {
+    return null;
+  }
+  const recurring = tasks.filter((task) => task.recurring === true).length;
+  return `· ${recurring} recurring · ${tasks.length - recurring} one-time`;
+}
 
 const columnLabelSx = {
   textTransform: 'uppercase' as const,
@@ -177,7 +165,7 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
       cursor={task.instanceCount > 0 ? 'pointer' : 'default'}
     >
       <Td>
-        <HStack align="center" spacing={3}>
+        <HStack align="center" spacing={2}>
           <Box
             aria-hidden="true"
             bgColor={dotColor(task.worstStatus)}
@@ -185,7 +173,10 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
             flexShrink={0}
             height="0.75rem"
             width="0.75rem"
+            // No status dot for empty tasks; hidden (not removed) keeps names aligned.
+            visibility={task.instanceCount === 0 ? 'hidden' : 'visible'}
           />
+          <TaskTypeIcon task={task} />
           <Box minW={0}>
             <Text fontWeight="bold">{task.taskName}</Text>
             <Box color={colors.primary['400']} fontSize="sm">
@@ -212,6 +203,27 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
     </Tr>
   );
 };
+
+// Recurring tasks are marked with a repeat icon; everything else gets an empty slot of the
+// same width so task names stay aligned. Tasks whose type the server could not determine
+// (recurring === null) are left unmarked rather than implicitly labelled one-time.
+const TaskTypeIcon: React.FC<{ task: OverviewTask }> = ({ task }) =>
+  task.recurring === true ? (
+    <Box
+      as="span"
+      role="img"
+      aria-label="Recurring task"
+      title="Recurring task"
+      display="flex"
+      alignItems="center"
+      flexShrink={0}
+      color={colors.primary['400']}
+    >
+      <RepeatIcon boxSize={5} />
+    </Box>
+  ) : (
+    <Box aria-hidden="true" flexShrink={0} boxSize="1.25rem" />
+  );
 
 // A dot whose opacity grows as the next run approaches — full for imminent/running,
 // faint for the far future. Rendered invisible (but space-preserving) when there is no
@@ -277,6 +289,12 @@ function subLine(task: OverviewTask) {
 
   const duration = statusDuration(task);
   const parts: string[] = [];
+
+  // Spells out what the repeat icon marks. Only recurring is stated: a null `recurring`
+  // means the server could not classify the task, not that it is one-time.
+  if (task.recurring === true) {
+    parts.push('recurring');
+  }
 
   if (task.worstStatus !== 'DORMANT') {
     const base = statusText[task.worstStatus];
