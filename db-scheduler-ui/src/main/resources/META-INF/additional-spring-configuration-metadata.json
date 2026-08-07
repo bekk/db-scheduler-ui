@@ -9,6 +9,18 @@
       "name": "db-scheduler-ui.overview",
       "type": "java.lang.Boolean",
       "description": "Expose the task-centric overview page in the UI."
+    },
+    {
+      "name": "db-scheduler-ui.ui-path",
+      "type": "java.lang.String",
+      "description": "UI path for the frontend SPA. Default is /db-scheduler.",
+      "defaultValue": "/db-scheduler"
+    },
+    {
+      "name": "db-scheduler-ui.api-path",
+      "type": "java.lang.String",
+      "description": "API path for REST endpoints. Default is /db-scheduler-api.",
+      "defaultValue": "/db-scheduler-api"
     }
   ]
 }

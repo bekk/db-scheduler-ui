@@ -14,8 +14,9 @@
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './src/App';
+import { getUiBasePath } from './src/utils/runtimeConfig';
 
-const basename = (window.CONTEXT_PATH || '') + import.meta.env.BASE_URL;
+const basename = getUiBasePath();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter basename={basename}>

@@ -26,6 +26,8 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  * @param overview whether the UI exposes the task-centric overview page
  * @param logLimit cap on the number of history rows fetched per request; 0 applies no explicit
  *     {@code LIMIT} clause, but the result set is still capped at 500 rows by the query layer
+ * @param uiPath URL path for the frontend SPA, defaults to {@code /db-scheduler}
+ * @param apiPath URL path for the REST API endpoints, defaults to {@code /db-scheduler-api}
  */
 @ConfigurationProperties("db-scheduler-ui")
 public record DbSchedulerUiProperties(
@@ -34,4 +36,6 @@ public record DbSchedulerUiProperties(
     @DefaultValue("true") boolean taskData,
     @DefaultValue("false") boolean history,
     @DefaultValue("false") boolean overview,
-    @DefaultValue("0") int logLimit) {}
+    @DefaultValue("0") int logLimit,
+    @DefaultValue("/db-scheduler") String uiPath,
+    @DefaultValue("/db-scheduler-api") String apiPath) {}

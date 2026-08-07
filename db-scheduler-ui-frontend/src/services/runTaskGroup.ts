@@ -11,20 +11,25 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const API_BASE_URL: string =
-  (import.meta.env.VITE_API_BASE_URL as string) ??
-  window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
+import { getApiBaseUrl, redirectToUi } from 'src/utils/runtimeConfig';
+
+const API_BASE_URL = getApiBaseUrl();
 
 const runTaskGroup = async (name: string, onlyFailed: boolean) => {
+  const queryParams = new URLSearchParams({
+    name,
+    onlyFailed: String(onlyFailed),
+  });
+
   const response = await fetch(
-    `${API_BASE_URL}/tasks/rerunGroup?name=${name}&onlyFailed=${onlyFailed}`,
+    `${API_BASE_URL}/tasks/rerunGroup?${queryParams}`,
     {
       method: 'POST',
     },
   );
 
   if (response.status == 401) {
-    document.location.href = '/db-scheduler';
+    redirectToUi();
   } else if (!response.ok) {
     throw new Error(`Error executing task. Status: ${response.statusText}`);
   }

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/db-scheduler-api/logs")
+@RequestMapping("${db-scheduler-ui.api-path:/db-scheduler-api}/logs")
 public class LogController {
 
   private final LogLogic logLogic;

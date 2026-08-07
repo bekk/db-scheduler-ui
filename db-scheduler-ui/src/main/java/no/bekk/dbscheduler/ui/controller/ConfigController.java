@@ -15,6 +15,7 @@ package no.bekk.dbscheduler.ui.controller;
 
 import java.util.function.Supplier;
 import no.bekk.dbscheduler.ui.model.ConfigResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,21 +23,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/db-scheduler-api/config")
+@RequestMapping("${db-scheduler-ui.api-path:/db-scheduler-api}/config")
 public class ConfigController {
 
   private final boolean showHistory;
   private final boolean showOverview;
   private final Supplier<Boolean> readOnly;
+  private final String uiPath;
+  private final String apiPath;
 
-  public ConfigController(boolean showHistory, boolean showOverview, Supplier<Boolean> readOnly) {
+  public ConfigController(
+      boolean showHistory,
+      boolean showOverview,
+      Supplier<Boolean> readOnly,
+      @Value("${db-scheduler-ui.ui-path:/db-scheduler}") String uiPath,
+      @Value("${db-scheduler-ui.api-path:/db-scheduler-api}") String apiPath) {
     this.showHistory = showHistory;
     this.showOverview = showOverview;
     this.readOnly = readOnly;
+    this.uiPath = uiPath;
+    this.apiPath = apiPath;
   }
 
   @GetMapping
   public ConfigResponse getConfig() {
-    return new ConfigResponse(showHistory, showOverview, readOnly.get());
+    return new ConfigResponse(showHistory, showOverview, readOnly.get(), uiPath, apiPath);
   }
 }

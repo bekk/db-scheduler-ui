@@ -1,2 +1,3 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-  no.bekk.dbscheduler.uistarter.autoconfigure.LegacyLogPropertyEnvironmentPostProcessor
+  no.bekk.dbscheduler.uistarter.autoconfigure.LegacyLogPropertyEnvironmentPostProcessor,\
+  no.bekk.dbscheduler.uistarter.autoconfigure.DbSchedulerUiPathEnvironmentPostProcessor

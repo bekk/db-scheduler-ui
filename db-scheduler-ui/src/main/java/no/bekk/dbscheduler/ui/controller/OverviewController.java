@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/db-scheduler-api/tasks")
+@RequestMapping("${db-scheduler-ui.api-path:/db-scheduler-api}/tasks")
 public class OverviewController {
 
   private final OverviewService overviewService;

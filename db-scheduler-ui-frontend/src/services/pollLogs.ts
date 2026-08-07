@@ -13,10 +13,9 @@
  */
 import { PollResponse } from 'src/models/PollResponse';
 import { TaskDetailsRequestParams } from 'src/models/TaskRequestParams';
+import { getApiBaseUrl, redirectToUi } from 'src/utils/runtimeConfig';
 
-const API_BASE_URL: string =
-  (import.meta.env.VITE_API_BASE_URL as string) ??
-  window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
+const API_BASE_URL = getApiBaseUrl();
 
 export const POLL_LOGS_QUERY_KEY = `logs/poll`;
 
@@ -61,7 +60,7 @@ export const pollLogs = async (
   });
 
   if (response.status == 401) {
-    document.location.href = '/db-scheduler';
+    redirectToUi();
   } else if (!response.ok) {
     throw new Error(`Error polling tasks. Status: ${response.statusText}`);
   }
