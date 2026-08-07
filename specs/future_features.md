@@ -27,6 +27,31 @@ definitions (and dormant rows) grows.
 > **Moved to MVP 1.** The `SchedulerClient` DB-side group-by method is part of the
 > current feature — see `MVP_1_overview_spec.md` §5.
 
+## Summary-strip cards: single-select or AND-combined?
+
+**Reported 2026-08-07.** Selecting *Failing* while *Scheduled* is active leaves both on and
+filters to their intersection; the expectation was that the second selection replaces the
+first, the way a segmented control or a tab bar behaves.
+
+The current behaviour is what `overview-header-summary/spec.md` specifies — "three
+**independent toggle** chips, **AND-combined**" — so this is a decision to revisit, not an
+implementation slip. What changed is the presentation: the chips became stat cards, and
+`Tasks` reads as "selected" whenever nothing else is, so the row now *looks* like a
+one-of-N selector while behaving as N checkboxes.
+
+Worth weighing before changing it:
+
+- AND-combining answers real questions — *failing **and** has queued work* is a different
+  set from either alone, and the `Showing X of Y tasks` line exists to make the combination
+  legible.
+- Single-select is what the cards' own visual language promises, and it makes `Tasks` a
+  natural member of the set ("all") rather than a special case.
+- A middle option: keep AND but make combination visible — e.g. only the active cards
+  outlined and an explicit `+` between them — so multi-select stops looking accidental.
+
+Whichever way it goes, `Tasks` and the other cards should follow one rule; today `Tasks`
+clears everything while the rest toggle.
+
 ## Cleanup: dead `lastHeartbeat` field
 
 `TaskModel.lastHeartbeat` is declared but never populated (db-scheduler's
@@ -88,6 +113,9 @@ Append items here as they come up during implementation (date · note):
   (c3) the log table needs an index on `(task_name, task_instance, id)` for per-instance
   reads — added to `sql/log-table/*.sql` and the example-app migrations, but **existing
   deployments must add it by hand**;
+- 2026-08-07 · summary-strip cards read as a one-of-N selector but behave as AND-combined
+  toggles (above). Surfaced in use, not in review — the spec sanctions the behaviour, so
+  only trying it caught the mismatch.
   (d) **`rerun` clears** `lastSuccess`/`lastFailure`/`consecutiveFailures` (db-scheduler's
   `reschedule` resets execution state) — the panel makes this visible, so consider saying so
   in the button's copy.
