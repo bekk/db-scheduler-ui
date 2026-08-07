@@ -13,7 +13,9 @@
  */
 import {
   Box,
+  Heading,
   HStack,
+  Stack,
   Table,
   TableContainer,
   Tbody,
@@ -23,6 +25,7 @@ import {
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { RepeatIcon } from 'src/assets/icons';
+import { SummaryStrip } from 'src/components/overview/SummaryStrip';
 import { OverviewTask, OverviewTaskStatus } from 'src/models/OverviewTask';
 import {
   getOverviewTasks,
@@ -30,6 +33,9 @@ import {
 } from 'src/services/getOverviewTasks';
 import colors from 'src/styles/colors';
 import { dateFormatText } from 'src/utils/dateFormatText';
+import { useOverviewFilters } from 'src/hooks/useOverviewFilters';
+import { applyOverviewFilters } from 'src/utils/overviewFilters';
+import { instancesText, summarizeOverview } from 'src/utils/overviewSummary';
 import {
   formatDistanceStrict,
   formatDistanceToNowStrict,
@@ -59,11 +65,28 @@ export const OverviewPage: React.FC = () => {
     isLoading,
     isError,
   } = useQuery([OVERVIEW_TASKS_QUERY_KEY], getOverviewTasks);
+  const { activeFilters, toggleFilter, clearFilters } = useOverviewFilters();
 
   const tasks = sortedByName(data);
+  const visibleTasks = applyOverviewFilters(tasks, activeFilters);
+  const loaded = !isLoading && !isError;
 
   return (
     <Box>
+      <Stack spacing={4} pt={10} pb={2}>
+        <Heading as="h1" size="lg" color={colors.primary['600']}>
+          All tasks
+        </Heading>
+        {loaded && (
+          <SummaryStrip
+            summary={summarizeOverview(tasks)}
+            activeFilters={activeFilters}
+            shownCount={visibleTasks.length}
+            onToggleFilter={toggleFilter}
+            onClearFilters={clearFilters}
+          />
+        )}
+      </Stack>
       <TableContainer overflowX="auto">
         <Table
           variant="simple"
@@ -73,13 +96,15 @@ export const OverviewPage: React.FC = () => {
           <Tbody>
             {isLoading && <MessageRow message="Loading tasks" />}
             {isError && <MessageRow message="Could not load tasks" />}
-            {!isLoading && !isError && (
+            {loaded && (
               <>
-                <TableHeader tasks={tasks} />
-                {tasks.length > 0 && <ColumnLabels />}
-                {tasks.map((task) => (
+                {visibleTasks.length > 0 && <ColumnLabels />}
+                {visibleTasks.map((task) => (
                   <OverviewRow key={task.taskName} task={task} />
                 ))}
+                {tasks.length > 0 && visibleTasks.length === 0 && (
+                  <MessageRow message="No tasks match the active filters" />
+                )}
               </>
             )}
           </Tbody>
@@ -88,46 +113,6 @@ export const OverviewPage: React.FC = () => {
     </Box>
   );
 };
-
-// One heading for the whole table. The per-type breakdown is only shown when the server
-// could actually determine the types — see typeBreakdown.
-const TableHeader: React.FC<{ tasks: OverviewTask[] }> = ({ tasks }) => {
-  const breakdown = typeBreakdown(tasks);
-  return (
-    <Tr>
-      <Td colSpan={3} border="none" pt={10} pb={1}>
-        <HStack spacing={3} align="center">
-          <Text
-            fontSize="2xl"
-            fontWeight="semibold"
-            color={colors.primary['600']}
-          >
-            Tasks
-          </Text>
-          <Text fontSize="lg" color={colors.primary['400']} fontWeight="normal">
-            {tasks.length}
-          </Text>
-          {breakdown && (
-            <Text fontSize="md" color={colors.primary['400']}>
-              {breakdown}
-            </Text>
-          )}
-        </HStack>
-      </Td>
-    </Tr>
-  );
-};
-
-// `recurring` is null for every task when the app registers no Task<?> beans, in which case
-// the server cannot tell recurring from one-time (OverviewService#taskDefinitionsAvailable).
-// Claiming a split we do not have would be a lie, so the breakdown is omitted entirely.
-function typeBreakdown(tasks: OverviewTask[]): string | null {
-  if (tasks.length === 0 || tasks.some((task) => task.recurring === null)) {
-    return null;
-  }
-  const recurring = tasks.filter((task) => task.recurring === true).length;
-  return `· ${recurring} recurring · ${tasks.length - recurring} one-time`;
-}
 
 const columnLabelSx = {
   textTransform: 'uppercase' as const,
@@ -384,10 +369,6 @@ function isOverdue(task: OverviewTask): boolean {
     !!task.nextExecutionTime &&
     isBefore(new Date(task.nextExecutionTime), new Date())
   );
-}
-
-function instancesText(count: number): string {
-  return `${count} ${count === 1 ? 'instance' : 'instances'}`;
 }
 
 function countPart(count: number, label: string, color: string) {
