@@ -25,11 +25,17 @@ the existing history (`LogModel`) and admin (`TaskAdminController`) plumbing.
   back/forward, and shared links reopen it.
 - **List context stays reachable** — exactly how depends on the presentation form (below).
 
-## Presentation — open for prototyping
+## Presentation — settled: slide-over
 
-The *content* and *behaviour* above are fixed; **how the detail is rendered is not** — settle
-it by prototyping a few variants. The three mockup screenshots above show the **docked
-side-panel**, **slide-over**, and **popover** candidates — none is the decision yet.
+> **Decided 2026-08-07: slide-over overlay.** Interactive prototypes of the three candidates
+> (same content and data, different shell) were compared against the invariants below. The
+> docked side panel is the most comfortable above ~1100px but has to stack under the list
+> below that, putting the detail off-screen on a click; the popover covers the rows it is
+> anchored to and makes one scroll container serve both the fact table and the stack trace.
+> The slide-over is the only variant whose behaviour does not change with viewport width.
+
+The *content* and *behaviour* above are fixed. The three mockup screenshots show the **docked
+side-panel**, **slide-over**, and **popover** candidates that were compared.
 
 | Variant | Sketch | Strengths | Weaknesses |
 |---|---|---|---|
@@ -65,7 +71,7 @@ and exception next, history and actions last.
 | 5  | **Last failure**                   | timestamp, or `never`                                                                           | `lastFailure` (per-instance) | —                |
 | 6  | **Last success**                   | timestamp, or `never`                                                                           | `lastSuccess` (per-instance) | —                |
 | 7  | **Picked / Picked by**             | currently running? on which scheduler node                                                      | `picked`, `pickedBy`         | —                |
-| 8  | **Version**                        | optimistic-lock version (per-instance)                                                          | `version` (per-instance)     | —                |
+| 8  | ~~**Version**~~                    | **Omitted** — see the data-sourcing note below                                                  | —                            | —                |
 | 9  | **Task data**                      | the payload, pretty-printed JSON; `no task data` when null                                      | `taskData`                   | —                |
 | 10 | **Last exception**                 | `exceptionClass` + `exceptionMessage` + stack trace                                             | `LogModel` (history)         | **history=true** |
 | 11 | **Recent history (this instance)** | last N runs: outcome · `timeStarted` · `durationMs` · `exceptionMessage`; `View full history →` | `LogModel` (history)         | **history=true** |
@@ -89,6 +95,23 @@ past and not picked is **overdue** (warning), consistent with the Overview Next-
   `TaskModel.lastHeartbeat` is declared but never populated. **Omit the Heartbeat row** (the
   mockup's `Heartbeat —` placeholder) until core surfaces it — see `../future_features.md`
   cleanup.
+- **Neither is version** (corrected 2026-08-07). `ScheduledExecution` has no accessor for it
+  either, so `TaskMapper` hardcodes `TaskModel.version` to `0`. **Omit the Version row** on
+  the same grounds as heartbeat — showing it would be showing a placeholder.
+- **Served by its own endpoint** (decided 2026-08-07): `GET /db-scheduler-api/tasks/instance`,
+  alongside `/tasks/overview` and gated by the same `db-scheduler-ui.overview` flag. It does
+  **not** reuse `TaskLogic`/`LogLogic`, which are the previous generation and are slated for
+  replacement:
+  - the execution comes from `SchedulerClient#getScheduledExecution(TaskInstanceId)` — one row
+    by primary key, where `TaskLogic` loads *every* scheduled execution per call and filters in
+    Java;
+  - the log side is a new `InstanceLogRepository` — one indexed query for one instance, no
+    cache, no paging, and the stack-trace column read only for the single failed row shown;
+  - `history` comes back `null` when `db-scheduler-ui.history` is off, so the client needs no
+    config flag to know whether to render the section.
+  - `id` is optional: without it the server resolves the task's sole execution (**404** none,
+    **409** several), which is how the Overview opens the panel — its rows name a task, not an
+    instance.
 - **Exception detail and recent history come from the log table (`LogModel`)** — the
   scheduled-tasks row has no stack trace, only `consecutiveFailures` + the `lastFailure`
   timestamp. `LogModel` carries `exceptionClass`, `exceptionMessage`, `exceptionStackTrace`,

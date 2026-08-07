@@ -26,6 +26,10 @@ public final class LogsRow {
   String taskInstance;
   boolean succeeded;
   Instant time;
+  long durationMs;
+  String exceptionClass;
+  String exceptionMessage;
+  String exceptionStackTrace;
 
   public static LogsRowBuilder defaultRow() {
     return builder()
@@ -33,5 +37,15 @@ public final class LogsRow {
         .taskInstance("happy-task-1")
         .succeeded(true)
         .time(Instant.now());
+  }
+
+  /** A failed run carrying the exception detail only the log table has. */
+  public static LogsRowBuilder failedRow() {
+    return defaultRow()
+        .succeeded(false)
+        .exceptionClass("java.lang.RuntimeException")
+        .exceptionMessage("boom")
+        .exceptionStackTrace(
+            "java.lang.RuntimeException: boom\n\tat com.acme.Worker.run(Worker.java:42)");
   }
 }

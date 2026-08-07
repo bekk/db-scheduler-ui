@@ -57,7 +57,8 @@ public final class LogsTable {
         "insert into "
             + NAME
             + " (id, task_name, task_instance, picked_by, time_started, time_finished,"
-            + " succeeded, duration_ms) values (?, ?, ?, ?, ?, ?, ?, ?)",
+            + " succeeded, duration_ms, exception_class, exception_message,"
+            + " exception_stacktrace) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         ID_SEQ.incrementAndGet(),
         row.taskName,
         row.taskInstance,
@@ -65,6 +66,9 @@ public final class LogsTable {
         ts,
         ts,
         row.succeeded,
-        0L);
+        row.durationMs,
+        row.exceptionClass,
+        row.exceptionMessage,
+        row.exceptionStackTrace);
   }
 }

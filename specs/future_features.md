@@ -66,3 +66,28 @@ Append items here as they come up during implementation (date · note):
 - 2026-05-29 · instance-panel **presentation form left open** in the spec (side panel /
   slide-over / popover / inline / dedicated route) — to be settled by prototyping variants;
   only the information set + behaviour are locked.
+- 2026-08-07 · instance panel built as a **slide-over** (decided by prototyping the three
+  candidates — see `instance-panel/spec.md` §Presentation). Attached to **single-instance
+  Overview rows only**, since the Scheduled tab is being replaced; a task with one execution
+  *is* that execution, so no list is needed in between. Discovered: (a) **version is not
+  available** either (no accessor on `ScheduledExecution`; `TaskMapper` hardcodes `0`) —
+  omitted like `lastHeartbeat`, and both should be removed from `TaskModel` in the same
+  cleanup; (b) the panel got its **own endpoint** (`GET /tasks/instance`) rather than reusing
+  `TaskLogic`/`LogLogic` — every `/tasks/details` call loads all scheduled executions and
+  filters in Java, where `SchedulerClient#getScheduledExecution` is a primary-key lookup. This
+  continues the pattern started by `/tasks/overview`: **new endpoints for the new UI, old ones
+  retired once nothing calls them**. `/tasks/details` and `/logs/all` are now used only by the
+  Scheduled and History pages;
+  (c) `GET /logs/all` has an **inverted `asc` flag** — `LogLogic:138` maps `asc=true` to
+  `id desc`. Not worth fixing in place given the endpoint is on its way out, but the
+  replacement must not inherit it;
+  (c2) **`SchedulerClient#getScheduledExecutionsForTask(taskName)` hides running executions** —
+  the single-argument overload narrows to `picked=false` (`SchedulerClient:619`), so a task's
+  only execution vanishes exactly while it runs. Pass `ScheduledExecutionsFilter.all()`
+  explicitly. The instance list will hit the same trap;
+  (c3) the log table needs an index on `(task_name, task_instance, id)` for per-instance
+  reads — added to `sql/log-table/*.sql` and the example-app migrations, but **existing
+  deployments must add it by hand**;
+  (d) **`rerun` clears** `lastSuccess`/`lastFailure`/`consecutiveFailures` (db-scheduler's
+  `reschedule` resets execution state) — the panel makes this visible, so consider saying so
+  in the button's copy.

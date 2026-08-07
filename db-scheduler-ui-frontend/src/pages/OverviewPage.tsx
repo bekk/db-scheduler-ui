@@ -13,6 +13,7 @@
  */
 import {
   Box,
+  Button,
   Heading,
   HStack,
   Stack,
@@ -23,8 +24,10 @@ import {
   Text,
   Tr,
 } from '@chakra-ui/react';
+import { ChevronRightIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
 import { RepeatIcon } from 'src/assets/icons';
+import { InstanceDrawer } from 'src/components/overview/InstanceDrawer';
 import { SummaryStrip } from 'src/components/overview/SummaryStrip';
 import { OverviewTask, OverviewTaskStatus } from 'src/models/OverviewTask';
 import {
@@ -34,6 +37,8 @@ import {
 import colors from 'src/styles/colors';
 import { dateFormatText } from 'src/utils/dateFormatText';
 import { useOverviewFilters } from 'src/hooks/useOverviewFilters';
+import { useSelectedInstance } from 'src/hooks/useSelectedInstance';
+import { isOverdue as executionOverdue, overdueColor } from 'src/utils/overdue';
 import { applyOverviewFilters } from 'src/utils/overviewFilters';
 import { instancesText, summarizeOverview } from 'src/utils/overviewSummary';
 import {
@@ -57,15 +62,15 @@ const statusColors: Record<OverviewTaskStatus, string> = {
   DORMANT: colors.primary['400'],
 };
 
-const overdueColor = '#725200';
-
 export const OverviewPage: React.FC = () => {
   const {
     data = [],
     isLoading,
     isError,
+    refetch,
   } = useQuery([OVERVIEW_TASKS_QUERY_KEY], getOverviewTasks);
   const { activeFilters, toggleFilter, clearFilters } = useOverviewFilters();
+  const { selected, select, clear } = useSelectedInstance();
 
   const tasks = sortedByName(data);
   const visibleTasks = applyOverviewFilters(tasks, activeFilters);
@@ -100,7 +105,11 @@ export const OverviewPage: React.FC = () => {
               <>
                 {visibleTasks.length > 0 && <ColumnLabels />}
                 {visibleTasks.map((task) => (
-                  <OverviewRow key={task.taskName} task={task} />
+                  <OverviewRow
+                    key={task.taskName}
+                    task={task}
+                    onOpenInstance={select}
+                  />
                 ))}
                 {tasks.length > 0 && visibleTasks.length === 0 && (
                   <MessageRow message="No tasks match the active filters" />
@@ -110,9 +119,19 @@ export const OverviewPage: React.FC = () => {
           </Tbody>
         </Table>
       </TableContainer>
+      <InstanceDrawer
+        taskName={selected}
+        onClose={clear}
+        onChanged={() => void refetch()}
+      />
     </Box>
   );
 };
+
+// Due in the past with nothing running it. The rule itself lives in utils/overdue so the row
+// and the drawer it opens cannot disagree; this only adapts it to the aggregate row shape.
+const overdue = (task: OverviewTask) =>
+  executionOverdue(task.nextExecutionTime, task.counts.running > 0);
 
 const columnLabelSx = {
   textTransform: 'uppercase' as const,
@@ -136,17 +155,32 @@ const ColumnLabels: React.FC = () => (
     <Td sx={columnLabelSx} width="18%">
       Last run
     </Td>
+    <Td sx={columnLabelSx} width="1%" />
   </Tr>
 );
 
-const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
+const OverviewRow: React.FC<{
+  task: OverviewTask;
+  onOpenInstance: (taskName: string) => void;
+}> = ({ task, onOpenInstance }) => {
   const navigate = useNavigate();
   const drillDownTarget = `/scheduled/${encodeURIComponent(task.taskName)}`;
+  // A task with one execution *is* that execution — the list in between would hold a single
+  // row, so the row opens the instance directly. Many-instance rows still go to the list.
+  const opensInstance = task.instanceCount === 1;
+
+  const open = () => {
+    if (opensInstance) {
+      onOpenInstance(task.taskName);
+    } else if (task.instanceCount > 0) {
+      navigate(drillDownTarget);
+    }
+  };
 
   return (
     <Tr
       sx={rowSx(task, task.instanceCount > 0)}
-      onClick={() => task.instanceCount > 0 && navigate(drillDownTarget)}
+      onClick={open}
       cursor={task.instanceCount > 0 ? 'pointer' : 'default'}
     >
       <Td>
@@ -175,9 +209,9 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
           <ProximityDot task={task} />
           <Text
             title={absoluteTitle(task.nextExecutionTime)}
-            color={isOverdue(task) ? overdueColor : colors.primary['500']}
+            color={overdue(task) ? overdueColor : colors.primary['500']}
             fontWeight={
-              isOverdue(task) || task.counts.running > 0 ? 'semibold' : 'normal'
+              overdue(task) || task.counts.running > 0 ? 'semibold' : 'normal'
             }
           >
             {nextRunText(task)}
@@ -185,6 +219,25 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
         </HStack>
       </Td>
       <Td>{lastRunText(task)}</Td>
+      <Td textAlign="right" width="1%" whiteSpace="nowrap">
+        {opensInstance && (
+          <Button
+            size="xs"
+            variant="ghost"
+            color={colors.running['300']}
+            rightIcon={<ChevronRightIcon />}
+            iconSpacing={0}
+            aria-label={`Show details for ${task.taskName}`}
+            onClick={(event) => {
+              // The row handles the same click; without this it would fire twice.
+              event.stopPropagation();
+              open();
+            }}
+          >
+            Details
+          </Button>
+        )}
+      </Td>
     </Tr>
   );
 };
@@ -230,7 +283,7 @@ const ProximityDot: React.FC<{ task: OverviewTask }> = ({ task }) => {
 
 const MessageRow: React.FC<{ message: string }> = ({ message }) => (
   <Tr>
-    <Td colSpan={3}>
+    <Td colSpan={4}>
       <Text color={colors.primary['400']}>{message}</Text>
     </Td>
   </Tr>
@@ -361,14 +414,6 @@ function parseDate(value: string | null): Date | null {
 
 function absoluteTitle(value: string | null): string | undefined {
   return value ? dateFormatText(new Date(value)) : undefined;
-}
-
-function isOverdue(task: OverviewTask): boolean {
-  return (
-    task.counts.running === 0 &&
-    !!task.nextExecutionTime &&
-    isBefore(new Date(task.nextExecutionTime), new Date())
-  );
 }
 
 function countPart(count: number, label: string, color: string) {
