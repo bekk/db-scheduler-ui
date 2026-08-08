@@ -52,6 +52,38 @@ Worth weighing before changing it:
 Whichever way it goes, `Tasks` and the other cards should follow one rule; today `Tasks`
 clears everything while the rest toggle.
 
+## Legacy log queries cannot use the log table's indexes
+
+**Found 2026-08-08**, while adding `stl_task_instance_idx` for the instance panel.
+
+`QueryUtils.logSearchCondition` builds every task-name and task-instance filter as
+`LOWER(task_name) = LOWER(:term)` (`QueryUtils.java:146-150`), and a plain b-tree index
+cannot be seeked through a function-wrapped column. So the History page's filters — including
+the per-instance one the ⋮ menu deep-links to — scan the log table.
+
+Measured on H2 (`MODE=PostgreSQL`, 5 000 rows, `explain analyze`):
+
+| Query shape                                   | Plan                      | Rows scanned |
+|-----------------------------------------------|---------------------------|--------------|
+| `task_name = ? and task_instance = ?`         | `stl_task_instance_idx`   | **2**        |
+| `LOWER(task_name) = ? and LOWER(task_instance) = ?` | table scan          | 5 001        |
+| `LOWER(task_name) = ?`                        | names `stl_task_name_idx` | 5 001        |
+
+The third row is the point: the index appears in the plan but is read as a scan, not a seek.
+As far as we can tell **no current UI query can seek `stl_task_name_idx`** — every
+`task_name` filter in `LogLogic` goes through `logSearchCondition` — leaving `stl_started_idx`
+(time-range) as the only index doing work.
+
+Caveats: measured on H2 only. MySQL with a case-insensitive collation, or Postgres with a
+`lower(task_name)` functional index, would behave differently, and this does not prove the
+History page is slow in production — only that the index cannot serve that query shape.
+
+The fix is not another index; it is to stop wrapping the column. When `/logs/all` is replaced,
+pick one: compare the columns directly (what `/tasks/instance` does), add functional indexes on
+`lower(...)`, or give the columns a case-insensitive collation. Note that dropping `LOWER`
+changes search semantics — today's exact-match search is case-insensitive — so that is a
+product decision, not only a performance one.
+
 ## Cleanup: dead `lastHeartbeat` field
 
 `TaskModel.lastHeartbeat` is declared but never populated (db-scheduler's
@@ -116,6 +148,9 @@ Append items here as they come up during implementation (date · note):
 - 2026-08-07 · summary-strip cards read as a one-of-N selector but behave as AND-combined
   toggles (above). Surfaced in use, not in review — the spec sanctions the behaviour, so
   only trying it caught the mismatch.
+- 2026-08-08 · the legacy log queries `LOWER()`-wrap the columns they filter, so they cannot
+  seek any index on `task_name` / `task_instance` (above). Came out of asking why the log
+  table had no per-instance index: it had no query that could have used one.
   (d) **`rerun` clears** `lastSuccess`/`lastFailure`/`consecutiveFailures` (db-scheduler's
   `reschedule` resets execution state) — the panel makes this visible, so consider saying so
   in the button's copy.
