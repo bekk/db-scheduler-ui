@@ -1,8 +1,10 @@
 # Overview — future features & derived requirements
 
 Backlog for the Overview page beyond MVP 1 (see `MVP_1_overview_spec.md`). This is a
-**living document** — append requirements here as we discover them while building the
-current feature. Keep MVP 1 lean; park anything non-essential below.
+**living document** — add a section here for anything we discover that still needs doing:
+a deferred feature, a trap the next implementation will hit, a cleanup we owe. Decisions
+already taken belong in the spec they were taken for, not here. Keep MVP 1 lean; park
+anything non-essential below.
 
 ---
 
@@ -84,11 +86,72 @@ pick one: compare the columns directly (what `/tasks/instance` does), add functi
 changes search semantics — today's exact-match search is case-insensitive — so that is a
 product decision, not only a performance one.
 
-## Cleanup: dead `lastHeartbeat` field
+Dropping `LOWER` need not cost the user anything, though, if the field stops asking them to
+type a name exactly: **autocomplete the task name from the names we already know**. The
+Overview response carries every registered task, and the recurring/one-time split needs that
+same list, so the candidates are in the client already — no extra endpoint. Picking a name from
+a list is both easier than typing one and exact by construction, which is what lets the query
+compare the column directly.
 
-`TaskModel.lastHeartbeat` is declared but never populated (db-scheduler's
-`ScheduledExecution` doesn't expose it). Either populate it (if a source becomes
-available) or remove it.
+## Existing deployments need the per-instance log index by hand
+
+`stl_task_instance_idx` on `(task_name, task_instance, id)` went into `sql/log-table/*.sql`
+and the example-app migrations with the instance panel, but those files are the *initial*
+schema — nothing replays them for a database that already exists. Without the index, opening
+the panel scans every log row belonging to the task. Needs a line in the release notes, or a
+migration path if one is ever added.
+
+## Reschedule has no backend
+
+`TaskAdminController` has rerun / rerunGroup / delete and nothing else, so the instance panel
+ships without a Reschedule action. Reviving it needs `POST /tasks/reschedule` over
+`SchedulerClient.reschedule`, plus a time picker in the panel.
+
+## Rerun silently clears the failure history
+
+db-scheduler's `reschedule` resets execution state, so pressing **Rerun** wipes `lastSuccess`,
+`lastFailure` and `consecutiveFailures`. The instance panel puts those fields next to the
+button that destroys them — the copy should say so.
+
+## Retire the legacy task and log endpoints
+
+`/tasks/overview` and `/tasks/instance` set the pattern: **new endpoints for the new UI, old
+ones retired once nothing calls them**. `/tasks/details` and `/logs/all` are now reached only
+by the Scheduled and History pages, and both are being replaced. Two things the replacements
+must not inherit:
+
+- `GET /logs/all` has an **inverted `asc` flag** — `LogLogic:138` maps `asc=true` to `id desc`.
+  Not worth fixing in place on an endpoint this close to deletion.
+- `/tasks/details` loads every scheduled execution and filters in Java, where
+  `SchedulerClient#getScheduledExecution` is a primary-key lookup.
+
+## Trap: `getScheduledExecutionsForTask(taskName)` hides running executions
+
+The single-argument overload narrows to `picked=false` (`SchedulerClient:619`), so a task's
+only execution disappears from the result exactly while it runs. Pass
+`ScheduledExecutionsFilter.all()` explicitly. `InstanceService` does; the instance list, when
+it is built, will meet the same trap.
+
+## Read the log table with db-scheduler's `JdbcRunner`, not spring-jdbc
+
+`InstanceLogRepository` uses `NamedParameterJdbcTemplate`; `JdbcRunner` would drop the
+spring-jdbc dependency and keep the UI on the same JDBC layer as the scheduler itself.
+Blocked upstream: db-scheduler's parent pom still relocates `com.github.kagkarlsson.jdbc` to
+`com.github.kagkarlsson.shaded.jdbc` at package time, left over from before `8c1e4fa`
+("Inline micro jdbc", 2025-04-23) made that package first-party source. Until a release ships
+without the relocation, the only importable name is the shaded one — and code compiled against
+it breaks at runtime the moment the relocation goes. Revisit when it does; the README's minimum
+db-scheduler version moves with it.
+
+`JdbcCustomization` (`com.github.kagkarlsson.scheduler.jdbc`, unshaded, already used by
+`JdbcLogRepository`) is available today and is the right way to read `time_started` back: the
+column is written with `setInstant`, whose UTC handling `getTimestamp` does not mirror.
+
+## Cleanup: dead `lastHeartbeat` and `version` fields
+
+Neither is populated: db-scheduler's `ScheduledExecution` exposes no accessor for the heartbeat,
+and `TaskMapper` hardcodes `version` to `0`. Populate them if a source appears, or remove both
+from `TaskModel` in one pass.
 
 ## Possibly later
 
@@ -102,55 +165,3 @@ available) or remove it.
 - **Dormant-recurring alerting** — a registered recurring task with 0 next executions
   is abnormal (failed to reschedule). Consider surfacing it more prominently than a
   plain dormant one-time task.
-
----
-
-## Derived requirements log
-
-Append items here as they come up during implementation (date · note):
-
-- 2026-05-28 · (seed) doc created from the MVP 1 interview.
-- 2026-05-28 · run-duration **proxy** (`now − executionTime`) pulled into MVP 1 for the
-  `running for <duration>` sub-line; precise/core-sourced duration stays deferred (above).
-- 2026-05-28 · global summary bar + quick-filter chips promoted out of this backlog into
-  `overview-header-summary/spec.md`; task-name search box stays deferred here.
-- 2026-05-29 · `instance-panel/spec.md` written. Discovered: (a) **Reschedule** has **no
-  backend** — `TaskAdminController` only has rerun/rerunGroup/delete; **dropped for this work**
-  (not in the current version); would need a new `POST /tasks/reschedule`
-  (`SchedulerClient.reschedule`) + time-picker if revived later;
-  (b) the instance **exception + stack trace** live only in the log table (`LogModel`), so the
-  detail's exception/recent-history sections are **history-gated**; scheduled_tasks has none.
-- 2026-05-29 · instance-panel **presentation form left open** in the spec (side panel /
-  slide-over / popover / inline / dedicated route) — to be settled by prototyping variants;
-  only the information set + behaviour are locked.
-- 2026-08-07 · instance panel built as a **slide-over** (decided by prototyping the three
-  candidates — see `instance-panel/spec.md` §Presentation). Attached to **single-instance
-  Overview rows only**, since the Scheduled tab is being replaced; a task with one execution
-  *is* that execution, so no list is needed in between. Discovered: (a) **version is not
-  available** either (no accessor on `ScheduledExecution`; `TaskMapper` hardcodes `0`) —
-  omitted like `lastHeartbeat`, and both should be removed from `TaskModel` in the same
-  cleanup; (b) the panel got its **own endpoint** (`GET /tasks/instance`) rather than reusing
-  `TaskLogic`/`LogLogic` — every `/tasks/details` call loads all scheduled executions and
-  filters in Java, where `SchedulerClient#getScheduledExecution` is a primary-key lookup. This
-  continues the pattern started by `/tasks/overview`: **new endpoints for the new UI, old ones
-  retired once nothing calls them**. `/tasks/details` and `/logs/all` are now used only by the
-  Scheduled and History pages;
-  (c) `GET /logs/all` has an **inverted `asc` flag** — `LogLogic:138` maps `asc=true` to
-  `id desc`. Not worth fixing in place given the endpoint is on its way out, but the
-  replacement must not inherit it;
-  (c2) **`SchedulerClient#getScheduledExecutionsForTask(taskName)` hides running executions** —
-  the single-argument overload narrows to `picked=false` (`SchedulerClient:619`), so a task's
-  only execution vanishes exactly while it runs. Pass `ScheduledExecutionsFilter.all()`
-  explicitly. The instance list will hit the same trap;
-  (c3) the log table needs an index on `(task_name, task_instance, id)` for per-instance
-  reads — added to `sql/log-table/*.sql` and the example-app migrations, but **existing
-  deployments must add it by hand**;
-- 2026-08-07 · summary-strip cards read as a one-of-N selector but behave as AND-combined
-  toggles (above). Surfaced in use, not in review — the spec sanctions the behaviour, so
-  only trying it caught the mismatch.
-- 2026-08-08 · the legacy log queries `LOWER()`-wrap the columns they filter, so they cannot
-  seek any index on `task_name` / `task_instance` (above). Came out of asking why the log
-  table had no per-instance index: it had no query that could have used one.
-  (d) **`rerun` clears** `lastSuccess`/`lastFailure`/`consecutiveFailures` (db-scheduler's
-  `reschedule` resets execution state) — the panel makes this visible, so consider saying so
-  in the button's copy.
