@@ -151,6 +151,16 @@ db-scheduler version moves with it.
 `JdbcLogRepository`) is available today and is the right way to read `time_started` back: the
 column is written with `setInstant`, whose UTC handling `getTimestamp` does not mirror.
 
+## Add third-party notices for the bundled frontend
+
+The jar ships the built SPA, and with it 196 npm packages — 191 MIT, 2 BSD-3-Clause, 2 ISC,
+1 0BSD (`pnpm licenses list --prod`). All permissive; MIT, BSD-3 and ISC ask that their copyright
+notice ship with the code, and today none does — minification keeps no `@license` banners and
+there is no notices file beside the assets.
+
+Generate one during the build rather than maintain it by hand: render `pnpm licenses list --json`
+into a `THIRD-PARTY.txt` from the existing `exec-maven-plugin` step, so it tracks the lockfile.
+
 ## Rewrite the Snowflake id generator
 
 `…/ui/log/jdbc/Snowflake.java` was adapted from an outside implementation rather than written
