@@ -13,10 +13,10 @@
  */
 package no.bekk.dbscheduler.ui.service;
 
+import com.github.kagkarlsson.scheduler.jdbc.AutodetectJdbcCustomization;
+import com.github.kagkarlsson.scheduler.jdbc.JdbcCustomization;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
@@ -47,9 +47,15 @@ public class InstanceLogRepository {
   private final DataSource dataSource;
   private final String logTableName;
 
+  // time_started is written through JdbcCustomization#setInstant, whose UTC handling depends on
+  // db-scheduler's persistTimestampInUTC setting. Reading it back with a plain getTimestamp would
+  // decode against the JVM's default zone instead, shifting every run time by the local offset.
+  private final JdbcCustomization jdbcCustomization;
+
   public InstanceLogRepository(DataSource dataSource, String logTableName) {
     this.dataSource = dataSource;
     this.logTableName = logTableName;
+    this.jdbcCustomization = new AutodetectJdbcCustomization(dataSource);
   }
 
   /** The most recent runs for one instance, newest first. */
@@ -83,7 +89,7 @@ public class InstanceLogRepository {
   }
 
   private List<InstanceRun> query(String sql, MapSqlParameterSource parameters, int maxRows) {
-    return template(maxRows).query(sql, parameters, InstanceLogRepository::mapRun);
+    return template(maxRows).query(sql, parameters, this::mapRun);
   }
 
   private static MapSqlParameterSource parameters(String taskName, String instanceId) {
@@ -101,18 +107,14 @@ public class InstanceLogRepository {
     return new NamedParameterJdbcTemplate(jdbcTemplate);
   }
 
-  private static InstanceRun mapRun(ResultSet resultSet, int rowNum) throws SQLException {
+  private InstanceRun mapRun(ResultSet resultSet, int rowNum) throws SQLException {
     return new InstanceRun(
         resultSet.getLong("id"),
         resultSet.getBoolean("succeeded"),
-        instant(resultSet.getTimestamp("time_started")),
+        jdbcCustomization.getInstant(resultSet, "time_started"),
         resultSet.getLong("duration_ms"),
         resultSet.getString("exception_class"),
         resultSet.getString("exception_message"),
         resultSet.getString("exception_stacktrace"));
-  }
-
-  private static Instant instant(Timestamp timestamp) {
-    return timestamp == null ? null : timestamp.toInstant();
   }
 }

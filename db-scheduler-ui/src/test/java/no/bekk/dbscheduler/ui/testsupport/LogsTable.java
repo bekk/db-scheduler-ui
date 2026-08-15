@@ -13,7 +13,8 @@
  */
 package no.bekk.dbscheduler.ui.testsupport;
 
-import java.sql.Timestamp;
+import com.github.kagkarlsson.scheduler.jdbc.AutodetectJdbcCustomization;
+import com.github.kagkarlsson.scheduler.jdbc.JdbcCustomization;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,8 +27,14 @@ public final class LogsTable {
 
   private final JdbcTemplate jdbc;
 
+  // The same abstraction JdbcLogRepository writes through, so the tests exercise the real
+  // write/read pairing. Inserting a bare Timestamp here would hide a mismatch on any JVM whose
+  // default zone is UTC — which is exactly what CI and the dev containers run.
+  private final JdbcCustomization jdbcCustomization;
+
   public LogsTable(DataSource dataSource) {
     this.jdbc = new JdbcTemplate(dataSource);
+    this.jdbcCustomization = new AutodetectJdbcCustomization(dataSource);
   }
 
   static void createSchema(DataSource dataSource) {
@@ -52,23 +59,24 @@ public final class LogsTable {
   }
 
   public void insert(LogsRow row) {
-    Timestamp ts = Timestamp.from(row.time);
     jdbc.update(
         "insert into "
             + NAME
             + " (id, task_name, task_instance, picked_by, time_started, time_finished,"
             + " succeeded, duration_ms, exception_class, exception_message,"
             + " exception_stacktrace) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        ID_SEQ.incrementAndGet(),
-        row.taskName,
-        row.taskInstance,
-        "test",
-        ts,
-        ts,
-        row.succeeded,
-        row.durationMs,
-        row.exceptionClass,
-        row.exceptionMessage,
-        row.exceptionStackTrace);
+        statement -> {
+          statement.setLong(1, ID_SEQ.incrementAndGet());
+          statement.setString(2, row.taskName);
+          statement.setString(3, row.taskInstance);
+          statement.setString(4, "test");
+          jdbcCustomization.setInstant(statement, 5, row.time);
+          jdbcCustomization.setInstant(statement, 6, row.time);
+          statement.setBoolean(7, row.succeeded);
+          statement.setLong(8, row.durationMs);
+          statement.setString(9, row.exceptionClass);
+          statement.setString(10, row.exceptionMessage);
+          statement.setString(11, row.exceptionStackTrace);
+        });
   }
 }
