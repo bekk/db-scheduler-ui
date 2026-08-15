@@ -151,6 +151,17 @@ db-scheduler version moves with it.
 `JdbcLogRepository`) is available today and is the right way to read `time_started` back: the
 column is written with `setInstant`, whose UTC handling `getTimestamp` does not mirror.
 
+## Share one `JdbcCustomization` between the log writer and reader
+
+`JdbcLogRepository` and `InstanceLogRepository` each construct their own
+`AutodetectJdbcCustomization(dataSource)`, so the dialect is probed twice at startup and the UTC
+warning is logged twice. Both also read `db-scheduler-ui.log.table-name` through separate
+`@Value` injections. One bean in each starter's `UiApiAutoConfiguration`, passed to both.
+
+Merging the two classes is not the fix: they sit on opposite sides of the system (the writer is
+driven by `LogSchedulerListener`, the reader serves HTTP), they are gated by different flags, and
+the writer lives under the vendored `ui.log.**` licence set.
+
 ## Add third-party notices for the bundled frontend
 
 The jar ships the built SPA, and with it 196 npm packages — 191 MIT, 2 BSD-3-Clause, 2 ISC,
