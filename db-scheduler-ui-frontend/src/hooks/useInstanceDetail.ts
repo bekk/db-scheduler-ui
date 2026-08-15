@@ -19,16 +19,14 @@ import {
   InstanceLookupError,
 } from 'src/services/getInstanceDetail';
 
-// Matches the app-wide interval set in App.tsx; restated here because the polling has to be
-// switchable per query state, which the global default cannot express.
+// Repeats the app-wide interval from App.tsx, because refetchInterval has to vary per state.
 const POLL_MS = 2000;
 
 /**
- * What the panel should be showing. One value rather than a handful of booleans, so the states
- * cannot contradict each other and the renderer is a switch.
+ * What the panel should be showing.
  *
  * - `gone` — the execution is not there: it finished, or someone deleted it
- * - `ambiguous` — the task no longer has exactly one execution, so "the" execution is a guess
+ * - `ambiguous` — the task no longer has exactly one execution
  */
 export type InstanceDetailStatus =
   | 'loading'
@@ -44,11 +42,8 @@ export interface InstanceDetailResult {
 }
 
 /**
- * Loads one execution from `GET /tasks/instance`.
- *
- * Everything the panel shows arrives in that one response, run log included, so there is no
- * second request to sequence and no config flag to consult: a `null` history *is* the answer
- * to "is history enabled".
+ * Loads one execution from `GET /tasks/instance`. The run log arrives in the same response, so a
+ * `null` history means `db-scheduler-ui.history` is off.
  */
 export const useInstanceDetail = (
   taskName: string | null,
@@ -58,11 +53,10 @@ export const useInstanceDetail = (
     () => getInstanceDetail(taskName as string),
     {
       enabled: !!taskName,
-      // A missing or ambiguous instance is an answer, not a hiccup — retrying cannot change it.
+      // A missing or ambiguous instance will not change on retry.
       retry: (failureCount, error) =>
         !(error instanceof InstanceLookupError) && failureCount < 3,
-      // ...and neither can polling. Without this the app-wide 2s interval re-asks a question
-      // that has already been answered, for as long as the drawer stays open.
+      // Nor on a poll; without this the app-wide interval repeats it every 2s.
       refetchInterval: (_data, q) =>
         q.state.error instanceof InstanceLookupError ? false : POLL_MS,
     },
@@ -86,7 +80,6 @@ const statusOf = (
   if (error) {
     return 'error';
   }
-  // Data outlives a background refetch, so an open panel keeps showing the instance instead of
-  // blanking every couple of seconds.
+  // Data outlives a background refetch, so the panel keeps showing it rather than reloading.
   return data ? 'ready' : isLoading ? 'loading' : 'error';
 };

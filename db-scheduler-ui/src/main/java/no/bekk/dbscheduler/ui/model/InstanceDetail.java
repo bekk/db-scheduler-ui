@@ -18,15 +18,13 @@ import java.time.Instant;
 /**
  * One scheduled execution, flat.
  *
- * <p>Deliberately not {@link TaskModel}: that one is group-shaped (parallel lists plus task-level
- * scalars), so reading a single instance out of it is only correct by accident.
+ * <p>Not {@link TaskModel}, which is group-shaped: parallel lists plus task-level scalars.
  *
  * <p>{@code version} and {@code lastHeartbeat} are absent because db-scheduler's {@code
- * ScheduledExecution} exposes neither — a field that can only ever be a placeholder is worse than
- * no field.
+ * ScheduledExecution} exposes neither.
  *
  * @param history run log for this instance, or {@code null} when {@code db-scheduler-ui.history} is
- *     off — the exception and past runs live in the log table and nowhere else.
+ *     off
  */
 public record InstanceDetail(
     String taskName,

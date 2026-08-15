@@ -119,8 +119,8 @@ class InstanceServiceTest {
 
   @Test
   void getSoleInstance_findsARunningExecution() {
-    // The convenience lookup on SchedulerClient filters to picked=false, which would hide a
-    // task's only execution exactly while it runs — the moment someone opens the panel.
+    // The convenience lookup on SchedulerClient filters to picked=false, hiding a running
+    // execution.
     InstanceService service = service(execution("webhook", "evt-1", NOW, true, "scheduler-1", 0));
 
     SoleInstance sole = service.getSoleInstance("webhook");

@@ -41,8 +41,7 @@ public class InstanceController {
    * strings that routinely contain slashes, colons and spaces.
    *
    * @param id the instance; when omitted the task's sole execution is used, which is how the
-   *     overview opens this — its rows name a task, not an instance. A task with several executions
-   *     then answers 409: the request has not said which one it means.
+   *     overview opens this. A task with several executions then answers 409.
    */
   @GetMapping("/instance")
   public InstanceDetail getInstance(

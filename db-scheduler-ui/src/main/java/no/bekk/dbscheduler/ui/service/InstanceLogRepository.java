@@ -28,16 +28,14 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 /**
  * Reads the run log for one instance.
  *
- * <p>Separate from {@link LogLogic} on purpose: that one serves the History page — paging,
- * free-text search, filters, a shared cache and a 500-row ceiling. All this needs is the newest few
- * rows for one exact instance.
+ * <p>Separate from {@link LogLogic}, which serves the History page with paging, search, filters and
+ * a shared cache. This needs only the newest few rows for one instance.
  *
- * <p>Both queries filter on {@code (task_name, task_instance)} and read newest-first, which the
- * {@code stl_task_instance_idx} index in {@code sql/log-table/*.sql} serves directly. Without that
- * index they degrade to scanning every log row belonging to the task.
+ * <p>Both queries filter on {@code (task_name, task_instance)} and read newest-first, served by the
+ * {@code stl_task_instance_idx} index in {@code sql/log-table/*.sql}. Without it they scan every
+ * log row for the task.
  *
- * <p>The stack trace is fetched only for the one failed row that gets shown, so the common case —
- * an instance that is running fine — never pulls one over the wire.
+ * <p>The stack trace is read only for the single failed row that gets shown.
  */
 public class InstanceLogRepository {
 
@@ -66,8 +64,7 @@ public class InstanceLogRepository {
   public Optional<InstanceRun> findLastFailure(String taskName, String instanceId) {
     return query(
             select("exception_stacktrace", " and succeeded = :succeeded"),
-            // Bound, not inlined: `false` is not a literal every database accepts — Oracle
-            // stores this as a number and SQL Server as a bit.
+            // Bound, not inlined: Oracle stores this as a number and SQL Server as a bit.
             parameters(taskName, instanceId).addValue("succeeded", false),
             1)
         .stream()
@@ -96,9 +93,8 @@ public class InstanceLogRepository {
         .addValue("instanceId", instanceId);
   }
 
-  // Row-capping via JDBC rather than a LIMIT clause, because `limit` / `top` / `fetch first` are
-  // not the same word everywhere. A template per call because setMaxRows mutates it, and these
-  // are shared across requests.
+  // Caps rows via JDBC rather than a LIMIT clause, whose syntax differs per database. A new
+  // template per call because setMaxRows mutates it.
   private NamedParameterJdbcTemplate template(int maxRows) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
     jdbcTemplate.setMaxRows(maxRows);

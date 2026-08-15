@@ -101,8 +101,7 @@ public class UiApiAutoConfiguration {
     return new OverviewService(scheduler, taskDefinitions.stream().toList());
   }
 
-  // Only exists when there is a log table to read; InstanceService takes it as an optional
-  // dependency and reports a null history when it is absent.
+  // Present only when there is a log table to read; InstanceService treats it as optional.
   @Bean
   @ConditionalOnMissingBean
   @ConditionalOnProperty(

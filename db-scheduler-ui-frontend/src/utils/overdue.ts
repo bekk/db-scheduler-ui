@@ -16,12 +16,7 @@ import { isBefore } from 'date-fns';
 /** Dark amber: the warning token is a background colour and unreadable as text. */
 export const overdueColor = '#725200';
 
-/**
- * Due in the past and nobody picked it up.
- *
- * One definition, because an overview row and the panel it opens describe the same execution —
- * if they disagree about "overdue", one of them is lying.
- */
+/** Due in the past and not picked up. Shared by the overview row and the drawer it opens. */
 export const isOverdue = (
   executionTime: string | null,
   running: boolean,

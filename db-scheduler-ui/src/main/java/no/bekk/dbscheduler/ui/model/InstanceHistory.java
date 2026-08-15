@@ -26,8 +26,8 @@ import java.util.List;
 public record InstanceHistory(InstanceRun lastFailure, List<InstanceRun> recentRuns) {
 
   /**
-   * @param stackTrace only populated on the {@code lastFailure} run — a stack trace per row would
-   *     dominate the payload for no gain, since the list only shows outcome and message.
+   * @param stackTrace only populated on the {@code lastFailure} run; the list shows outcome and
+   *     message only
    */
   public record InstanceRun(
       long id,

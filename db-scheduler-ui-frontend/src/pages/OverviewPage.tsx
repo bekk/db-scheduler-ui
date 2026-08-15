@@ -128,8 +128,7 @@ export const OverviewPage: React.FC = () => {
   );
 };
 
-// Due in the past with nothing running it. The rule itself lives in utils/overdue so the row
-// and the drawer it opens cannot disagree; this only adapts it to the aggregate row shape.
+// Adapts the shared rule in utils/overdue to the aggregate shape of an overview row.
 const overdue = (task: OverviewTask) =>
   executionOverdue(task.nextExecutionTime, task.counts.running > 0);
 
@@ -165,8 +164,7 @@ const OverviewRow: React.FC<{
 }> = ({ task, onOpenInstance }) => {
   const navigate = useNavigate();
   const drillDownTarget = `/scheduled/${encodeURIComponent(task.taskName)}`;
-  // A task with one execution *is* that execution — the list in between would hold a single
-  // row, so the row opens the instance directly. Many-instance rows still go to the list.
+  // Single-instance rows open the instance directly; the rest drill down to the list.
   const opensInstance = task.instanceCount === 1;
 
   const open = () => {

@@ -14,8 +14,8 @@
 package no.bekk.dbscheduler.ui.model;
 
 /**
- * State of a single execution. There is no {@code DORMANT} here — that is a task-level state (a
- * task with no executions at all), and a task with none has no instance to describe.
+ * State of a single execution. No {@code DORMANT}: that is a task-level state, describing a task
+ * with no executions at all.
  */
 public enum InstanceStatus {
   FAILED,

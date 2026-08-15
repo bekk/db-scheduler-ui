@@ -13,9 +13,8 @@
  */
 import { useSearchParams } from 'react-router-dom';
 
-// Named for the task, not the instance: the Overview knows only which task a row is, and the
-// endpoint resolves the one execution behind it. When an instance list exists to open the
-// panel from, this grows an instance parameter to go with it.
+// Named for the task, not the instance: Overview rows identify a task, and the endpoint
+// resolves the single execution behind it.
 const TASK_PARAM = 'task';
 
 interface SelectedInstanceState {
@@ -25,10 +24,7 @@ interface SelectedInstanceState {
   clear: () => void;
 }
 
-/**
- * Keeps the open instance in the query string, so a refresh, the back button or a link pasted
- * to a colleague reopens the same execution.
- */
+/** Keeps the open instance in the query string, so reloads and shared links reopen it. */
 export const useSelectedInstance = (): SelectedInstanceState => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -39,8 +35,7 @@ export const useSelectedInstance = (): SelectedInstanceState => {
     } else {
       params.delete(TASK_PARAM);
     }
-    // Push, not replace: opening a detail is a place you can go "back" from, which is what
-    // the browser's back button should undo first.
+    // Push, not replace, so the back button closes the drawer.
     setSearchParams(params);
   };
 

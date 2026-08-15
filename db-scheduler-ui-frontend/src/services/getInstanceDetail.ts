@@ -30,11 +30,8 @@ export class InstanceLookupError extends Error {
 }
 
 /**
- * One execution in full.
- *
- * The server resolves the task's sole execution, which is what the overview can ask for — its
- * rows name a task, not an instance. (The endpoint also accepts an `id`; nothing sends one
- * until there is an instance list to pick from.)
+ * One execution in full. Without an `id` the server resolves the task's sole execution, which is
+ * what the overview needs — its rows name a task, not an instance.
  */
 export const getInstanceDetail = async (
   taskName: string,

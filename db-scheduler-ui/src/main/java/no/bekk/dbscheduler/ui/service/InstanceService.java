@@ -28,11 +28,10 @@ import no.bekk.dbscheduler.ui.model.InstanceStatus;
  *
  * <p>Named executions are fetched by primary key ({@link
  * SchedulerClient#getScheduledExecution(TaskInstanceId)}); resolving a task's sole execution reads
- * at most two rows for that task. Neither goes through {@code TaskLogic}, whose every call loads
- * all scheduled executions in the database and filters them in Java.
+ * at most two rows for that task.
  *
  * <p>The log side is optional: with {@code db-scheduler-ui.history} off there is no log table to
- * read, and the detail is returned with a {@code null} history rather than a hollow one.
+ * read, and the detail comes back with a {@code null} history.
  */
 public class InstanceService {
 
@@ -70,9 +69,8 @@ public class InstanceService {
   public record SoleInstance(InstanceDetail detail, int executionCount) {}
 
   public SoleInstance getSoleInstance(String taskName) {
-    // all() rather than the single-argument overload, which quietly filters to picked=false —
-    // that would hide a task's only execution exactly while it runs. Two is all we need to
-    // fetch: one to show, two to know that showing one would be a guess.
+    // all() rather than the single-argument overload, which filters to picked=false and would
+    // hide the execution while it runs. Two rows: one to show, two to detect ambiguity.
     List<ScheduledExecution<Object>> executions =
         scheduler.getScheduledExecutionsForTask(
             taskName, Object.class, ScheduledExecutionsFilter.all().limit(2));
@@ -102,16 +100,14 @@ public class InstanceService {
     if (logRepository == null) {
       return null;
     }
-    // Looking for a failed run in a log that has none is the expensive case: nothing matches,
-    // so the search cannot stop early. The execution row already knows whether to bother.
-    // (A rerun resets lastFailure, which correctly stops showing the trace it reset.)
+    // Skip the failure query when the execution never failed: with nothing to match, it cannot
+    // stop early and scans the instance's whole log.
     return new InstanceHistory(
         hasEverFailed ? logRepository.findLastFailure(taskName, instanceId).orElse(null) : null,
         logRepository.findRecentRuns(taskName, instanceId, RECENT_RUNS));
   }
 
-  // Picked beats failing: an execution that is running right now is being retried, and what the
-  // operator needs to know first is that something is happening.
+  // Picked beats failing: a failing execution that is running now reports as RUNNING.
   private InstanceStatus status(ScheduledExecution<Object> execution) {
     if (execution.isPicked()) {
       return InstanceStatus.RUNNING;

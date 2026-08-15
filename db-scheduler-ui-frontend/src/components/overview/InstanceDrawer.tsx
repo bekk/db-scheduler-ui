@@ -68,10 +68,7 @@ const statusColor: Record<InstanceStatus, string> = {
   SCHEDULED: colors.primary['500'],
 };
 
-/**
- * Slide-over detail for a single execution — the form settled on in
- * `specs/instance-panel/spec.md` (it works at any width and never reflows the list).
- */
+/** Slide-over detail for a single execution. See `specs/instance-panel/spec.md`. */
 export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
   taskName,
   onClose,
@@ -99,8 +96,7 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
               </Text>
             )}
           </HStack>
-          {/* Only once the instance is known: until then the title above is the task name,
-              and repeating it reads as a rendering bug. */}
+          {/* Only once loaded: before that the title above already shows the task name. */}
           {instance && (
             <Text
               fontSize="xs"
@@ -261,8 +257,7 @@ const Facts: React.FC<{ instance: InstanceDetail }> = ({ instance }) => (
   </Box>
 );
 
-// The whole log side is one block on the payload: absent means db-scheduler-ui.history is
-// off, so there is no log table to have read.
+// An absent history block means db-scheduler-ui.history is off.
 const ExceptionSection: React.FC<{ instance: InstanceDetail }> = ({
   instance,
 }) => {
@@ -380,8 +375,7 @@ const RunRow: React.FC<{ run: InstanceRun }> = ({ run }) => (
   </HStack>
 );
 
-// TaskAdminController is not registered at all when read-only=true, so the buttons are
-// hidden rather than disabled — there is nothing behind them to call.
+// TaskAdminController is not registered when read-only=true, so hide the buttons entirely.
 const Actions: React.FC<{
   instance: InstanceDetail;
   onDone: () => void;
@@ -452,8 +446,7 @@ const Actions: React.FC<{
           Disabled while running
         </Text>
       )}
-      {/* Deleting an execution cannot be undone, and the drawer names the one instance it
-          would remove — so the confirmation can say exactly what is about to disappear. */}
+      {/* Deletion cannot be undone; spec.md marks it destructive and requires confirmation. */}
       <AlertDialog
         isOpen={confirmingDelete}
         leastDestructiveRef={cancelRef}

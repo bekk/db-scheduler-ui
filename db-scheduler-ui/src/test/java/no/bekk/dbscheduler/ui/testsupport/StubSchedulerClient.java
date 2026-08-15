@@ -28,8 +28,7 @@ import java.util.function.Consumer;
 /**
  * Minimal {@link SchedulerClient} test double answering only the lookups the UI services depend on:
  * {@link #getScheduledExecutionsSummaryByTask()} for the overview, and the by-id / by-task
- * execution lookups for the instance detail. All other operations throw, so a test that
- * accidentally relies on them fails loudly rather than silently observing no-op behaviour.
+ * execution lookups for the instance detail. All other operations throw rather than no-op.
  */
 public final class StubSchedulerClient implements SchedulerClient {
 
@@ -126,8 +125,8 @@ public final class StubSchedulerClient implements SchedulerClient {
   @Override
   public <T> void fetchScheduledExecutionsForTask(
       String taskName, Class<T> dataClass, Consumer<ScheduledExecution<T>> consumer) {
-    // Mirrors the real client, which quietly narrows this overload to unpicked executions
-    // (SchedulerClient:619) — modelled so that a caller relying on it fails here too.
+    // Mirrors the real client, which narrows this overload to unpicked executions
+    // (SchedulerClient:619).
     fetchScheduledExecutionsForTask(
         taskName, dataClass, ScheduledExecutionsFilter.all().withPicked(false), consumer);
   }
