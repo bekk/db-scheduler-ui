@@ -54,7 +54,7 @@ Worth weighing before changing it:
 Whichever way it goes, `Tasks` and the other cards should follow one rule; today `Tasks`
 clears everything while the rest toggle.
 
-## Legacy log queries cannot use the log table's indexes
+## Legacy log filters cannot seek the task-name / task-instance indexes
 
 **Found 2026-08-08**, while adding `stl_task_instance_idx` for the instance panel.
 
@@ -87,11 +87,15 @@ changes search semantics — today's exact-match search is case-insensitive — 
 product decision, not only a performance one.
 
 Dropping `LOWER` need not cost the user anything, though, if the field stops asking them to
-type a name exactly: **autocomplete the task name from the names we already know**. The
-Overview response carries every registered task, and the recurring/one-time split needs that
-same list, so the candidates are in the client already — no extra endpoint. Picking a name from
-a list is both easier than typing one and exact by construction, which is what lets the query
-compare the column directly.
+type a name exactly: **autocomplete the task name from the names we already know**. Picking a
+name from a list is both easier than typing one and exact by construction, which is what lets
+the query compare the column directly.
+
+No new endpoint is needed — `/tasks/overview` already returns every registered task — but the
+candidates are *not* in the client yet where the search box lives: `OVERVIEW_TASKS_QUERY_KEY`
+is queried only by `OverviewPage`, while History runs `ALL_LOG_QUERY_KEY` and its header
+carries a bare text input. So this costs either the same query issued from History, or a
+store both pages share. Worth deciding when `/logs/all` is replaced, not before.
 
 ## Existing deployments need the per-instance log index by hand
 

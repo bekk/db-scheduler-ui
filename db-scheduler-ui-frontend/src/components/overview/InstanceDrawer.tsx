@@ -12,6 +12,12 @@
  * limitations under the License.
  */
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Box,
   Button,
   Drawer,
@@ -25,7 +31,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JsonViewer from 'src/components/common/JsonViewer';
 import { useInstanceDetail } from 'src/hooks/useInstanceDetail';
@@ -382,6 +388,8 @@ const Actions: React.FC<{
   onDeleted: () => void;
 }> = ({ instance, onDone, onDeleted }) => {
   const [busy, setBusy] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const cancelRef = useRef<HTMLButtonElement>(null);
   const toast = useToast();
 
   if (getReadonly()) {
@@ -435,13 +443,7 @@ const Actions: React.FC<{
         size="sm"
         colorScheme="red"
         isDisabled={busy || instance.picked}
-        onClick={() =>
-          act(
-            () => deleteTask(instance.id, instance.taskName),
-            'Instance deleted',
-            onDeleted,
-          )
-        }
+        onClick={() => setConfirmingDelete(true)}
       >
         Delete
       </Button>
@@ -450,6 +452,45 @@ const Actions: React.FC<{
           Disabled while running
         </Text>
       )}
+      {/* Deleting an execution cannot be undone, and the drawer names the one instance it
+          would remove — so the confirmation can say exactly what is about to disappear. */}
+      <AlertDialog
+        isOpen={confirmingDelete}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setConfirmingDelete(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete instance
+            </AlertDialogHeader>
+            <AlertDialogBody>
+              Delete {instance.taskName} · {instance.id}? The scheduled execution
+              is removed and will not run.
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setConfirmingDelete(false)}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                ml={3}
+                isDisabled={busy}
+                onClick={() => {
+                  setConfirmingDelete(false);
+                  act(
+                    () => deleteTask(instance.id, instance.taskName),
+                    'Instance deleted',
+                    onDeleted,
+                  );
+                }}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </HStack>
   );
 };

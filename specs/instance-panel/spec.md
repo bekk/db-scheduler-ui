@@ -6,18 +6,20 @@ the three candidate presentation forms: `screenshots/01-side-panel.png` (docked 
 `screenshots/02-slide-over.png` (slide-over overlay), `screenshots/03-popover.png` (floating
 popover).
 
-Child of the **task-detail** drill-down (planned spec) — it opens for the row the operator
-selects in that view. Builds on `../overview-tasks-table/spec.md` (status model) and reuses
-the existing history (`LogModel`) and admin (`TaskAdminController`) plumbing.
+Eventually a child of the **task-detail** drill-down (planned spec), opening for the row the
+operator selects there. **Until that view exists it is attached to Overview rows that have
+exactly one instance** — a task with one execution *is* that execution, so no list is needed
+in between. Builds on `../overview-tasks-table/spec.md` (status model) and reuses the existing
+admin (`TaskAdminController`) plumbing.
 
-> **Focus: information + data sourcing + interaction.** Both the **visual styling** and the
-> **panel's presentation form** are open for prototyping (see *Presentation* below) — this
-> spec locks the *content* and *behaviour*, not the rendering.
+> **Focus: information + data sourcing + interaction.** The **presentation form** was settled
+> by prototyping — slide-over, see *Presentation* below. **Visual styling** still follows the
+> existing app; this spec locks the *content* and *behaviour*.
 
 ## Interaction (presentation-agnostic)
 
-- **Selection:** selecting an instance in the task-detail list opens its detail; the
-  selected row stays highlighted.
+- **Selection:** selecting an instance opens its detail — from the task-detail list once that
+  exists, today from a single-instance Overview row; the selected row stays highlighted.
 - **One instance at a time** — selecting another replaces the contents.
 - **Dismiss** via an explicit close / `Esc` (and, where it fits the form, re-clicking the
   selected row).
@@ -55,7 +57,8 @@ Any variant must satisfy these invariants (the contract a prototype is judged ag
 - Does **not reorder or disturb** the list.
 - Respects **read-only** (no actions) and **history gating**.
 
-> Soft lean: docked side-panel on wide screens, slide-over on narrow — but prototype before locking.
+> The prototypes settled this in favour of the slide-over — see the decision above. The table
+> below records what each candidate was judged on.
 
 ## Information shown (priority order)
 
@@ -127,10 +130,10 @@ past and not picked is **overdue** (warning), consistent with the Overview Next-
 
 ## Recent history — this instance (history-gated)
 
-- Last N log rows for this instance via `GET /db-scheduler-api/logs/all` filtered by
-  `taskName` **and** `taskInstance` (exact match — `searchTermTaskInstance` / `taskId`
-  already support this). Each line: outcome (ok/failed) · `timeStarted` · `durationMs` ·
-  `exceptionMessage`.
+- Last N log rows for this instance, in the `history` block of the `GET /tasks/instance`
+  response (see *Served by its own endpoint* above) — one indexed query on
+  `(task_name, task_instance)`, not a filtered `/logs/all` page. Each line: outcome
+  (ok/failed) · `timeStarted` · `durationMs` · `exceptionMessage`.
 - `View full history →` deep-links the **History** page pre-filtered to this instance.
 - **`history=false`** ⇒ hide the whole section.
 
@@ -169,7 +172,8 @@ At the foot of the detail. All live under `TaskAdminController`, which is **abse
 - `…/ui/model/LogModel.java` — `exceptionClass` / `exceptionMessage` /
   `exceptionStackTrace` + per-run fields (exception + recent-history source).
 - `…/ui/service/LogLogic.java`, `…/ui/controller/LogController.java` —
-  `GET /logs/all`, `/logs/poll`; filter by `taskName` + `taskInstance` (exact).
+  `GET /logs/all`, `/logs/poll`. **Not used by the panel** (see *Served by its own endpoint*);
+  listed because the `View full history →` link deep-links to the History page they serve.
 - `…/ui/controller/TaskAdminController.java` — `/rerun`, `/delete` (read-only gated);
   **no `/reschedule`**. Service: `…/ui/service/TaskLogic.java` (`runTaskNow`, `deleteTask`).
 - `…/ui/controller/ConfigController.java` — `/config` history + read-only flags.
