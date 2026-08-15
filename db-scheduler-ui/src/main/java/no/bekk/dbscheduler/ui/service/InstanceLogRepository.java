@@ -47,9 +47,7 @@ public class InstanceLogRepository {
   private final DataSource dataSource;
   private final String logTableName;
 
-  // time_started is written through JdbcCustomization#setInstant, whose UTC handling depends on
-  // db-scheduler's persistTimestampInUTC setting. Reading it back with a plain getTimestamp would
-  // decode against the JVM's default zone instead, shifting every run time by the local offset.
+  // time_started is written through setInstant; read it back the same way so the encodings match.
   private final JdbcCustomization jdbcCustomization;
 
   public InstanceLogRepository(DataSource dataSource, String logTableName) {

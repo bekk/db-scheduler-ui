@@ -27,9 +27,7 @@ public final class LogsTable {
 
   private final JdbcTemplate jdbc;
 
-  // The same abstraction JdbcLogRepository writes through, so the tests exercise the real
-  // write/read pairing. Inserting a bare Timestamp here would hide a mismatch on any JVM whose
-  // default zone is UTC — which is exactly what CI and the dev containers run.
+  // Writes through the same abstraction as JdbcLogRepository, so tests cover the real pairing.
   private final JdbcCustomization jdbcCustomization;
 
   public LogsTable(DataSource dataSource) {
