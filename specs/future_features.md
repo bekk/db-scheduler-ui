@@ -151,6 +151,18 @@ db-scheduler version moves with it.
 `JdbcLogRepository`) is available today and is the right way to read `time_started` back: the
 column is written with `setInstant`, whose UTC handling `getTimestamp` does not mirror.
 
+## Rewrite the Snowflake id generator
+
+`…/ui/log/jdbc/Snowflake.java` was adapted from an outside implementation rather than written
+here. Replace it with our own — it is ~60 lines of bit-shifting and one of the few pieces of the
+log stack we did not author.
+
+The bit layout is not free to change: ids already sitting in `scheduled_execution_logs` were
+minted with 43 epoch bits / 10 node bits / 10 sequence bits over a 2020-01-01 epoch, and both
+`LogLogic` and `InstanceLogRepository` order and page on `id`, so a replacement has to keep
+producing monotonically increasing ids in that same encoding. The layout is the contract; the
+code around it is ours to write.
+
 ## Cleanup: dead `lastHeartbeat` and `version` fields
 
 Neither is populated: db-scheduler's `ScheduledExecution` exposes no accessor for the heartbeat,
