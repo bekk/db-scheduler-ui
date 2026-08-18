@@ -75,6 +75,10 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
   onChanged,
 }) => {
   const { instance, status, refetch } = useInstanceDetail(taskName);
+  // react-query keeps `data` from the last successful fetch around on a failed poll, so gate on
+  // `status` rather than `instance` — otherwise the header keeps a stale badge after the body
+  // has already moved on to a gone/ambiguous/error message.
+  const showInstance = status === 'ready' && !!instance;
 
   return (
     <Drawer isOpen={!!taskName} placement="right" onClose={onClose} size="md">
@@ -84,9 +88,9 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
         <DrawerHeader borderBottomWidth="1px" pb={3}>
           <HStack spacing={3} align="center">
             <Text fontSize="lg" color={colors.primary['600']}>
-              {instance?.id ?? taskName}
+              {showInstance ? instance.id : taskName}
             </Text>
-            {instance && (
+            {showInstance && (
               <Text
                 fontSize="sm"
                 fontWeight="bold"
@@ -97,7 +101,7 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
             )}
           </HStack>
           {/* Only once loaded: before that the title above already shows the task name. */}
-          {instance && (
+          {showInstance && (
             <Text
               fontSize="xs"
               fontWeight="normal"
@@ -144,6 +148,9 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
               <ExceptionSection instance={instance} />
               <HistorySection instance={instance} />
               <Actions
+                // Remounts on a different instance so confirm/busy state doesn't survive a
+                // switch (e.g. Back navigating from one instance's delete-confirm to another's).
+                key={`${instance.taskName}:${instance.id}`}
                 instance={instance}
                 onDone={() => {
                   refetch();

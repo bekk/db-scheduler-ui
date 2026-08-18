@@ -45,14 +45,12 @@ export const getInstanceDetail = async (
 
   if (response.status === 401) {
     document.location.href = '/db-scheduler';
-  }
-  if (response.status === 404) {
+    throw new Error('Unauthorized');
+  } else if (response.status === 404) {
     throw new InstanceLookupError('GONE');
-  }
-  if (response.status === 409) {
+  } else if (response.status === 409) {
     throw new InstanceLookupError('AMBIGUOUS');
-  }
-  if (!response.ok) {
+  } else if (!response.ok) {
     throw new Error(`Error fetching instance. Status: ${response.statusText}`);
   }
 
