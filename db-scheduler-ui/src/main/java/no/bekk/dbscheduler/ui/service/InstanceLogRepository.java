@@ -18,9 +18,7 @@ import com.github.kagkarlsson.scheduler.jdbc.JdbcCustomization;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.model.InstanceHistory.InstanceRun;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,11 +47,6 @@ public class InstanceLogRepository {
 
   // time_started is written through setInstant; read it back the same way so the encodings match.
   private final JdbcCustomization jdbcCustomization;
-
-  // Keyed by row cap: JdbcTemplate.setMaxRows mutates the instance, so each cap gets its own
-  // template, built once and reused rather than on every query.
-  private final Map<Integer, NamedParameterJdbcTemplate> templatesByMaxRows =
-      new ConcurrentHashMap<>();
 
   public InstanceLogRepository(DataSource dataSource, String logTableName) {
     this.dataSource = dataSource;
@@ -100,11 +93,9 @@ public class InstanceLogRepository {
         .addValue("instanceId", instanceId);
   }
 
+  // JdbcTemplate.setMaxRows mutates the instance, so a fresh one per call keeps concurrent
+  // callers passing a different cap from racing on it.
   private NamedParameterJdbcTemplate template(int maxRows) {
-    return templatesByMaxRows.computeIfAbsent(maxRows, this::newTemplate);
-  }
-
-  private NamedParameterJdbcTemplate newTemplate(int maxRows) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
     jdbcTemplate.setMaxRows(maxRows);
     return new NamedParameterJdbcTemplate(jdbcTemplate);
