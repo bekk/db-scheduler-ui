@@ -14,9 +14,12 @@
 import {
   Box,
   Button,
+  FormControl,
+  FormLabel,
   Heading,
   HStack,
   Stack,
+  Switch,
   Table,
   TableContainer,
   Tbody,
@@ -36,6 +39,7 @@ import {
 } from 'src/services/getOverviewTasks';
 import colors from 'src/styles/colors';
 import { dateFormatText } from 'src/utils/dateFormatText';
+import { useAutoRefresh } from 'src/hooks/useAutoRefresh';
 import { useOverviewFilters } from 'src/hooks/useOverviewFilters';
 import { useSelectedInstance } from 'src/hooks/useSelectedInstance';
 import { isOverdue as executionOverdue, overdueColor } from 'src/utils/overdue';
@@ -62,13 +66,20 @@ const statusColors: Record<OverviewTaskStatus, string> = {
   DORMANT: colors.primary['400'],
 };
 
+// Matches the app-wide default in App.tsx; named here because this query overrides it.
+const AUTO_REFRESH_MS = 2000;
+
 export const OverviewPage: React.FC = () => {
+  const { enabled: autoRefresh, setEnabled: setAutoRefresh } =
+    useAutoRefresh();
   const {
     data = [],
     isLoading,
     isError,
     refetch,
-  } = useQuery([OVERVIEW_TASKS_QUERY_KEY], getOverviewTasks);
+  } = useQuery([OVERVIEW_TASKS_QUERY_KEY], getOverviewTasks, {
+    refetchInterval: autoRefresh ? AUTO_REFRESH_MS : false,
+  });
   const { activeFilters, toggleFilter, clearFilters } = useOverviewFilters();
   const { selected, select, clear } = useSelectedInstance();
 
@@ -79,9 +90,28 @@ export const OverviewPage: React.FC = () => {
   return (
     <Box>
       <Stack spacing={4} pt={10} pb={2}>
-        <Heading as="h1" size="lg" color={colors.primary['600']}>
-          All tasks
-        </Heading>
+        <HStack justify="space-between" align="center">
+          <Heading as="h1" size="lg" color={colors.primary['600']}>
+            All tasks
+          </Heading>
+          <FormControl display="flex" alignItems="center" width="auto">
+            <FormLabel
+              htmlFor="auto-refresh"
+              fontSize="sm"
+              color={colors.primary['500']}
+              mb={0}
+              mr={2}
+            >
+              Auto-refresh
+            </FormLabel>
+            <Switch
+              id="auto-refresh"
+              size="sm"
+              isChecked={autoRefresh}
+              onChange={(e) => setAutoRefresh(e.target.checked)}
+            />
+          </FormControl>
+        </HStack>
         {loaded && (
           <SummaryStrip
             summary={summarizeOverview(tasks)}
