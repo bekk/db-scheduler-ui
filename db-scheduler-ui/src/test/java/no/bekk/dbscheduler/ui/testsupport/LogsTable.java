@@ -13,7 +13,8 @@
  */
 package no.bekk.dbscheduler.ui.testsupport;
 
-import java.sql.Timestamp;
+import com.github.kagkarlsson.scheduler.jdbc.AutodetectJdbcCustomization;
+import com.github.kagkarlsson.scheduler.jdbc.JdbcCustomization;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,8 +27,12 @@ public final class LogsTable {
 
   private final JdbcTemplate jdbc;
 
+  // Writes through the same abstraction as JdbcLogRepository, so tests cover the real pairing.
+  private final JdbcCustomization jdbcCustomization;
+
   public LogsTable(DataSource dataSource) {
     this.jdbc = new JdbcTemplate(dataSource);
+    this.jdbcCustomization = new AutodetectJdbcCustomization(dataSource);
   }
 
   static void createSchema(DataSource dataSource) {
@@ -52,19 +57,24 @@ public final class LogsTable {
   }
 
   public void insert(LogsRow row) {
-    Timestamp ts = Timestamp.from(row.time);
     jdbc.update(
         "insert into "
             + NAME
             + " (id, task_name, task_instance, picked_by, time_started, time_finished,"
-            + " succeeded, duration_ms) values (?, ?, ?, ?, ?, ?, ?, ?)",
-        ID_SEQ.incrementAndGet(),
-        row.taskName,
-        row.taskInstance,
-        "test",
-        ts,
-        ts,
-        row.succeeded,
-        0L);
+            + " succeeded, duration_ms, exception_class, exception_message,"
+            + " exception_stacktrace) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        statement -> {
+          statement.setLong(1, ID_SEQ.incrementAndGet());
+          statement.setString(2, row.taskName);
+          statement.setString(3, row.taskInstance);
+          statement.setString(4, "test");
+          jdbcCustomization.setInstant(statement, 5, row.time);
+          jdbcCustomization.setInstant(statement, 6, row.time);
+          statement.setBoolean(7, row.succeeded);
+          statement.setLong(8, row.durationMs);
+          statement.setString(9, row.exceptionClass);
+          statement.setString(10, row.exceptionMessage);
+          statement.setString(11, row.exceptionStackTrace);
+        });
   }
 }

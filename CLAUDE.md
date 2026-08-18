@@ -84,6 +84,15 @@ Multi-module Maven project (`pom.xml` at root):
 
 - **example-app-webflux** — WebFlux variant of the example app.
 
+## Code comments
+
+This is a public repository; comments are read by maintainers, not by the reviewer of a diff.
+
+- Say what a non-obvious field, branch or constant is for, in a line or two. Prefer no comment to one that restates the code.
+- Do not narrate the change itself: no justifying a decision against the alternative that was rejected, no recording how something was tested, no "this used to...".
+- Keep the register plain. No rhetorical flourishes, no asides to the reader.
+- Reasoning that belongs to the *change* rather than the code goes in the commit message, the PR, or `specs/` — that is what those are for.
+
 ## Key Patterns
 
 - The frontend build is triggered during Maven's `generate-resources` phase via `exec-maven-plugin` (runs `pnpm install --frozen-lockfile` and `pnpm run build` in `db-scheduler-ui-frontend/`), then output is copied to backend resources via `maven-resources-plugin`. The pnpm version is pinned via the `packageManager` field in `package.json`.

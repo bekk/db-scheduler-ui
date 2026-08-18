@@ -1,8 +1,10 @@
 # Overview — future features & derived requirements
 
 Backlog for the Overview page beyond MVP 1 (see `MVP_1_overview_spec.md`). This is a
-**living document** — append requirements here as we discover them while building the
-current feature. Keep MVP 1 lean; park anything non-essential below.
+**living document** — add a section here for anything we discover that still needs doing:
+a deferred feature, a trap the next implementation will hit, a cleanup we owe. Decisions
+already taken belong in the spec they were taken for, not here. Keep MVP 1 lean; park
+anything non-essential below.
 
 ---
 
@@ -27,11 +29,166 @@ definitions (and dormant rows) grows.
 > **Moved to MVP 1.** The `SchedulerClient` DB-side group-by method is part of the
 > current feature — see `MVP_1_overview_spec.md` §5.
 
-## Cleanup: dead `lastHeartbeat` field
+## Summary-strip cards: single-select or AND-combined?
 
-`TaskModel.lastHeartbeat` is declared but never populated (db-scheduler's
-`ScheduledExecution` doesn't expose it). Either populate it (if a source becomes
-available) or remove it.
+**Reported 2026-08-07.** Selecting *Failing* while *Scheduled* is active leaves both on and
+filters to their intersection; the expectation was that the second selection replaces the
+first, the way a segmented control or a tab bar behaves.
+
+The current behaviour is what `overview-header-summary/spec.md` specifies — "three
+**independent toggle** chips, **AND-combined**" — so this is a decision to revisit, not an
+implementation slip. What changed is the presentation: the chips became stat cards, and
+`Tasks` reads as "selected" whenever nothing else is, so the row now *looks* like a
+one-of-N selector while behaving as N checkboxes.
+
+Worth weighing before changing it:
+
+- AND-combining answers real questions — *failing **and** has queued work* is a different
+  set from either alone, and the `Showing X of Y tasks` line exists to make the combination
+  legible.
+- Single-select is what the cards' own visual language promises, and it makes `Tasks` a
+  natural member of the set ("all") rather than a special case.
+- A middle option: keep AND but make combination visible — e.g. only the active cards
+  outlined and an explicit `+` between them — so multi-select stops looking accidental.
+
+Whichever way it goes, `Tasks` and the other cards should follow one rule; today `Tasks`
+clears everything while the rest toggle.
+
+## Legacy log filters cannot seek the task-name / task-instance indexes
+
+**Found 2026-08-08**, while adding `stl_task_instance_idx` for the instance panel.
+
+`QueryUtils.logSearchCondition` builds every task-name and task-instance filter as
+`LOWER(task_name) = LOWER(:term)` (`QueryUtils.java:146-150`), and a plain b-tree index
+cannot be seeked through a function-wrapped column. So the History page's filters — including
+the per-instance one the ⋮ menu deep-links to — scan the log table.
+
+Measured on H2 (`MODE=PostgreSQL`, 5 000 rows, `explain analyze`):
+
+| Query shape                                   | Plan                      | Rows scanned |
+|-----------------------------------------------|---------------------------|--------------|
+| `task_name = ? and task_instance = ?`         | `stl_task_instance_idx`   | **2**        |
+| `LOWER(task_name) = ? and LOWER(task_instance) = ?` | table scan          | 5 001        |
+| `LOWER(task_name) = ?`                        | names `stl_task_name_idx` | 5 001        |
+
+The third row is the point: the index appears in the plan but is read as a scan, not a seek.
+As far as we can tell **no current UI query can seek `stl_task_name_idx`** — every
+`task_name` filter in `LogLogic` goes through `logSearchCondition` — leaving `stl_started_idx`
+(time-range) as the only index doing work.
+
+Caveats: measured on H2 only. MySQL with a case-insensitive collation, or Postgres with a
+`lower(task_name)` functional index, would behave differently, and this does not prove the
+History page is slow in production — only that the index cannot serve that query shape.
+
+The fix is not another index; it is to stop wrapping the column. When `/logs/all` is replaced,
+pick one: compare the columns directly (what `/tasks/instance` does), add functional indexes on
+`lower(...)`, or give the columns a case-insensitive collation. Note that dropping `LOWER`
+changes search semantics — today's exact-match search is case-insensitive — so that is a
+product decision, not only a performance one.
+
+Dropping `LOWER` need not cost the user anything, though, if the field stops asking them to
+type a name exactly: **autocomplete the task name from the names we already know**. Picking a
+name from a list is both easier than typing one and exact by construction, which is what lets
+the query compare the column directly.
+
+No new endpoint is needed — `/tasks/overview` already returns every registered task — but the
+candidates are *not* in the client yet where the search box lives: `OVERVIEW_TASKS_QUERY_KEY`
+is queried only by `OverviewPage`, while History runs `ALL_LOG_QUERY_KEY` and its header
+carries a bare text input. So this costs either the same query issued from History, or a
+store both pages share. Worth deciding when `/logs/all` is replaced, not before.
+
+## Existing deployments need the per-instance log index by hand
+
+`stl_task_instance_idx` on `(task_name, task_instance, id)` went into `sql/log-table/*.sql`
+and the example-app migrations with the instance panel, but those files are the *initial*
+schema — nothing replays them for a database that already exists. Without the index, opening
+the panel scans every log row belonging to the task. Needs a line in the release notes, or a
+migration path if one is ever added.
+
+## Reschedule has no backend
+
+`TaskAdminController` has rerun / rerunGroup / delete and nothing else, so the instance panel
+ships without a Reschedule action. Reviving it needs `POST /tasks/reschedule` over
+`SchedulerClient.reschedule`, plus a time picker in the panel.
+
+## Rerun silently clears the failure history
+
+db-scheduler's `reschedule` resets execution state, so pressing **Rerun** wipes `lastSuccess`,
+`lastFailure` and `consecutiveFailures`. The instance panel puts those fields next to the
+button that destroys them — the copy should say so.
+
+## Retire the legacy task and log endpoints
+
+`/tasks/overview` and `/tasks/instance` set the pattern: **new endpoints for the new UI, old
+ones retired once nothing calls them**. `/tasks/details` and `/logs/all` are now reached only
+by the Scheduled and History pages, and both are being replaced. Two things the replacements
+must not inherit:
+
+- `GET /logs/all` has an **inverted `asc` flag** — `LogLogic:138` maps `asc=true` to `id desc`.
+  Not worth fixing in place on an endpoint this close to deletion.
+- `/tasks/details` loads every scheduled execution and filters in Java, where
+  `SchedulerClient#getScheduledExecution` is a primary-key lookup.
+
+## Trap: `getScheduledExecutionsForTask(taskName)` hides running executions
+
+The single-argument overload narrows to `picked=false` (`SchedulerClient:619`), so a task's
+only execution disappears from the result exactly while it runs. Pass
+`ScheduledExecutionsFilter.all()` explicitly. `InstanceService` does; the instance list, when
+it is built, will meet the same trap.
+
+## Read the log table with db-scheduler's `JdbcRunner`, not spring-jdbc
+
+`InstanceLogRepository` uses `NamedParameterJdbcTemplate`; `JdbcRunner` would drop the
+spring-jdbc dependency and keep the UI on the same JDBC layer as the scheduler itself.
+Blocked upstream: db-scheduler's parent pom still relocates `com.github.kagkarlsson.jdbc` to
+`com.github.kagkarlsson.shaded.jdbc` at package time, left over from before `8c1e4fa`
+("Inline micro jdbc", 2025-04-23) made that package first-party source. Until a release ships
+without the relocation, the only importable name is the shaded one — and code compiled against
+it breaks at runtime the moment the relocation goes. Revisit when it does; the README's minimum
+db-scheduler version moves with it.
+
+`JdbcCustomization` (`com.github.kagkarlsson.scheduler.jdbc`, unshaded, already used by
+`JdbcLogRepository`) is available today and is the right way to read `time_started` back: the
+column is written with `setInstant`, whose UTC handling `getTimestamp` does not mirror.
+
+## Share one `JdbcCustomization` between the log writer and reader
+
+`JdbcLogRepository` and `InstanceLogRepository` each construct their own
+`AutodetectJdbcCustomization(dataSource)`, so the dialect is probed twice at startup and the UTC
+warning is logged twice. Both also read `db-scheduler-ui.log.table-name` through separate
+`@Value` injections. One bean in each starter's `UiApiAutoConfiguration`, passed to both.
+
+Merging the two classes is not the fix: they sit on opposite sides of the system (the writer is
+driven by `LogSchedulerListener`, the reader serves HTTP), they are gated by different flags, and
+the writer lives under the vendored `ui.log.**` licence set.
+
+## Add third-party notices for the bundled frontend
+
+The jar ships the built SPA, and with it 196 npm packages — 191 MIT, 2 BSD-3-Clause, 2 ISC,
+1 0BSD (`pnpm licenses list --prod`). All permissive; MIT, BSD-3 and ISC ask that their copyright
+notice ship with the code, and today none does — minification keeps no `@license` banners and
+there is no notices file beside the assets.
+
+Generate one during the build rather than maintain it by hand: render `pnpm licenses list --json`
+into a `THIRD-PARTY.txt` from the existing `exec-maven-plugin` step, so it tracks the lockfile.
+
+## Rewrite the Snowflake id generator
+
+`…/ui/log/jdbc/Snowflake.java` was adapted from an outside implementation rather than written
+here. Replace it with our own — it is ~60 lines of bit-shifting and one of the few pieces of the
+log stack we did not author.
+
+The bit layout is not free to change: ids already sitting in `scheduled_execution_logs` were
+minted with 43 epoch bits / 10 node bits / 10 sequence bits over a 2020-01-01 epoch, and both
+`LogLogic` and `InstanceLogRepository` order and page on `id`, so a replacement has to keep
+producing monotonically increasing ids in that same encoding. The layout is the contract; the
+code around it is ours to write.
+
+## Cleanup: dead `lastHeartbeat` and `version` fields
+
+Neither is populated: db-scheduler's `ScheduledExecution` exposes no accessor for the heartbeat,
+and `TaskMapper` hardcodes `version` to `0`. Populate them if a source appears, or remove both
+from `TaskModel` in one pass.
 
 ## Possibly later
 
@@ -45,24 +202,3 @@ available) or remove it.
 - **Dormant-recurring alerting** — a registered recurring task with 0 next executions
   is abnormal (failed to reschedule). Consider surfacing it more prominently than a
   plain dormant one-time task.
-
----
-
-## Derived requirements log
-
-Append items here as they come up during implementation (date · note):
-
-- 2026-05-28 · (seed) doc created from the MVP 1 interview.
-- 2026-05-28 · run-duration **proxy** (`now − executionTime`) pulled into MVP 1 for the
-  `running for <duration>` sub-line; precise/core-sourced duration stays deferred (above).
-- 2026-05-28 · global summary bar + quick-filter chips promoted out of this backlog into
-  `overview-header-summary/spec.md`; task-name search box stays deferred here.
-- 2026-05-29 · `instance-panel/spec.md` written. Discovered: (a) **Reschedule** has **no
-  backend** — `TaskAdminController` only has rerun/rerunGroup/delete; **dropped for this work**
-  (not in the current version); would need a new `POST /tasks/reschedule`
-  (`SchedulerClient.reschedule`) + time-picker if revived later;
-  (b) the instance **exception + stack trace** live only in the log table (`LogModel`), so the
-  detail's exception/recent-history sections are **history-gated**; scheduled_tasks has none.
-- 2026-05-29 · instance-panel **presentation form left open** in the spec (side panel /
-  slide-over / popover / inline / dedicated route) — to be settled by prototyping variants;
-  only the information set + behaviour are locked.

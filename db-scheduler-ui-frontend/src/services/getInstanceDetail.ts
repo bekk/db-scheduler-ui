@@ -1,0 +1,58 @@
+/*
+ * Copyright (C) Bekk
+ *
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
+ *
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { InstanceDetail } from 'src/models/InstanceDetail';
+
+const API_BASE_URL: string =
+  (import.meta.env.VITE_API_BASE_URL as string) ??
+  window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
+
+export const INSTANCE_QUERY_KEY = 'tasks/instance';
+
+/** Why the server would not return an instance — each needs different words in the UI. */
+export type InstanceLookupProblem = 'GONE' | 'AMBIGUOUS';
+
+export class InstanceLookupError extends Error {
+  constructor(readonly problem: InstanceLookupProblem) {
+    super(problem);
+    this.name = 'InstanceLookupError';
+  }
+}
+
+/**
+ * One execution in full. Without an `id` the server resolves the task's sole execution, which is
+ * what the overview needs — its rows name a task, not an instance.
+ */
+export const getInstanceDetail = async (
+  taskName: string,
+): Promise<InstanceDetail> => {
+  const queryParams = new URLSearchParams({ taskName });
+
+  const response = await fetch(
+    `${API_BASE_URL}/tasks/instance?${queryParams}`,
+    { method: 'GET', headers: { 'Content-Type': 'application/json' } },
+  );
+
+  if (response.status === 401) {
+    document.location.href = '/db-scheduler';
+    throw new Error('Unauthorized');
+  } else if (response.status === 404) {
+    throw new InstanceLookupError('GONE');
+  } else if (response.status === 409) {
+    throw new InstanceLookupError('AMBIGUOUS');
+  } else if (!response.ok) {
+    throw new Error(`Error fetching instance. Status: ${response.statusText}`);
+  }
+
+  return await response.json();
+};

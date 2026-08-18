@@ -13,9 +13,13 @@
  */
 import {
   Box,
+  Button,
+  FormControl,
+  FormLabel,
   Heading,
   HStack,
   Stack,
+  Switch,
   Table,
   TableContainer,
   Tbody,
@@ -23,8 +27,10 @@ import {
   Text,
   Tr,
 } from '@chakra-ui/react';
+import { ChevronRightIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
 import { RepeatIcon } from 'src/assets/icons';
+import { InstanceDrawer } from 'src/components/overview/InstanceDrawer';
 import { SummaryStrip } from 'src/components/overview/SummaryStrip';
 import { OverviewTask, OverviewTaskStatus } from 'src/models/OverviewTask';
 import {
@@ -33,7 +39,10 @@ import {
 } from 'src/services/getOverviewTasks';
 import colors from 'src/styles/colors';
 import { dateFormatText } from 'src/utils/dateFormatText';
+import { useAutoRefresh } from 'src/hooks/useAutoRefresh';
 import { useOverviewFilters } from 'src/hooks/useOverviewFilters';
+import { useSelectedInstance } from 'src/hooks/useSelectedInstance';
+import { isOverdue as executionOverdue, overdueColor } from 'src/utils/overdue';
 import { applyOverviewFilters } from 'src/utils/overviewFilters';
 import { instancesText, summarizeOverview } from 'src/utils/overviewSummary';
 import {
@@ -57,15 +66,22 @@ const statusColors: Record<OverviewTaskStatus, string> = {
   DORMANT: colors.primary['400'],
 };
 
-const overdueColor = '#725200';
+// Matches the app-wide default in App.tsx; named here because this query overrides it.
+const AUTO_REFRESH_MS = 2000;
 
 export const OverviewPage: React.FC = () => {
+  const { enabled: autoRefresh, setEnabled: setAutoRefresh } =
+    useAutoRefresh();
   const {
     data = [],
     isLoading,
     isError,
-  } = useQuery([OVERVIEW_TASKS_QUERY_KEY], getOverviewTasks);
+    refetch,
+  } = useQuery([OVERVIEW_TASKS_QUERY_KEY], getOverviewTasks, {
+    refetchInterval: autoRefresh ? AUTO_REFRESH_MS : false,
+  });
   const { activeFilters, toggleFilter, clearFilters } = useOverviewFilters();
+  const { selected, select, clear } = useSelectedInstance();
 
   const tasks = sortedByName(data);
   const visibleTasks = applyOverviewFilters(tasks, activeFilters);
@@ -74,9 +90,28 @@ export const OverviewPage: React.FC = () => {
   return (
     <Box>
       <Stack spacing={4} pt={10} pb={2}>
-        <Heading as="h1" size="lg" color={colors.primary['600']}>
-          All tasks
-        </Heading>
+        <HStack justify="space-between" align="center">
+          <Heading as="h1" size="lg" color={colors.primary['600']}>
+            All tasks
+          </Heading>
+          <FormControl display="flex" alignItems="center" width="auto">
+            <FormLabel
+              htmlFor="auto-refresh"
+              fontSize="sm"
+              color={colors.primary['500']}
+              mb={0}
+              mr={2}
+            >
+              Auto-refresh
+            </FormLabel>
+            <Switch
+              id="auto-refresh"
+              size="sm"
+              isChecked={autoRefresh}
+              onChange={(e) => setAutoRefresh(e.target.checked)}
+            />
+          </FormControl>
+        </HStack>
         {loaded && (
           <SummaryStrip
             summary={summarizeOverview(tasks)}
@@ -100,7 +135,11 @@ export const OverviewPage: React.FC = () => {
               <>
                 {visibleTasks.length > 0 && <ColumnLabels />}
                 {visibleTasks.map((task) => (
-                  <OverviewRow key={task.taskName} task={task} />
+                  <OverviewRow
+                    key={task.taskName}
+                    task={task}
+                    onOpenInstance={select}
+                  />
                 ))}
                 {tasks.length > 0 && visibleTasks.length === 0 && (
                   <MessageRow message="No tasks match the active filters" />
@@ -110,9 +149,18 @@ export const OverviewPage: React.FC = () => {
           </Tbody>
         </Table>
       </TableContainer>
+      <InstanceDrawer
+        taskName={selected}
+        onClose={clear}
+        onChanged={() => void refetch()}
+      />
     </Box>
   );
 };
+
+// Adapts the shared rule in utils/overdue to the aggregate shape of an overview row.
+const overdue = (task: OverviewTask) =>
+  executionOverdue(task.nextExecutionTime, task.counts.running > 0);
 
 const columnLabelSx = {
   textTransform: 'uppercase' as const,
@@ -136,17 +184,31 @@ const ColumnLabels: React.FC = () => (
     <Td sx={columnLabelSx} width="18%">
       Last run
     </Td>
+    <Td sx={columnLabelSx} width="1%" />
   </Tr>
 );
 
-const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
+const OverviewRow: React.FC<{
+  task: OverviewTask;
+  onOpenInstance: (taskName: string) => void;
+}> = ({ task, onOpenInstance }) => {
   const navigate = useNavigate();
   const drillDownTarget = `/scheduled/${encodeURIComponent(task.taskName)}`;
+  // Single-instance rows open the instance directly; the rest drill down to the list.
+  const opensInstance = task.instanceCount === 1;
+
+  const open = () => {
+    if (opensInstance) {
+      onOpenInstance(task.taskName);
+    } else if (task.instanceCount > 0) {
+      navigate(drillDownTarget);
+    }
+  };
 
   return (
     <Tr
       sx={rowSx(task, task.instanceCount > 0)}
-      onClick={() => task.instanceCount > 0 && navigate(drillDownTarget)}
+      onClick={open}
       cursor={task.instanceCount > 0 ? 'pointer' : 'default'}
     >
       <Td>
@@ -175,9 +237,9 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
           <ProximityDot task={task} />
           <Text
             title={absoluteTitle(task.nextExecutionTime)}
-            color={isOverdue(task) ? overdueColor : colors.primary['500']}
+            color={overdue(task) ? overdueColor : colors.primary['500']}
             fontWeight={
-              isOverdue(task) || task.counts.running > 0 ? 'semibold' : 'normal'
+              overdue(task) || task.counts.running > 0 ? 'semibold' : 'normal'
             }
           >
             {nextRunText(task)}
@@ -185,6 +247,25 @@ const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
         </HStack>
       </Td>
       <Td>{lastRunText(task)}</Td>
+      <Td textAlign="right" width="1%" whiteSpace="nowrap">
+        {opensInstance && (
+          <Button
+            size="xs"
+            variant="ghost"
+            color={colors.running['300']}
+            rightIcon={<ChevronRightIcon />}
+            iconSpacing={0}
+            aria-label={`Show details for ${task.taskName}`}
+            onClick={(event) => {
+              // The row handles the same click; without this it would fire twice.
+              event.stopPropagation();
+              open();
+            }}
+          >
+            Details
+          </Button>
+        )}
+      </Td>
     </Tr>
   );
 };
@@ -230,7 +311,7 @@ const ProximityDot: React.FC<{ task: OverviewTask }> = ({ task }) => {
 
 const MessageRow: React.FC<{ message: string }> = ({ message }) => (
   <Tr>
-    <Td colSpan={3}>
+    <Td colSpan={4}>
       <Text color={colors.primary['400']}>{message}</Text>
     </Td>
   </Tr>
@@ -361,14 +442,6 @@ function parseDate(value: string | null): Date | null {
 
 function absoluteTitle(value: string | null): string | undefined {
   return value ? dateFormatText(new Date(value)) : undefined;
-}
-
-function isOverdue(task: OverviewTask): boolean {
-  return (
-    task.counts.running === 0 &&
-    !!task.nextExecutionTime &&
-    isBefore(new Date(task.nextExecutionTime), new Date())
-  );
 }
 
 function countPart(count: number, label: string, color: string) {
