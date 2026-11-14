@@ -25,11 +25,14 @@ import java.nio.charset.StandardCharsets;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.ConfigController;
 import no.bekk.dbscheduler.ui.controller.IndexHtmlController;
+import no.bekk.dbscheduler.ui.controller.InstanceController;
 import no.bekk.dbscheduler.ui.controller.LogController;
 import no.bekk.dbscheduler.ui.controller.OverviewController;
 import no.bekk.dbscheduler.ui.controller.SpaFallbackMvc;
 import no.bekk.dbscheduler.ui.controller.TaskAdminController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
+import no.bekk.dbscheduler.ui.service.InstanceLogRepository;
+import no.bekk.dbscheduler.ui.service.InstanceService;
 import no.bekk.dbscheduler.ui.service.LogLogic;
 import no.bekk.dbscheduler.ui.service.OverviewService;
 import no.bekk.dbscheduler.ui.service.TaskLogic;
@@ -96,6 +99,46 @@ public class UiApiAutoConfiguration {
       matchIfMissing = false)
   OverviewService overviewLogic(Scheduler scheduler, ObjectProvider<Task<?>> taskDefinitions) {
     return new OverviewService(scheduler, taskDefinitions.stream().toList());
+  }
+
+  // Present only when there is a log table to read; InstanceService treats it as optional.
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "history",
+      havingValue = "true",
+      matchIfMissing = false)
+  InstanceLogRepository instanceLogRepository(
+      DataSource dataSource,
+      DbSchedulerCustomizer customizer,
+      @Value("${db-scheduler-ui.log.table-name:scheduled_execution_logs}") String logTableName) {
+    return new InstanceLogRepository(customizer.dataSource().orElse(dataSource), logTableName);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "overview",
+      havingValue = "true",
+      matchIfMissing = false)
+  InstanceService instanceService(
+      Scheduler scheduler,
+      ObjectProvider<InstanceLogRepository> logRepository,
+      DbSchedulerUiProperties properties) {
+    return new InstanceService(scheduler, logRepository.getIfAvailable(), properties.taskData());
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "overview",
+      havingValue = "true",
+      matchIfMissing = false)
+  InstanceController instanceController(InstanceService instanceService) {
+    return new InstanceController(instanceService);
   }
 
   @Bean

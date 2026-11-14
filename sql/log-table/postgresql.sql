@@ -15,4 +15,5 @@ create table scheduled_execution_logs (
 
 CREATE INDEX stl_started_idx         ON scheduled_execution_logs (time_started);
 CREATE INDEX stl_task_name_idx       ON scheduled_execution_logs (task_name);
+CREATE INDEX stl_task_instance_idx   ON scheduled_execution_logs (task_name, task_instance, id);
 CREATE INDEX stl_exception_class_idx ON scheduled_execution_logs (exception_class);

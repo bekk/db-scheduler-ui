@@ -7,6 +7,13 @@
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },
+  "pnpm": {
+    "_comment": "Vite 8 bundles with rolldown, whose binary is platform-specific. pnpm materialises only the installing machine's binary by default, so a node_modules installed on macOS cannot build inside a Linux container sharing the same checkout. List the platforms we actually build on: darwin/arm64 (dev machines), linux/arm64 (containers), linux/x64 (ubuntu-latest CI). 'current' keeps any other contributor's platform working.",
+    "supportedArchitectures": {
+      "os": ["current", "darwin", "linux"],
+      "cpu": ["current", "arm64", "x64"]
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

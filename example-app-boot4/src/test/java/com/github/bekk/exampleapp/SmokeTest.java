@@ -33,6 +33,10 @@ class SmokeTest {
   void testContextLoads() {
     assertThat(context.containsBean("taskAdminController")).isTrue();
     assertThat(context.containsBean("taskController")).isTrue();
+    // The two starters keep separate copies of UiApiAutoConfiguration, so a bean added to one
+    // and forgotten in the other compiles, passes every other test, and 404s only at runtime.
+    assertThat(context.containsBean("instanceController")).isTrue();
+    assertThat(context.containsBean("instanceService")).isTrue();
   }
 
   @Test

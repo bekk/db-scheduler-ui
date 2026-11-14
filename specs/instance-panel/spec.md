@@ -1,55 +1,32 @@
 # Instance panel — single-instance detail (implementation spec)
 
-The side drawer in the task drill-down that shows **one execution** in full: status, why
-it's broken, payload, last exception, recent history, and per-instance actions. Mockups of
-the three candidate presentation forms: `screenshots/01-side-panel.png` (docked side panel),
-`screenshots/02-slide-over.png` (slide-over overlay), `screenshots/03-popover.png` (floating
-popover).
+A slide-over drawer showing **one execution** in full: status, why it's broken, payload, last
+exception, recent history, and per-instance actions.
 
-Child of the **task-detail** drill-down (planned spec) — it opens for the row the operator
-selects in that view. Builds on `../overview-tasks-table/spec.md` (status model) and reuses
-the existing history (`LogModel`) and admin (`TaskAdminController`) plumbing.
+Eventually a child of the **task-detail** drill-down (planned spec), opening for the row the
+operator selects there. **Until that view exists it is attached to Overview rows that have
+exactly one instance.** Builds on `../overview-tasks-table/spec.md` (status model) and reuses
+the existing admin (`TaskAdminController`) plumbing.
 
-> **Focus: information + data sourcing + interaction.** Both the **visual styling** and the
-> **panel's presentation form** are open for prototyping (see *Presentation* below) — this
-> spec locks the *content* and *behaviour*, not the rendering.
+## Presentation
 
-## Interaction (presentation-agnostic)
+**Slide-over overlay** (Chakra `Drawer`), chosen by prototyping against a docked side panel and
+an anchored popover. The side panel is more comfortable above ~1100px but has to stack under the
+list below that, putting the detail off-screen on a click; the popover covers the rows it is
+anchored to, and makes one scroll container serve both the fact table and the stack trace. The
+slide-over is the only one whose behaviour does not change with viewport width.
 
-- **Selection:** selecting an instance in the task-detail list opens its detail; the
-  selected row stays highlighted.
+Visual styling follows the existing app.
+
+## Interaction
+
+- **Selection:** selecting an instance opens its detail — from the task-detail list once that
+  exists, today from a single-instance Overview row; the selected row stays highlighted.
 - **One instance at a time** — selecting another replaces the contents.
-- **Dismiss** via an explicit close / `Esc` (and, where it fits the form, re-clicking the
-  selected row).
-- **Deep-link the selection** via the URL (e.g. `?instance=<taskInstance>`) so refresh,
-  back/forward, and shared links reopen it.
-- **List context stays reachable** — exactly how depends on the presentation form (below).
-
-## Presentation — open for prototyping
-
-The *content* and *behaviour* above are fixed; **how the detail is rendered is not** — settle
-it by prototyping a few variants. The three mockup screenshots above show the **docked
-side-panel**, **slide-over**, and **popover** candidates — none is the decision yet.
-
-| Variant | Sketch | Strengths | Weaknesses |
-|---|---|---|---|
-| **Docked side panel** | list left, detail pinned right (`screenshots/01-side-panel.png`) | compare instances; list stays visible; room for stack traces | needs width; cramped on narrow screens |
-| **Slide-over overlay** | detail slides in over the list, dims the rest (`screenshots/02-slide-over.png`) | works on narrow screens; standard Chakra `Drawer` | hides the list while open |
-| **Floating / hover popover** | small panel anchored to the clicked row (`screenshots/03-popover.png`) | lightweight peek; fast scan | too small for stack traces / payload; awkward to pin |
-| **Inline row expansion** | row expands in place (today's accordion) | familiar; no new layout | pushes rows down; poor for long traces / comparing |
-| **Dedicated route/page** | navigate to `/…/instance/<id>` | best for deep links + lots of content | loses list context; heavier nav |
-
-Any variant must satisfy these invariants (the contract a prototype is judged against):
-
-- Surfaces the **full information set** below — especially a possibly-long **stack trace**,
-  without breaking layout (i.e. it scrolls).
-- **One instance at a time**; easy to **dismiss** and to **switch** to another row.
-- Selection is **deep-linkable** (URL reflects the open instance).
-- **List context stays reachable** (visible alongside, or one back-action away).
-- Does **not reorder or disturb** the list.
-- Respects **read-only** (no actions) and **history gating**.
-
-> Soft lean: docked side-panel on wide screens, slide-over on narrow — but prototype before locking.
+- **Dismiss** via an explicit close or `Esc`.
+- **Deep-link the selection** via `?task=<taskName>`, so refresh, back/forward and shared links
+  reopen it. (An instance parameter joins it when a list exists to open the panel from.)
+- **List context** returns on dismiss; the drawer never reorders or disturbs the list.
 
 ## Information shown (priority order)
 
@@ -65,10 +42,9 @@ and exception next, history and actions last.
 | 5  | **Last failure**                   | timestamp, or `never`                                                                           | `lastFailure` (per-instance) | —                |
 | 6  | **Last success**                   | timestamp, or `never`                                                                           | `lastSuccess` (per-instance) | —                |
 | 7  | **Picked / Picked by**             | currently running? on which scheduler node                                                      | `picked`, `pickedBy`         | —                |
-| 8  | **Version**                        | optimistic-lock version (per-instance)                                                          | `version` (per-instance)     | —                |
-| 9  | **Task data**                      | the payload, pretty-printed JSON; `no task data` when null                                      | `taskData`                   | —                |
-| 10 | **Last exception**                 | `exceptionClass` + `exceptionMessage` + stack trace                                             | `LogModel` (history)         | **history=true** |
-| 11 | **Recent history (this instance)** | last N runs: outcome · `timeStarted` · `durationMs` · `exceptionMessage`; `View full history →` | `LogModel` (history)         | **history=true** |
+| 8  | **Task data**                      | the payload, pretty-printed JSON; `no task data` when null                                      | `taskData`                   | —                |
+| 9  | **Last exception**                 | `exceptionClass` + `exceptionMessage` + stack trace (scrollable, monospaced)                    | `LogModel` (history)         | **history=true** |
+| 10 | **Recent history (this instance)** | last N runs: outcome · `timeStarted` · `durationMs` · `exceptionMessage`; `View full history →` | `LogModel` (history)         | **history=true** |
 
 **Status derivation (single instance):** `picked` ⇒ Running; else `consecutiveFailures > 0`
 ⇒ Failed; else Scheduled. An instance is **never dormant** (dormant is a task-level state —
@@ -77,18 +53,31 @@ past and not picked is **overdue** (warning), consistent with the Overview Next-
 
 ## Data sourcing & availability (the load-bearing part)
 
-- **Per-instance fields come from the individual `ScheduledExecution`**, which the
-  task-detail list already loads per row — **the drawer reuses that row's data**, no extra
-  scheduled-tasks fetch. db-scheduler exposes per execution: `taskInstance`, `taskData`,
-  `executionTime`, `picked`, `pickedBy`, `lastSuccess`, `lastFailure`,
-  `consecutiveFailures`, `version`.
+- **Per-instance fields come from the individual `ScheduledExecution`.** db-scheduler exposes
+  per execution: `taskInstance`, `taskData`, `executionTime`, `picked`, `pickedBy`,
+  `lastSuccess`, `lastFailure`, `consecutiveFailures`, `version`.
 - **Do not source these from the grouped `TaskModel`.** That model is group-shaped (one per
   task name, parallel arrays), and `lastFailure` / `lastHeartbeat` / `version` are
   **group-level scalars** — wrong or unavailable for a single instance.
 - **Heartbeat is not available.** db-scheduler's `ScheduledExecution` exposes no heartbeat;
-  `TaskModel.lastHeartbeat` is declared but never populated. **Omit the Heartbeat row** (the
-  mockup's `Heartbeat —` placeholder) until core surfaces it — see `../future_features.md`
-  cleanup.
+  `TaskModel.lastHeartbeat` is declared but never populated. **Omit the Heartbeat row** until
+  core surfaces it — see `../future_features.md` cleanup.
+- **Neither is version.** `ScheduledExecution` has no accessor for it either, so `TaskMapper`
+  hardcodes `TaskModel.version` to `0`. **Omit the Version row** on the same grounds.
+- **Served by its own endpoint**: `GET /db-scheduler-api/tasks/instance`,
+  alongside `/tasks/overview` and gated by the same `db-scheduler-ui.overview` flag. It does
+  **not** reuse `TaskLogic`/`LogLogic`, which are the previous generation and are slated for
+  replacement:
+  - the execution comes from `SchedulerClient#getScheduledExecution(TaskInstanceId)` — one row
+    by primary key, where `TaskLogic` loads *every* scheduled execution per call and filters in
+    Java;
+  - the log side is a new `InstanceLogRepository` — one indexed query for one instance, no
+    cache, no paging, and the stack-trace column read only for the single failed row shown;
+  - `history` comes back `null` when `db-scheduler-ui.history` is off, so the client needs no
+    config flag to know whether to render the section.
+  - `id` is optional: without it the server resolves the task's sole execution (**404** none,
+    **409** several), which is how the Overview opens the panel — its rows name a task, not an
+    instance.
 - **Exception detail and recent history come from the log table (`LogModel`)** — the
   scheduled-tasks row has no stack trace, only `consecutiveFailures` + the `lastFailure`
   timestamp. `LogModel` carries `exceptionClass`, `exceptionMessage`, `exceptionStackTrace`,
@@ -104,10 +93,10 @@ past and not picked is **overdue** (warning), consistent with the Overview Next-
 
 ## Recent history — this instance (history-gated)
 
-- Last N log rows for this instance via `GET /db-scheduler-api/logs/all` filtered by
-  `taskName` **and** `taskInstance` (exact match — `searchTermTaskInstance` / `taskId`
-  already support this). Each line: outcome (ok/failed) · `timeStarted` · `durationMs` ·
-  `exceptionMessage`.
+- Last N log rows for this instance, in the `history` block of the `GET /tasks/instance`
+  response (see *Served by its own endpoint* above) — one indexed query on
+  `(task_name, task_instance)`, not a filtered `/logs/all` page. Each line: outcome
+  (ok/failed) · `timeStarted` · `durationMs` · `exceptionMessage`.
 - `View full history →` deep-links the **History** page pre-filtered to this instance.
 - **`history=false`** ⇒ hide the whole section.
 
@@ -146,7 +135,8 @@ At the foot of the detail. All live under `TaskAdminController`, which is **abse
 - `…/ui/model/LogModel.java` — `exceptionClass` / `exceptionMessage` /
   `exceptionStackTrace` + per-run fields (exception + recent-history source).
 - `…/ui/service/LogLogic.java`, `…/ui/controller/LogController.java` —
-  `GET /logs/all`, `/logs/poll`; filter by `taskName` + `taskInstance` (exact).
+  `GET /logs/all`, `/logs/poll`. **Not used by the panel** (see *Served by its own endpoint*);
+  listed because the `View full history →` link deep-links to the History page they serve.
 - `…/ui/controller/TaskAdminController.java` — `/rerun`, `/delete` (read-only gated);
   **no `/reschedule`**. Service: `…/ui/service/TaskLogic.java` (`runTaskNow`, `deleteTask`).
 - `…/ui/controller/ConfigController.java` — `/config` history + read-only flags.
@@ -156,9 +146,8 @@ At the foot of the detail. All live under `TaskAdminController`, which is **abse
   accordion this drawer **replaces**; `TaskRunButton` (rerun) + `DotButton` (delete) are the
   existing action controls.
 - `src/utils/dateFormatText.ts` — relative/absolute timestamps.
-- New component: the instance-detail component (form per *Presentation* — e.g. Chakra
-  `Drawer` for a side/slide-over panel, a `Popover`, or a dedicated route) replacing the
-  inline accordion expansion.
+- `src/components/overview/InstanceDrawer.tsx` — the drawer itself, with
+  `src/hooks/useInstanceDetail.ts` and `src/hooks/useSelectedInstance.ts`.
 
 ## Out of scope
 
