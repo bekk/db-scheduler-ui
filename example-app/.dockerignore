@@ -1,0 +1,4 @@
+*
+!target/example-app-*.jar
+target/*-javadoc.jar
+target/*-sources.jar
