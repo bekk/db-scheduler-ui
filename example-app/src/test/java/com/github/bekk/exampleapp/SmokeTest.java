@@ -3,8 +3,11 @@ package com.github.bekk.exampleapp;
 import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.SEND_WELCOME_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
+import no.bekk.dbscheduler.ui.model.ExecutionPage;
 import no.bekk.dbscheduler.ui.model.GetTasksResponse;
 import no.bekk.dbscheduler.ui.model.OverviewTask;
+import no.bekk.dbscheduler.ui.model.RerunFailedResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,8 @@ class SmokeTest {
     // and forgotten in the other compiles, passes every other test, and 404s only at runtime.
     assertThat(context.containsBean("instanceController")).isTrue();
     assertThat(context.containsBean("instanceService")).isTrue();
+    assertThat(context.containsBean("executionPager")).isTrue();
+    assertThat(context.containsBean("executionAdminController")).isTrue();
   }
 
   @Test
@@ -82,6 +87,43 @@ class SmokeTest {
     assertThat(result.getBody()).isNotNull();
     assertThat(result.getBody())
         .anyMatch(task -> task.taskName().equals(SEND_WELCOME_EMAIL.getTaskName()));
+  }
+
+  @Test
+  void testGetExecutionsReturnsPage() {
+    ResponseEntity<ExecutionPage> result =
+        this.restTemplate.getForEntity(
+            baseUrl
+                + "/db-scheduler-api/tasks/executions?taskName=%s&status=all"
+                    .formatted(SEND_WELCOME_EMAIL.getTaskName()),
+            ExecutionPage.class);
+
+    assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(result.getBody()).isNotNull();
+    assertThat(result.getBody().items()).isNotEmpty();
+  }
+
+  @Test
+  void testGetExecutionsRejectsUnknownStatus() {
+    ResponseEntity<String> result =
+        this.restTemplate.getForEntity(
+            baseUrl + "/db-scheduler-api/tasks/executions?taskName=x&status=nope", String.class);
+
+    assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  void testRerunFailedReturnsCount() {
+    ResponseEntity<RerunFailedResponse> result =
+        restTemplate.postForEntity(
+            baseUrl
+                + "/db-scheduler-api/tasks/rerunFailed?taskName=%s&cutoff=%s"
+                    .formatted(SEND_WELCOME_EMAIL.getTaskName(), Instant.now()),
+            null,
+            RerunFailedResponse.class);
+
+    assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(result.getBody()).isNotNull();
   }
 
   @Test
