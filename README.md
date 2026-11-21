@@ -109,6 +109,15 @@ for full attribution.
 > **Migrating from `io.rocketbase.extension:db-scheduler-log-spring-boot-starter`:**
 > remove that dependency and rename `db-scheduler-log.*` properties to `db-scheduler-ui.log.*`.
 
+## Recommended index
+
+Per-task views page through one task's executions in execution-time order. db-scheduler's default
+schema has no index for that, so on large tables add one:
+
+```sql
+CREATE INDEX st_task_time_idx ON scheduled_tasks (task_name, execution_time, task_instance);
+```
+
 ## How it works
 
 db-scheduler-ui adds a REST-api package that has a bundled frontend application.
