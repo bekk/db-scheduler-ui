@@ -44,7 +44,7 @@ import { useSelectedInstance } from 'src/hooks/useSelectedInstance';
 import { overdueColor } from 'src/utils/overdue';
 import { applyOverviewFilters } from 'src/utils/overviewFilters';
 import { summarizeOverview } from 'src/utils/overviewSummary';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   absoluteTitle,
   dotColor,
@@ -176,7 +176,8 @@ const OverviewRow: React.FC<{
   onOpenInstance: (taskName: string) => void;
 }> = ({ task, onOpenInstance }) => {
   const navigate = useNavigate();
-  const drillDownTarget = `/scheduled/${encodeURIComponent(task.taskName)}`;
+  const location = useLocation();
+  const drillDownTarget = `/tasks/${encodeURIComponent(task.taskName)}`;
   // Single-instance rows open the instance directly; the rest drill down to the list.
   const opensInstance = task.instanceCount === 1;
 
@@ -184,7 +185,10 @@ const OverviewRow: React.FC<{
     if (opensInstance) {
       onOpenInstance(task.taskName);
     } else if (task.instanceCount > 0) {
-      navigate(drillDownTarget);
+      // Hands the task page the Overview's URL, filters included, for its breadcrumb.
+      navigate(drillDownTarget, {
+        state: { from: location.pathname + location.search },
+      });
     }
   };
 
