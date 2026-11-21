@@ -105,6 +105,31 @@ schema — nothing replays them for a database that already exists. Without the 
 the panel scans every log row belonging to the task. Needs a line in the release notes, or a
 migration path if one is ever added.
 
+## Too-old db-scheduler stops the host application from starting
+
+Nothing enforces the README's minimum db-scheduler version for an application that uses the UI.
+The published pom only *suggests* 16.12.0: Maven's nearest-wins resolution lets an application's
+own db-scheduler or BOM version override it silently.
+
+The Overview needs 16.12.0 (`SchedulerClient#getScheduledExecutionsSummaryByTask`, `TaskSummary`).
+On an older version, the failure depends on the flag. Tested by running the example app with
+15.6.0 jars:
+
+- `overview=false`: the app starts, and the legacy UI works.
+- `overview=true`: **the host application fails to start**. Spring introspects
+  `OverviewService` while creating the bean and throws
+  `NoClassDefFoundError: com/github/kagkarlsson/scheduler/TaskSummary`. Nothing in the error
+  mentions versions.
+
+This is harmless while the flag is off by default and undocumented. Before the flag goes
+default-on, consider a version check in both starters' `UiApiAutoConfiguration`: when the
+overview is enabled, verify that the required db-scheduler API is on the classpath. If it is
+missing, either fail with "db-scheduler-ui overview requires db-scheduler ≥ X", or log that and
+leave the Overview off. The task-detail page adds a second such API
+(`ScheduledExecutionsFilter.withFailing`, `task-detail/spec.md`), so one check that names the
+minimum version is better than one check per class. Maven's enforcer plugin cannot help here: it
+runs only in this project's build, not in the applications that use it.
+
 ## Reschedule has no backend
 
 `TaskAdminController` has rerun / rerunGroup / delete and nothing else, so the instance panel
