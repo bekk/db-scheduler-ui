@@ -32,46 +32,33 @@ import { useQuery } from '@tanstack/react-query';
 import { RepeatIcon } from 'src/assets/icons';
 import { InstanceDrawer } from 'src/components/overview/InstanceDrawer';
 import { SummaryStrip } from 'src/components/overview/SummaryStrip';
-import { OverviewTask, OverviewTaskStatus } from 'src/models/OverviewTask';
+import { OverviewTask } from 'src/models/OverviewTask';
 import {
   getOverviewTasks,
   OVERVIEW_TASKS_QUERY_KEY,
 } from 'src/services/getOverviewTasks';
 import colors from 'src/styles/colors';
-import { dateFormatText } from 'src/utils/dateFormatText';
 import { useAutoRefresh } from 'src/hooks/useAutoRefresh';
 import { useOverviewFilters } from 'src/hooks/useOverviewFilters';
 import { useSelectedInstance } from 'src/hooks/useSelectedInstance';
-import { isOverdue as executionOverdue, overdueColor } from 'src/utils/overdue';
+import { overdueColor } from 'src/utils/overdue';
 import { applyOverviewFilters } from 'src/utils/overviewFilters';
-import { instancesText, summarizeOverview } from 'src/utils/overviewSummary';
-import {
-  formatDistanceStrict,
-  formatDistanceToNowStrict,
-  isBefore,
-} from 'date-fns';
+import { summarizeOverview } from 'src/utils/overviewSummary';
 import { useNavigate } from 'react-router-dom';
-
-const statusText: Record<OverviewTaskStatus, string> = {
-  FAILING: 'failing',
-  RUNNING: 'running',
-  SCHEDULED: 'scheduled',
-  DORMANT: 'dormant',
-};
-
-const statusColors: Record<OverviewTaskStatus, string> = {
-  FAILING: colors.failed['200'],
-  RUNNING: colors.running['300'],
-  SCHEDULED: colors.success['200'],
-  DORMANT: colors.primary['400'],
-};
+import {
+  absoluteTitle,
+  dotColor,
+  lastRunText,
+  nextRunText,
+  overdue,
+  subLine,
+} from 'src/utils/overviewWording';
 
 // Matches the app-wide default in App.tsx; named here because this query overrides it.
 const AUTO_REFRESH_MS = 2000;
 
 export const OverviewPage: React.FC = () => {
-  const { enabled: autoRefresh, setEnabled: setAutoRefresh } =
-    useAutoRefresh();
+  const { enabled: autoRefresh, setEnabled: setAutoRefresh } = useAutoRefresh();
   const {
     data = [],
     isLoading,
@@ -157,10 +144,6 @@ export const OverviewPage: React.FC = () => {
     </Box>
   );
 };
-
-// Adapts the shared rule in utils/overdue to the aggregate shape of an overview row.
-const overdue = (task: OverviewTask) =>
-  executionOverdue(task.nextExecutionTime, task.counts.running > 0);
 
 const columnLabelSx = {
   textTransform: 'uppercase' as const,
@@ -341,124 +324,6 @@ function proximityOpacity(task: OverviewTask): number | null {
   return Math.min(1, Math.max(0.15, 1 - (Math.log10(secondsUntil) - 1) / 4));
 }
 
-function subLine(task: OverviewTask) {
-  if (task.instanceCount > 1 && task.recurring !== true) {
-    return (
-      <HStack spacing={1} flexWrap="wrap">
-        <Text as="span">{instancesText(task.instanceCount)}</Text>
-        {countPart(task.counts.failing, 'failing', colors.failed['200'])}
-        {countPart(task.counts.running, 'running', colors.running['300'])}
-        {countPart(task.counts.scheduled, 'scheduled', colors.primary['500'])}
-      </HStack>
-    );
-  }
-
-  const duration = statusDuration(task);
-  const parts: string[] = [];
-
-  // Spells out what the repeat icon marks. Only recurring is stated: a null `recurring`
-  // means the server could not classify the task, not that it is one-time.
-  if (task.recurring === true) {
-    parts.push('recurring');
-  }
-
-  if (task.worstStatus !== 'DORMANT') {
-    const base = statusText[task.worstStatus];
-    parts.push(duration ? `${base} for ${duration}` : base);
-  }
-
-  if (task.recurring !== true) {
-    parts.push(instancesText(task.instanceCount));
-  }
-
-  return parts.join(' · ');
-}
-
-function statusDuration(task: OverviewTask): string | null {
-  if (task.worstStatus === 'FAILING' && task.lastSuccess) {
-    return formatDistanceStrict(new Date(task.lastSuccess), new Date());
-  }
-
-  if (
-    task.worstStatus === 'RUNNING' &&
-    task.instanceCount === 1 &&
-    task.nextExecutionTime
-  ) {
-    return formatDistanceStrict(new Date(task.nextExecutionTime), new Date());
-  }
-
-  return null;
-}
-
-function nextRunText(task: OverviewTask): string {
-  if (task.worstStatus === 'DORMANT' || !task.nextExecutionTime) {
-    return '-';
-  }
-
-  if (task.counts.running > 0) {
-    return 'running now';
-  }
-
-  const date = new Date(task.nextExecutionTime);
-  const distance = formatDistanceToNowStrict(date);
-  return isBefore(date, new Date()) ? `due ${distance} ago` : `in ${distance}`;
-}
-
-function lastRunText(task: OverviewTask) {
-  if (task.worstStatus === 'DORMANT') {
-    return <Text color={colors.primary['400']}>-</Text>;
-  }
-
-  const lastSuccess = parseDate(task.lastSuccess);
-  const lastFailure = parseDate(task.lastFailure);
-
-  if (!lastSuccess && !lastFailure) {
-    return <Text color={colors.primary['400']}>-</Text>;
-  }
-
-  const lastWasFailure =
-    lastFailure !== null && (lastSuccess === null || lastFailure > lastSuccess);
-  const date = lastWasFailure ? lastFailure : lastSuccess;
-
-  if (!date) {
-    return <Text color={colors.primary['400']}>-</Text>;
-  }
-
-  return (
-    <Text
-      title={dateFormatText(date)}
-      color={lastWasFailure ? colors.failed['200'] : colors.success['200']}
-      fontWeight={lastWasFailure ? 'semibold' : 'normal'}
-    >
-      {lastWasFailure ? 'last failure' : 'last success'}{' '}
-      {formatDistanceToNowStrict(date, { addSuffix: true })}
-    </Text>
-  );
-}
-
-function parseDate(value: string | null): Date | null {
-  return value ? new Date(value) : null;
-}
-
-function absoluteTitle(value: string | null): string | undefined {
-  return value ? dateFormatText(new Date(value)) : undefined;
-}
-
-function countPart(count: number, label: string, color: string) {
-  if (count === 0) {
-    return null;
-  }
-
-  return (
-    <>
-      <Text as="span">·</Text>
-      <Text as="span" color={color} fontWeight="semibold">
-        {count} {label}
-      </Text>
-    </>
-  );
-}
-
 function rowBackground(task: OverviewTask): string | undefined {
   if (task.worstStatus === 'FAILING') {
     return '#fcf3f3';
@@ -496,16 +361,6 @@ function rowBorderColor(task: OverviewTask): string {
     return '#eceef0';
   }
   return colors.primary['300'];
-}
-
-function dotColor(status: OverviewTaskStatus): string {
-  if (status === 'DORMANT') {
-    return '#cfd6dc';
-  }
-  if (status === 'SCHEDULED') {
-    return colors.primary['400'];
-  }
-  return statusColors[status];
 }
 
 function rowSx(task: OverviewTask, clickable = false) {
