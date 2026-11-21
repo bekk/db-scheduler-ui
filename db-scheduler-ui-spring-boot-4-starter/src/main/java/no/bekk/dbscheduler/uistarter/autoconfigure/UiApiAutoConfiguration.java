@@ -18,6 +18,7 @@ import static no.bekk.dbscheduler.uistarter.config.DbSchedulerUiUtil.normalizePa
 
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
+import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerOverrides;
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import com.github.kagkarlsson.scheduler.task.Task;
 import java.io.IOException;
@@ -111,9 +112,12 @@ public class UiApiAutoConfiguration {
       matchIfMissing = false)
   InstanceLogRepository instanceLogRepository(
       DataSource dataSource,
-      DbSchedulerCustomizer customizer,
+      ObjectProvider<DbSchedulerOverrides> overrides,
+      ObjectProvider<DbSchedulerCustomizer> customizer,
       @Value("${db-scheduler-ui.log.table-name:scheduled_execution_logs}") String logTableName) {
-    return new InstanceLogRepository(customizer.dataSource().orElse(dataSource), logTableName);
+    SchedulerSettings settings =
+        SchedulerSettings.resolve(overrides.getIfAvailable(), customizer.getIfAvailable());
+    return new InstanceLogRepository(settings.dataSource().orElse(dataSource), logTableName);
   }
 
   @Bean
@@ -151,13 +155,16 @@ public class UiApiAutoConfiguration {
   LogLogic logLogic(
       DataSource dataSource,
       Caching caching,
-      DbSchedulerCustomizer customizer,
+      ObjectProvider<DbSchedulerOverrides> overrides,
+      ObjectProvider<DbSchedulerCustomizer> customizer,
       DbSchedulerUiProperties properties,
       @Value("${db-scheduler-ui.log.table-name:scheduled_execution_logs}") String logTableName,
       @Value("${db-scheduler-ui.log-limit:0}") int logLimit) {
+    SchedulerSettings settings =
+        SchedulerSettings.resolve(overrides.getIfAvailable(), customizer.getIfAvailable());
     return new LogLogic(
-        customizer.dataSource().orElse(dataSource),
-        customizer.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
+        settings.dataSource().orElse(dataSource),
+        settings.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
         caching,
         properties.taskData(),
         logTableName,
