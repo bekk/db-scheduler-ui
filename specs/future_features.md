@@ -136,12 +136,6 @@ runs only in this project's build, not in the applications that use it.
 ships without a Reschedule action. Reviving it needs `POST /tasks/reschedule` over
 `SchedulerClient.reschedule`, plus a time picker in the panel.
 
-## Rerun silently clears the failure history
-
-db-scheduler's `reschedule` resets execution state, so pressing **Rerun** wipes `lastSuccess`,
-`lastFailure` and `consecutiveFailures`. The instance panel puts those fields next to the
-button that destroys them — the copy should say so.
-
 ## Retire the legacy task and log endpoints
 
 `/tasks/overview` and `/tasks/instance` set the pattern: **new endpoints for the new UI, old

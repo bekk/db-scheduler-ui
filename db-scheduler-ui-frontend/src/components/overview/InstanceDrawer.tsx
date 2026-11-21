@@ -32,7 +32,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import JsonViewer from 'src/components/common/JsonViewer';
 import { useInstanceDetail } from 'src/hooks/useInstanceDetail';
 import {
@@ -49,8 +49,12 @@ import { getReadonly } from 'src/utils/config';
 import { formatDistanceToNowStrict } from 'date-fns';
 
 interface InstanceDrawerProps {
-  /** The task whose sole execution to show; null keeps the drawer closed. */
+  /** The task whose execution to show; null keeps the drawer closed. */
   taskName: string | null;
+  /** The execution to show; when absent the task's sole execution is used. */
+  instanceId?: string | null;
+  /** Link to the task page, for drawers opened from somewhere other than that page. */
+  showTaskPageLink?: boolean;
   onClose: () => void;
   /** Refresh the overview behind the drawer after an action changes the execution. */
   onChanged: () => void;
@@ -71,10 +75,12 @@ const statusColor: Record<InstanceStatus, string> = {
 /** Slide-over detail for a single execution. See `specs/instance-panel/spec.md`. */
 export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
   taskName,
+  instanceId,
+  showTaskPageLink = false,
   onClose,
   onChanged,
 }) => {
-  const { instance, status, refetch } = useInstanceDetail(taskName);
+  const { instance, status, refetch } = useInstanceDetail(taskName, instanceId);
   // react-query keeps `data` from the last successful fetch around on a failed poll, so gate on
   // `status` rather than `instance` — otherwise the header keeps a stale badge after the body
   // has already moved on to a gone/ambiguous/error message.
@@ -109,6 +115,17 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
             >
               {taskName}
             </Text>
+          )}
+          {showTaskPageLink && taskName && (
+            <Link
+              as={RouterLink}
+              to={`/tasks/${encodeURIComponent(taskName)}`}
+              fontSize="xs"
+              fontWeight="normal"
+              color={colors.running['300']}
+            >
+              Open task page →
+            </Link>
           )}
         </DrawerHeader>
 
@@ -448,10 +465,16 @@ const Actions: React.FC<{
       >
         Delete
       </Button>
-      {instance.picked && (
+      {instance.picked ? (
         <Text fontSize="xs" color={colors.primary['400']}>
           Disabled while running
         </Text>
+      ) : (
+        instance.lastFailure && (
+          <Text fontSize="xs" color={colors.primary['400']}>
+            Rerunning resets the failure count and last-failure time.
+          </Text>
+        )
       )}
       {/* Deletion cannot be undone; spec.md marks it destructive and requires confirmation. */}
       <AlertDialog

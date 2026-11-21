@@ -35,8 +35,12 @@ export class InstanceLookupError extends Error {
  */
 export const getInstanceDetail = async (
   taskName: string,
+  id?: string,
 ): Promise<InstanceDetail> => {
   const queryParams = new URLSearchParams({ taskName });
+  if (id) {
+    queryParams.set('id', id);
+  }
 
   const response = await fetch(
     `${API_BASE_URL}/tasks/instance?${queryParams}`,

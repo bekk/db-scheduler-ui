@@ -26,8 +26,18 @@ import {
   Switch,
   Text,
 } from '@chakra-ui/react';
-import { useQuery } from '@tanstack/react-query';
-import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  Link as RouterLink,
+  useLocation,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
+import { InstanceDrawer } from 'src/components/overview/InstanceDrawer';
+import { GoToInstance } from 'src/components/task/GoToInstance';
+import { RerunFailedButton } from 'src/components/task/RerunFailedButton';
+import { TASK_EXECUTIONS_QUERY_KEY } from 'src/services/getTaskExecutions';
+import { getShowHistory } from 'src/utils/config';
 import { ExecutionTable } from 'src/components/task/ExecutionTable';
 import { StartFromControl } from 'src/components/task/StartFromControl';
 import { StatusTabs } from 'src/components/task/StatusTabs';
@@ -64,6 +74,8 @@ const emptyText: Record<ExecutionStatusFilter, string> = {
 export const TaskPage: React.FC = () => {
   const { taskName = '' } = useParams<{ taskName: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { enabled: autoRefresh, setEnabled: setAutoRefresh } = useAutoRefresh();
   const params = useTaskPageParams();
   const refetchInterval = autoRefresh ? AUTO_REFRESH_MS : false;
@@ -83,6 +95,11 @@ export const TaskPage: React.FC = () => {
     refetchInterval,
   });
   const rows = executions.data?.pages.flatMap((page) => page.items) ?? [];
+
+  const refresh = () => {
+    void summary.refetch();
+    void queryClient.invalidateQueries([TASK_EXECUTIONS_QUERY_KEY, taskName]);
+  };
 
   const backTo: string =
     (location.state as { from?: string } | null)?.from ?? '/overview';
@@ -122,24 +139,32 @@ export const TaskPage: React.FC = () => {
         <Stack spacing={4}>
           <HStack justify="space-between" align="start">
             <Header task={task} />
-            <FormControl display="flex" alignItems="center" width="auto">
-              <FormLabel
-                htmlFor="auto-refresh"
-                fontSize="sm"
-                color={colors.primary['500']}
-                mb={0}
-                mr={2}
-              >
-                Auto-refresh
-              </FormLabel>
-              <Switch
-                id="auto-refresh"
-                size="sm"
-                isChecked={autoRefresh}
-                onChange={(e) => setAutoRefresh(e.target.checked)}
+            <HStack spacing={4}>
+              <RerunFailedButton
+                taskName={taskName}
+                failing={task.counts.failing}
+                onDone={refresh}
               />
-            </FormControl>
+              <FormControl display="flex" alignItems="center" width="auto">
+                <FormLabel
+                  htmlFor="auto-refresh"
+                  fontSize="sm"
+                  color={colors.primary['500']}
+                  mb={0}
+                  mr={2}
+                >
+                  Auto-refresh
+                </FormLabel>
+                <Switch
+                  id="auto-refresh"
+                  size="sm"
+                  isChecked={autoRefresh}
+                  onChange={(e) => setAutoRefresh(e.target.checked)}
+                />
+              </FormControl>
+            </HStack>
           </HStack>
+          <GoToInstance onOpen={params.openInstance} />
 
           <Flex wrap="wrap" gap={3} justify="space-between" align="center">
             <StatusTabs
@@ -181,8 +206,25 @@ export const TaskPage: React.FC = () => {
               </Button>
             </Flex>
           )}
+          {getShowHistory() && (
+            <Button
+              variant="link"
+              size="sm"
+              alignSelf="start"
+              color={colors.running['300']}
+              onClick={() => navigate('/history/all', { state: { taskName } })}
+            >
+              View history for this task →
+            </Button>
+          )}
         </Stack>
       )}
+      <InstanceDrawer
+        taskName={params.instance ? taskName : null}
+        instanceId={params.instance}
+        onClose={params.closeInstance}
+        onChanged={refresh}
+      />
     </Box>
   );
 };

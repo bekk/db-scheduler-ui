@@ -138,6 +138,7 @@ export const OverviewPage: React.FC = () => {
       </TableContainer>
       <InstanceDrawer
         taskName={selected}
+        showTaskPageLink
         onClose={clear}
         onChanged={() => void refetch()}
       />
