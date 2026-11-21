@@ -38,9 +38,8 @@ class FailedRerunnerTest {
   }
 
   @Test
-  void rerun_onlyFailingUnpickedBeforeCutoff() {
+  void rerun_onlyFailingAndUnpicked() {
     failing("failing-before", NOW.minus(Duration.ofHours(1)));
-    failing("failing-after", NOW.plus(Duration.ofHours(1)));
     schedule("scheduled-before", NOW.minus(Duration.ofHours(1)));
     failing("picked-failing", NOW.minus(Duration.ofHours(1)));
     ScheduledTasksTable.markPicked(dataSource, TASK, "picked-failing");
@@ -49,9 +48,35 @@ class FailedRerunnerTest {
 
     assertThat(rescheduled).isEqualTo(1);
     assertThat(executionTime("failing-before")).isEqualTo(NOW);
-    assertThat(executionTime("failing-after")).isEqualTo(NOW.plus(Duration.ofHours(1)));
     assertThat(executionTime("scheduled-before")).isEqualTo(NOW.minus(Duration.ofHours(1)));
     assertThat(executionTime("picked-failing")).isEqualTo(NOW.minus(Duration.ofHours(1)));
+  }
+
+  @Test
+  void rerun_includesFailuresAwaitingALaterRetry() {
+    // A failure handler typically moves the execution to a later retry.
+    failing("retry-later", NOW.plus(Duration.ofMinutes(30)));
+
+    assertThat(rerunner(client, 3).rerunFailed(TASK, CUTOFF)).isEqualTo(1);
+    assertThat(executionTime("retry-later")).isEqualTo(NOW);
+  }
+
+  @Test
+  void rerun_skipsFailuresAfterTheCutoff() {
+    failing("failed-after-click", NOW.minus(Duration.ofHours(1)));
+    setLastFailure("failed-after-click", CUTOFF.plusSeconds(5));
+
+    assertThat(rerunner(client, 3).rerunFailed(TASK, CUTOFF)).isZero();
+  }
+
+  @Test
+  void rerun_manyAcrossBatches_eachCountedOnce() {
+    for (int i = 0; i < 8; i++) {
+      failing("past-" + i, NOW.minus(Duration.ofMinutes(10 + i)));
+      failing("future-" + i, NOW.plus(Duration.ofMinutes(10 + i)));
+    }
+
+    assertThat(rerunner(client, 3).rerunFailed(TASK, CUTOFF)).isEqualTo(16);
   }
 
   @Test
@@ -107,6 +132,16 @@ class FailedRerunnerTest {
   private void failing(String id, Instant time) {
     schedule(id, time);
     ScheduledTasksTable.markFailing(dataSource, TASK, id, 2);
+    setLastFailure(id, CUTOFF.minus(Duration.ofMinutes(1)));
+  }
+
+  private void setLastFailure(String id, Instant lastFailure) {
+    new JdbcTemplate(dataSource)
+        .update(
+            "update scheduled_tasks set last_failure = ? where task_name = ? and task_instance = ?",
+            java.sql.Timestamp.from(lastFailure),
+            TASK,
+            id);
   }
 
   private Instant executionTime(String id) {

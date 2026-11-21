@@ -16,8 +16,8 @@ const API_BASE_URL: string =
   window.location.origin + (window.CONTEXT_PATH || '') + '/db-scheduler-api';
 
 /**
- * Reruns the task's failing executions whose execution time is before `cutoff`. Passing the
- * moment the user confirmed keeps an execution the call itself reran from being picked up again.
+ * Reruns the task's failing executions whose last failure is before `cutoff`. Passing the moment
+ * the user confirmed keeps an execution that fails again after the rerun from being rerun twice.
  */
 export const rerunFailed = async (
   taskName: string,

@@ -175,9 +175,11 @@ section is **not** part of this spec; decide that once the page is in use.
 - The confirm dialog says it targets **every failing instance of the task, not only the loaded
   rows**, and that a rerun **resets each instance's failure count and last-failure time**.
 - **No eternal loop.** The client sends the moment the dialog was confirmed as `cutoff`. The
-  server reruns only instances that are failing, not picked, **and have `execution_time <
-  cutoff`**. A rerun moves `execution_time` to now (≥ cutoff), so an instance rerun by this
-  action, or one that fails again straight away, is never picked up a second time by it.
+  server reruns only instances that are failing, not picked, **and whose `last_failure` is
+  before the cutoff**. An instance that fails again after the rerun has a later
+  `last_failure`, so this action never picks it up a second time. (Not `execution_time`: a
+  failure handler usually moves a failed execution to a *later* retry, so filtering on
+  execution time would skip most failing instances.)
 - It applies to the whole task regardless of the active tab or `from`.
 - The response returns how many instances were rescheduled (some may have been picked or
   finished meanwhile). Toast it, then refetch the summary and the list.
@@ -230,12 +232,11 @@ On `TaskAdminController`, so it is absent under `read-only=true`.
 ?taskName=<required>&cutoff=<instant, required>   →   { rescheduled: int }
 ```
 
-Pages with `withPicked(false).withFailing(true)` in batches (e.g. 500), bounded by the cutoff:
-`after(<previous batch's last row> ?? <epoch sentinel>)` + `before(cutoff, "")`, so the range
-stays ascending (see the Overdue ordering trap).
-Each row goes through `reschedule(instance, now)`, skipping rows that were picked or are gone
-(`reschedule` returns false). The legacy `/tasks/rerunGroup` stays untouched for the Scheduled
-page.
+Pages `withPicked(false).withFailing(true)` in ascending batches (e.g. 500), keeping rows whose
+`last_failure` is before the cutoff. Each goes through `tryReschedule(instance, rerunAt)`, with
+`rerunAt` taken once per call. That skips rows picked or gone meanwhile; it returns false rather
+than throwing. Rows already at `rerunAt` were moved there by this call and are skipped when the walk
+reaches them again. The legacy `/tasks/rerunGroup` stays untouched for the Scheduled page.
 
 ### `/tasks/instance`
 
@@ -270,7 +271,8 @@ the Overview.
   skipped or duplicated across pages, including equal `execution_time`); `from`; the Overdue
   ascending range; `limit` clamp; preview truncation and hiding; picked rows present in All and
   Running.
-- `rerunFailed`: only failing, unpicked and before cutoff; an instance rerun during the call is
+- `rerunFailed`: only failing, unpicked, last failure before the cutoff, including failures
+  waiting for a later retry; an instance rerun during the call is
   not rerun twice; the read-only context has no endpoint.
 - Smoke test in `example-app` for both endpoints; flag-off test.
 - Example data: `example-app` needs a task with enough instances (hundreds, a handful failing,

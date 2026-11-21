@@ -24,9 +24,9 @@ import java.util.List;
 /**
  * Reruns a task's failing executions, batch by batch, without loading them all.
  *
- * <p>Only executions scheduled before the cutoff are touched. A rerun moves an execution to now,
- * which is not before the cutoff, so one call never reruns the same execution twice, even if it
- * fails again while the call is still running.
+ * <p>Only executions whose last failure is before the cutoff are touched. An execution this rerun
+ * fails again gets a later last failure, so one call never reruns the same execution twice; nor
+ * does it count one twice when the rerun moves it further along the walk.
  */
 public class FailedRerunner {
 
@@ -47,8 +47,7 @@ public class FailedRerunner {
    *     skipped
    */
   public int rerunFailed(String taskName, Instant cutoff) {
-    ExecutionTimeAndId before = new ExecutionTimeAndId(cutoff, "");
-    // Both bounds keep the range ascending; db-scheduler sorts descending with only an upper one.
+    Instant rerunAt = clock.instant();
     ExecutionTimeAndId after = ExecutionPager.START;
     int rescheduled = 0;
 
@@ -61,10 +60,15 @@ public class FailedRerunner {
                   .withPicked(false)
                   .withFailing(true)
                   .after(after)
-                  .before(before)
                   .limit(batchSize));
       for (ScheduledExecution<Object> execution : batch) {
-        if (scheduler.tryReschedule(execution.getTaskInstance(), clock.instant())) {
+        boolean failedBeforeCutoff =
+            execution.getLastFailure() != null && execution.getLastFailure().isBefore(cutoff);
+        // Moved here by this call already, and reached again further along the walk.
+        boolean alreadyRerun = execution.getExecutionTime().equals(rerunAt);
+        if (failedBeforeCutoff
+            && !alreadyRerun
+            && scheduler.tryReschedule(execution.getTaskInstance(), rerunAt)) {
           rescheduled++;
         }
       }

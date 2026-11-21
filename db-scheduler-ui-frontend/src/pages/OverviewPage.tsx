@@ -236,7 +236,7 @@ const OverviewRow: React.FC<{
       </Td>
       <Td>{lastRunText(task)}</Td>
       <Td textAlign="right" width="1%" whiteSpace="nowrap">
-        {opensInstance && (
+        {task.instanceCount > 0 && (
           <Button
             size="xs"
             variant="ghost"

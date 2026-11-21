@@ -35,8 +35,8 @@ public class ExecutionAdminController {
   }
 
   /**
-   * @param cutoff only executions scheduled before this are rerun; the client sends the moment the
-   *     user confirmed
+   * @param cutoff only executions whose last failure is before this are rerun; the client sends the
+   *     moment the user confirmed
    */
   @PostMapping("/rerunFailed")
   public RerunFailedResponse rerunFailed(
