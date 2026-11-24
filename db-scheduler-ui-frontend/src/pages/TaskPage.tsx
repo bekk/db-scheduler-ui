@@ -56,7 +56,6 @@ import {
   dotColor,
   lastRunText,
   nextRunText,
-  subLine,
 } from 'src/utils/overviewWording';
 
 // Same interval as the Overview, so the two pages refresh alike.
@@ -105,7 +104,8 @@ export const TaskPage: React.FC = () => {
     (location.state as { from?: string } | null)?.from ?? '/overview';
 
   return (
-    <Box pt={6} pb={24}>
+    // Capped so the row columns stay together on wide screens.
+    <Box pt={6} pb={24} maxW="78rem" mx="auto">
       <Breadcrumb fontSize="sm" color={colors.primary['400']} mb={2}>
         <BreadcrumbItem>
           <BreadcrumbLink as={RouterLink} to={backTo}>
@@ -136,43 +136,39 @@ export const TaskPage: React.FC = () => {
       )}
 
       {task && (
-        <Stack spacing={4}>
+        <Stack spacing={5}>
           <HStack justify="space-between" align="start">
             <Header task={task} />
-            <HStack spacing={4}>
-              <RerunFailedButton
-                taskName={taskName}
-                failing={task.counts.failing}
-                onDone={refresh}
+            <FormControl display="flex" alignItems="center" width="auto" pt={2}>
+              <FormLabel
+                htmlFor="auto-refresh"
+                fontSize="sm"
+                color={colors.primary['500']}
+                mb={0}
+                mr={2}
+              >
+                Auto-refresh
+              </FormLabel>
+              <Switch
+                id="auto-refresh"
+                size="sm"
+                isChecked={autoRefresh}
+                onChange={(e) => setAutoRefresh(e.target.checked)}
               />
-              <FormControl display="flex" alignItems="center" width="auto">
-                <FormLabel
-                  htmlFor="auto-refresh"
-                  fontSize="sm"
-                  color={colors.primary['500']}
-                  mb={0}
-                  mr={2}
-                >
-                  Auto-refresh
-                </FormLabel>
-                <Switch
-                  id="auto-refresh"
-                  size="sm"
-                  isChecked={autoRefresh}
-                  onChange={(e) => setAutoRefresh(e.target.checked)}
-                />
-              </FormControl>
-            </HStack>
+            </FormControl>
           </HStack>
-          <GoToInstance onOpen={params.openInstance} />
 
-          <Flex wrap="wrap" gap={3} justify="space-between" align="center">
-            <StatusTabs
-              task={task}
-              status={status}
-              onChange={params.setStatus}
-            />
+          <StatusTabs task={task} status={status} onChange={params.setStatus} />
+
+          <Flex wrap="wrap" gap={3} align="center">
+            <GoToInstance onOpen={params.openInstance} />
             <StartFromControl from={params.from} onChange={params.setFrom} />
+            <Box flex={1} />
+            <RerunFailedButton
+              taskName={taskName}
+              failing={task.counts.failing}
+              onDone={refresh}
+            />
           </Flex>
 
           {executions.isError && (
@@ -186,24 +182,30 @@ export const TaskPage: React.FC = () => {
               rows={rows}
               selected={params.instance}
               onSelect={params.openInstance}
+              hideStatus={status !== 'all'}
+              nextRunLabel={status === 'failing' ? 'Retry' : 'Next run'}
             />
           )}
           {rows.length > 0 && (
-            <Flex justify="center">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => void executions.fetchNextPage()}
-                isDisabled={
-                  !executions.hasNextPage || executions.isFetchingNextPage
-                }
-              >
-                {executions.isFetchingNextPage
-                  ? 'Loading…'
-                  : executions.hasNextPage
-                  ? 'Load more'
-                  : 'Nothing more to load'}
-              </Button>
+            <Flex justify="center" align="center" gap={3}>
+              {executions.hasNextPage && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  bgColor="white"
+                  onClick={() => void executions.fetchNextPage()}
+                  isLoading={executions.isFetchingNextPage}
+                >
+                  Load 50 more
+                </Button>
+              )}
+              <Text fontSize="sm" color={colors.primary['400']}>
+                {shownText(
+                  rows.length,
+                  tabCount(task, status),
+                  !!executions.hasNextPage,
+                )}
+              </Text>
             </Flex>
           )}
           {getShowHistory() && (
@@ -243,15 +245,51 @@ const Header: React.FC<{ task: OverviewTask }> = ({ task }) => (
         {task.taskName}
       </Heading>
     </HStack>
-    <Box color={colors.primary['400']} fontSize="sm" mt={1}>
-      {subLine(task)}
-    </Box>
-    <HStack spacing={2} fontSize="sm" color={colors.primary['500']} mt={1}>
+    {/* Counts live on the status cards below; this line is about timing. */}
+    <HStack spacing={2} fontSize="sm" color={colors.primary['400']} mt={1}>
+      {task.recurring !== null && (
+        <>
+          <Text>{task.recurring ? 'Recurring' : 'One-time'}</Text>
+          <Text>·</Text>
+        </>
+      )}
       <Text title={absoluteTitle(task.nextExecutionTime)}>
-        Next run {nextRunText(task)}
+        next run{' '}
+        <Text as="span" fontWeight="semibold" color={colors.primary['600']}>
+          {nextRunText(task)}
+        </Text>
       </Text>
       <Text>·</Text>
       {lastRunText(task)}
     </HStack>
   </Box>
 );
+
+function tabCount(
+  task: OverviewTask,
+  status: ExecutionStatusFilter,
+): number | null {
+  switch (status) {
+    case 'all':
+      return task.instanceCount;
+    case 'failing':
+      return task.counts.failing;
+    case 'running':
+      return task.counts.running;
+    case 'scheduled':
+      return task.counts.scheduled;
+    default:
+      return null;
+  }
+}
+
+function shownText(shown: number, total: number | null, more: boolean): string {
+  if (!more) {
+    return shown === 1
+      ? 'The only instance'
+      : `All ${shown.toLocaleString()} shown`;
+  }
+  return total === null
+    ? `Showing ${shown.toLocaleString()}`
+    : `Showing ${shown.toLocaleString()} of ${total.toLocaleString()}`;
+}

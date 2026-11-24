@@ -11,22 +11,15 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-} from '@chakra-ui/react';
+import { ChevronRightIcon } from '@chakra-ui/icons';
+import { Box, Grid, HStack, Text } from '@chakra-ui/react';
 import { formatDistanceToNowStrict, isBefore } from 'date-fns';
-import { InstanceStatus } from 'src/models/InstanceDetail';
 import { ExecutionRow } from 'src/models/ExecutionPage';
+import { InstanceStatus } from 'src/models/InstanceDetail';
 import colors from 'src/styles/colors';
 import { dateFormatText } from 'src/utils/dateFormatText';
 import { isOverdue, overdueColor } from 'src/utils/overdue';
+import { timeSections } from 'src/utils/timeSections';
 
 const statusLabel: Record<InstanceStatus, string> = {
   FAILED: 'Failed',
@@ -40,85 +33,215 @@ const statusColor: Record<InstanceStatus, string> = {
   SCHEDULED: colors.primary['400'],
 };
 
-export const ExecutionTable: React.FC<{
+// The Overview's row tints, so a failing instance looks like a failing task.
+const rowTint: Record<
+  InstanceStatus,
+  { bg: string; border: string; hover: string }
+> = {
+  FAILED: { bg: '#fcf3f3', border: '#f3dede', hover: '#f7e8e8' },
+  RUNNING: { bg: '#f6f8fd', border: '#e7edf9', hover: '#eef2fc' },
+  SCHEDULED: {
+    bg: colors.primary['100'],
+    border: colors.primary['300'],
+    hover: colors.primary['200'],
+  },
+};
+
+interface ExecutionTableProps {
   rows: ExecutionRow[];
   selected: string | null;
   onSelect: (id: string) => void;
-}> = ({ rows, selected, onSelect }) => (
-  <TableContainer overflowX="auto" whiteSpace="normal">
-    <Table size="sm" variant="simple">
-      <Thead>
-        <Tr>
-          <Th>Instance</Th>
-          <Th>Status</Th>
-          <Th>Next run</Th>
-          <Th>Last run</Th>
-          <Th isNumeric>Failures</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {rows.map((row) => (
-          <Tr
-            key={row.taskInstance}
-            cursor="pointer"
-            bgColor={
-              row.taskInstance === selected ? colors.running['100'] : undefined
+  /** Every row has the same status, so the column would only repeat the tab. */
+  hideStatus: boolean;
+  /** Failing rows wait for a retry; label the time column for what it is. */
+  nextRunLabel: string;
+}
+
+export const ExecutionTable: React.FC<ExecutionTableProps> = ({
+  rows,
+  selected,
+  onSelect,
+  hideStatus,
+  nextRunLabel,
+}) => {
+  const columns = hideStatus
+    ? 'minmax(16rem, 2.4fr) 1.2fr 1.3fr 4.5rem 1rem'
+    : 'minmax(16rem, 2.4fr) 0.8fr 1.2fr 1.3fr 4.5rem 1rem';
+  const sections = timeSections(rows, new Date());
+
+  return (
+    <Box>
+      <Grid
+        templateColumns={columns}
+        gap={3}
+        px={4}
+        pb={2}
+        borderBottom="1px solid"
+        borderBottomColor={colors.primary['300']}
+        fontSize="xs"
+        fontWeight="bold"
+        textTransform="uppercase"
+        letterSpacing="wider"
+        color={colors.primary['400']}
+      >
+        <Text>Instance</Text>
+        {!hideStatus && <Text>Status</Text>}
+        <Text>{nextRunLabel}</Text>
+        <Text>Last run</Text>
+        <Text textAlign="right">Fails</Text>
+        <span />
+      </Grid>
+      {sections.map((section) => (
+        <Box key={section.key} mt={4}>
+          <Text
+            fontSize="xs"
+            fontWeight="bold"
+            textTransform="uppercase"
+            letterSpacing="wider"
+            color={
+              section.key === 'overdue' ? overdueColor : colors.primary['500']
             }
-            _hover={{
-              bgColor:
-                row.taskInstance === selected
-                  ? colors.running['100']
-                  : colors.primary['200'],
-            }}
-            onClick={() => onSelect(row.taskInstance)}
+            mb={2}
           >
-            <Td maxW="32rem">
-              <Text fontFamily="mono" fontSize="sm" wordBreak="break-all">
-                {row.taskInstance}
-              </Text>
-              {row.taskDataPreview && (
+            {section.label}
+            <Text as="span" fontWeight="normal" color={colors.primary['400']}>
+              {' '}
+              · {section.rows.length}
+            </Text>
+          </Text>
+          {section.rows.map((row) => {
+            const tint = rowTint[row.status];
+            const isSelected = row.taskInstance === selected;
+            return (
+              <Grid
+                key={row.taskInstance}
+                templateColumns={columns}
+                gap={3}
+                alignItems="center"
+                px={4}
+                py={3}
+                mb={2}
+                bgColor={isSelected ? colors.running['100'] : tint.bg}
+                border="1px solid"
+                borderColor={isSelected ? colors.running['300'] : tint.border}
+                borderRadius="8px"
+                cursor="pointer"
+                transition="background-color 0.12s ease"
+                _hover={{
+                  bgColor: isSelected ? colors.running['100'] : tint.hover,
+                }}
+                onClick={() => onSelect(row.taskInstance)}
+              >
+                <Box minW={0}>
+                  <Text
+                    fontFamily="mono"
+                    fontSize="sm"
+                    fontWeight="semibold"
+                    wordBreak="break-all"
+                  >
+                    {row.taskInstance}
+                  </Text>
+                  {row.taskDataPreview && (
+                    <DataPreview preview={row.taskDataPreview} />
+                  )}
+                </Box>
+                {!hideStatus && (
+                  <Text
+                    color={statusColor[row.status]}
+                    fontWeight="semibold"
+                    fontSize="sm"
+                  >
+                    {statusLabel[row.status]}
+                  </Text>
+                )}
+                <NextRun row={row} />
+                <LastRun row={row} />
                 <Text
-                  fontFamily="mono"
-                  fontSize="xs"
-                  color={colors.primary['400']}
-                  noOfLines={1}
-                  title={row.taskDataPreview}
+                  textAlign="right"
+                  fontWeight="bold"
+                  color={
+                    row.consecutiveFailures > 0
+                      ? colors.failed['200']
+                      : colors.primary['300']
+                  }
                 >
-                  {row.taskDataPreview}
+                  {row.consecutiveFailures > 0
+                    ? `${row.consecutiveFailures}×`
+                    : '—'}
                 </Text>
-              )}
-            </Td>
-            <Td>
-              <Text color={statusColor[row.status]} fontWeight="semibold">
-                {statusLabel[row.status]}
-              </Text>
-            </Td>
-            <Td>
-              <NextRun row={row} />
-            </Td>
-            <Td>
-              <LastRun row={row} />
-            </Td>
-            <Td isNumeric>
-              {row.consecutiveFailures > 0 ? (
-                <Text color={colors.failed['200']} fontWeight="bold">
-                  {row.consecutiveFailures}
-                </Text>
-              ) : (
-                <Text color={colors.primary['400']}>—</Text>
-              )}
-            </Td>
-          </Tr>
-        ))}
-      </Tbody>
-    </Table>
-  </TableContainer>
-);
+                <ChevronRightIcon color={colors.primary['400']} />
+              </Grid>
+            );
+          })}
+        </Box>
+      ))}
+    </Box>
+  );
+};
+
+// A flat JSON object reads better as key/value chips; anything else (including a preview the
+// server cut short, which no longer parses) is shown as text.
+const DataPreview: React.FC<{ preview: string }> = ({ preview }) => {
+  const entries = flatEntries(preview);
+  if (!entries) {
+    return (
+      <Text
+        fontFamily="mono"
+        fontSize="xs"
+        color={colors.primary['400']}
+        noOfLines={1}
+        title={preview}
+      >
+        {preview}
+      </Text>
+    );
+  }
+  return (
+    <HStack spacing={1} mt={1} flexWrap="wrap" title={preview}>
+      {entries.slice(0, 4).map(([key, value]) => (
+        <Text
+          key={key}
+          as="span"
+          fontSize="xs"
+          bgColor={colors.primary['200']}
+          borderRadius="4px"
+          px={1.5}
+          color={colors.primary['500']}
+        >
+          <Text as="span" fontWeight="semibold" color={colors.primary['400']}>
+            {key}
+          </Text>{' '}
+          {value}
+        </Text>
+      ))}
+    </HStack>
+  );
+};
+
+function flatEntries(preview: string): [string, string][] | null {
+  try {
+    const parsed: unknown = JSON.parse(preview);
+    if (
+      parsed === null ||
+      typeof parsed !== 'object' ||
+      Array.isArray(parsed)
+    ) {
+      return null;
+    }
+    const entries = Object.entries(parsed as Record<string, unknown>);
+    if (entries.some(([, v]) => v !== null && typeof v === 'object')) {
+      return null;
+    }
+    return entries.map(([k, v]) => [k, String(v)]);
+  } catch {
+    return null;
+  }
+}
 
 const NextRun: React.FC<{ row: ExecutionRow }> = ({ row }) => {
   if (row.picked) {
     return (
-      <Text color={colors.running['300']} fontWeight="semibold">
+      <Text color={colors.running['300']} fontWeight="semibold" fontSize="sm">
         running now
       </Text>
     );
@@ -128,6 +251,7 @@ const NextRun: React.FC<{ row: ExecutionRow }> = ({ row }) => {
   const overdue = isOverdue(row.executionTime, false);
   return (
     <Text
+      fontSize="sm"
       title={dateFormatText(date)}
       color={overdue ? overdueColor : colors.primary['500']}
       fontWeight={overdue ? 'semibold' : 'normal'}
@@ -148,15 +272,20 @@ const LastRun: React.FC<{ row: ExecutionRow }> = ({ row }) => {
       : null;
 
   if (!latest) {
-    return <Text color={colors.primary['400']}>never run</Text>;
+    return (
+      <Text fontSize="sm" color={colors.primary['400']}>
+        never run
+      </Text>
+    );
   }
   return (
     <Text
+      fontSize="sm"
       title={dateFormatText(latest.date)}
       color={latest.failed ? colors.failed['200'] : colors.success['200']}
       fontWeight={latest.failed ? 'semibold' : 'normal'}
     >
-      {latest.failed ? '✕' : '✓'}{' '}
+      {latest.failed ? '✕ failed' : '✓ succeeded'}{' '}
       {formatDistanceToNowStrict(latest.date, { addSuffix: true })}
     </Text>
   );

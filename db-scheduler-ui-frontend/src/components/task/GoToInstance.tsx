@@ -11,7 +11,15 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, HStack, Input } from '@chakra-ui/react';
+import { SearchIcon } from '@chakra-ui/icons';
+import {
+  Button,
+  HStack,
+  Input,
+  InputGroup,
+  InputLeftElement,
+} from '@chakra-ui/react';
+import colors from 'src/styles/colors';
 import { useState } from 'react';
 
 /** Opens an instance by its exact id; the drawer reports an id that does not exist. */
@@ -32,14 +40,19 @@ export const GoToInstance: React.FC<{ onOpen: (id: string) => void }> = ({
         }
       }}
     >
-      <Input
-        size="sm"
-        width="16rem"
-        placeholder="Go to instance id"
-        aria-label="Instance id"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
+      <InputGroup size="sm" width="18rem">
+        <InputLeftElement pointerEvents="none">
+          <SearchIcon color={colors.primary['400']} />
+        </InputLeftElement>
+        <Input
+          bgColor="white"
+          borderRadius="6px"
+          placeholder="Go to instance id"
+          aria-label="Instance id"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </InputGroup>
       <Button size="sm" type="submit" variant="outline">
         Open
       </Button>

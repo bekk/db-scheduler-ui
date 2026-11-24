@@ -117,7 +117,7 @@ summary is one `GROUP BY` and is already paid for by the Overview.)*
 
 ### Status tabs
 
-Single-select tab bar (not chips). Each tab shows its count from the task summary.
+The tabs are the Overview's stat cards (same look as the summary strip), single-select. Each shows its count from the task summary; the header line above them carries timing only (one-time/recurring · next run · last run), so counts appear once.
 
 | Tab       | Contents                                              | Filter                                        | Count           |
 |-----------|-------------------------------------------------------|-----------------------------------------------|-----------------|
@@ -136,10 +136,14 @@ Single-select tab bar (not chips). Each tab shows its count from the task summar
 
 ### List
 
-- **Columns:** instance id · status · next run · last run · consecutive failures.
+- **Layout:** content capped at ~78rem so the columns stay together on wide screens. Rows are cards tinted by status with the Overview's row colours (failing red, running blue). One toolbar row holds go-to-instance, the Start-from control and, on the right, Rerun all failed.
+- **Time sections:** rows sit under headings computed from the loaded rows, which are already in time order: Running now, Overdue, Next hour, Later today, Tomorrow, then one per later day.
+- **Columns:** instance id · status (All tab only; elsewhere it repeats the tab) · next run (labelled **Retry** on the Failing tab) · last run · consecutive failures.
   - *Instance id:* full, monospace, wraps rather than being cut. Below it is a **one-line muted
     task-data preview**, only when task data is shown (`db-scheduler-ui.task-data`) and non-null.
     The server truncates it (≈100 chars of compact JSON); the full payload lives in the drawer.
+    A preview that parses as a flat JSON object is shown as key/value chips (up to four);
+    anything else, including a preview cut short, as one line of text.
   - *Status:* Failed / Running / Scheduled (per `../instance-panel/spec.md` §Status derivation).
   - *Next run / last run:* same rules and colours as the Overview columns: relative time,
     absolute time on hover, `running now`, overdue as `due 3m ago` in the warning colour,
@@ -147,8 +151,8 @@ Single-select tab bar (not chips). Each tab shows its count from the task summar
   - *Failures:* `consecutiveFailures`, emphasised red when > 0, `—` when 0.
 - **Order:** `execution_time` ascending, then `task_instance`, which is the database's keyset
   order. No sort controls.
-- **Paging:** keyset, **50 per page**, a **Load more** button. "Nothing more" when `next` is null.
-- **Start from:** a date-time input plus presets `now`, `−1h`, `−1d` and `earliest` (clears
+- **Paging:** keyset, **50 per page**, a **Load 50 more** button beside `Showing X of Y`; when `next` is null the button goes and the line reads `All N shown`.
+- **Start from:** a compact `From: earliest ▾` button opening presets `earliest`, `−1 day`, `−1 hour`, `now` and a date-time input (`earliest` clears
   `from`). It sets `from` and restarts the list at that execution time. It combines with every
   tab.
 - **Go to instance:** an exact-id box. On submit it opens the drawer with `?instance=<id>`;

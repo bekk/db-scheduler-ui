@@ -11,9 +11,23 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, HStack, Input, Text } from '@chakra-ui/react';
+import { ChevronDownIcon, TimeIcon } from '@chakra-ui/icons';
+import {
+  Button,
+  HStack,
+  Input,
+  Popover,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Stack,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { format, subDays, subHours } from 'date-fns';
+import { useState } from 'react';
 import colors from 'src/styles/colors';
+import { dateFormatText } from 'src/utils/dateFormatText';
 
 // datetime-local works in local time without a zone; the URL keeps an ISO instant.
 const toInputValue = (iso: string | null) =>
@@ -24,45 +38,90 @@ export const StartFromControl: React.FC<{
   from: string | null;
   onChange: (from: string | null) => void;
 }> = ({ from, onChange }) => {
-  const preset = (date: Date) => onChange(date.toISOString());
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [draft, setDraft] = useState(toInputValue(from));
+
+  const choose = (value: string | null) => {
+    onChange(value);
+    onClose();
+  };
 
   return (
-    <HStack spacing={2}>
-      <Text fontSize="sm" color={colors.primary['400']} whiteSpace="nowrap">
-        Start from
-      </Text>
-      <Input
-        type="datetime-local"
-        size="sm"
-        width="13rem"
-        value={toInputValue(from)}
-        aria-label="Start from execution time"
-        onChange={(e) =>
-          onChange(
-            e.target.value ? new Date(e.target.value).toISOString() : null,
-          )
-        }
-      />
-      <Button size="xs" variant="outline" onClick={() => preset(new Date())}>
-        now
-      </Button>
-      <Button
-        size="xs"
-        variant="outline"
-        onClick={() => preset(subHours(new Date(), 1))}
-      >
-        −1h
-      </Button>
-      <Button
-        size="xs"
-        variant="outline"
-        onClick={() => preset(subDays(new Date(), 1))}
-      >
-        −1d
-      </Button>
-      <Button size="xs" variant="outline" onClick={() => onChange(null)}>
-        earliest
-      </Button>
-    </HStack>
+    <Popover
+      isOpen={isOpen}
+      onOpen={() => {
+        setDraft(toInputValue(from));
+        onOpen();
+      }}
+      onClose={onClose}
+      placement="bottom-start"
+    >
+      <PopoverTrigger>
+        <Button
+          size="sm"
+          variant="outline"
+          bgColor="white"
+          fontWeight="normal"
+          leftIcon={<TimeIcon color={colors.primary['400']} />}
+          rightIcon={<ChevronDownIcon />}
+        >
+          From: {from ? dateFormatText(new Date(from)) : 'earliest'}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent width="18rem">
+        <PopoverBody>
+          <Stack spacing={3}>
+            <HStack spacing={2}>
+              <Button size="xs" variant="outline" onClick={() => choose(null)}>
+                earliest
+              </Button>
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() => choose(subDays(new Date(), 1).toISOString())}
+              >
+                −1 day
+              </Button>
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() => choose(subHours(new Date(), 1).toISOString())}
+              >
+                −1 hour
+              </Button>
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() => choose(new Date().toISOString())}
+              >
+                now
+              </Button>
+            </HStack>
+            <Text fontSize="xs" color={colors.primary['400']}>
+              Or a point in time
+            </Text>
+            <HStack
+              as="form"
+              spacing={2}
+              onSubmit={(e: React.FormEvent) => {
+                e.preventDefault();
+                choose(draft ? new Date(draft).toISOString() : null);
+              }}
+            >
+              <Input
+                type="datetime-local"
+                size="sm"
+                value={draft}
+                aria-label="Start from execution time"
+                onChange={(e) => setDraft(e.target.value)}
+              />
+              <Button size="sm" type="submit">
+                Go
+              </Button>
+            </HStack>
+          </Stack>
+        </PopoverBody>
+      </PopoverContent>
+    </Popover>
   );
 };

@@ -11,13 +11,14 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Badge, Tab, TabList, Tabs } from '@chakra-ui/react';
+import { Box, Text, Wrap, WrapItem } from '@chakra-ui/react';
 import {
   EXECUTION_STATUS_FILTERS,
   ExecutionStatusFilter,
 } from 'src/models/ExecutionPage';
 import { OverviewTask } from 'src/models/OverviewTask';
 import colors from 'src/styles/colors';
+import { overdueColor } from 'src/utils/overdue';
 
 const labels: Record<ExecutionStatusFilter, string> = {
   all: 'All',
@@ -25,6 +26,14 @@ const labels: Record<ExecutionStatusFilter, string> = {
   running: 'Running',
   overdue: 'Overdue',
   scheduled: 'Scheduled',
+};
+
+const tones: Record<ExecutionStatusFilter, string> = {
+  all: colors.primary['600'],
+  failing: colors.failed['200'],
+  running: colors.running['300'],
+  overdue: overdueColor,
+  scheduled: colors.primary['600'],
 };
 
 // Overdue has no count: the task summary does not carry one.
@@ -46,45 +55,70 @@ function count(
   }
 }
 
+/**
+ * The task page's tabs, drawn as the Overview's stat cards so the two pages read as one.
+ * Unlike the Overview's cards these are single-select: exactly one is always chosen.
+ */
 export const StatusTabs: React.FC<{
   task: OverviewTask;
   status: ExecutionStatusFilter;
   onChange: (status: ExecutionStatusFilter) => void;
 }> = ({ task, status, onChange }) => (
-  <Tabs
-    index={EXECUTION_STATUS_FILTERS.indexOf(status)}
-    onChange={(index) => onChange(EXECUTION_STATUS_FILTERS[index])}
-    size="sm"
-    colorScheme="gray"
-  >
-    <TabList>
-      {EXECUTION_STATUS_FILTERS.map((value) => {
-        const n = count(task, value);
-        return (
-          <Tab key={value} color={colors.primary['500']}>
-            {labels[value]}
-            {n !== null && (
-              <Badge
-                ml={2}
-                borderRadius="full"
-                px={2}
-                bg={
-                  value === 'failing' && n > 0
-                    ? colors.failed['100']
-                    : colors.primary['200']
-                }
-                color={
-                  value === 'failing' && n > 0
-                    ? colors.failed['200']
-                    : colors.primary['500']
-                }
-              >
-                {n.toLocaleString()}
-              </Badge>
-            )}
-          </Tab>
-        );
-      })}
-    </TabList>
-  </Tabs>
+  <Wrap spacing={3} role="tablist" aria-label="Instances by status">
+    {EXECUTION_STATUS_FILTERS.map((value) => {
+      const n = count(task, value);
+      const active = value === status;
+      const tone = tones[value];
+      return (
+        <WrapItem key={value}>
+          <Box
+            as="button"
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(value)}
+            minW="8.5rem"
+            textAlign="left"
+            bgColor={
+              active && value === 'failing' ? '#fdf6f6' : colors.primary['100']
+            }
+            border="1px solid"
+            borderColor={active ? tone : colors.primary['300']}
+            boxShadow={active ? `inset 0 0 0 1px ${tone}` : undefined}
+            borderRadius="8px"
+            px={4}
+            py={3}
+            cursor="pointer"
+            transition="border-color 0.12s ease"
+            _hover={{ borderColor: tone }}
+          >
+            <Text
+              fontSize="2xl"
+              fontWeight="bold"
+              lineHeight="1.2"
+              // Zero is calm, not alarming, as on the Overview.
+              color={
+                n === null
+                  ? colors.primary['300']
+                  : n > 0
+                  ? tone
+                  : colors.primary['300']
+              }
+            >
+              {n === null ? '–' : n.toLocaleString()}
+            </Text>
+            <Text
+              fontSize="xs"
+              fontWeight="bold"
+              textTransform="uppercase"
+              letterSpacing="wider"
+              color={active ? tone : colors.primary['400']}
+            >
+              {labels[value]}
+            </Text>
+          </Box>
+        </WrapItem>
+      );
+    })}
+  </Wrap>
 );
