@@ -157,7 +157,7 @@ The tabs are the Overview's stat cards (same look as the summary strip), single-
 - **Order:** `execution_time` ascending, then `task_instance`, which is the database's keyset
   order. No sort controls.
 - **Paging:** keyset, **50 per page**, a **Load 50 more** button beside `Showing X of Y`; when `next` is null the button goes and the line reads `All N shown`.
-- **Start from:** a compact `From: earliest ▾` button opening forward presets `now`, `+1 hour`, `+6 hours`, `+1 day`, `+1 week` (most rows are in the future), backward ones `earliest`, `−1 day`, `−1 hour`, and a date-time input (`earliest` clears
+- **Start from:** a compact `From: earliest ▾` button opening forward presets `now`, `+1 hour`, `+6 hours`, `+1 day`, `+1 week` (most rows are in the future), backward ones `earliest`, `−1 day`, `−1 hour`, and a date-time input to the second (`earliest` clears
   `from`). It sets `from` and restarts the list at that execution time. It combines with every
   tab.
 - **Go to instance:** an exact-id box. On submit it opens the drawer with `?instance=<id>`;

@@ -38,7 +38,7 @@ import { dateFormatText } from 'src/utils/dateFormatText';
 
 // datetime-local works in local time without a zone; the URL keeps an ISO instant.
 const toInputValue = (iso: string | null) =>
-  iso ? format(new Date(iso), "yyyy-MM-dd'T'HH:mm") : '';
+  iso ? format(new Date(iso), "yyyy-MM-dd'T'HH:mm:ss") : '';
 
 /** Where in execution time the list starts. Cleared means the earliest execution. */
 export const StartFromControl: React.FC<{
@@ -79,7 +79,7 @@ export const StartFromControl: React.FC<{
         <PopoverBody>
           <Stack spacing={3}>
             <PresetRow
-              label="Ahead"
+              label="Forward"
               presets={[
                 ['now', () => new Date()],
                 ['+1 hour', () => addHours(new Date(), 1)],
@@ -90,7 +90,7 @@ export const StartFromControl: React.FC<{
               onPick={(date) => choose(date.toISOString())}
             />
             <HStack spacing={2} align="center">
-              <Text fontSize="xs" color={colors.primary['400']} width="3rem">
+              <Text fontSize="xs" color={colors.primary['400']} width="3.75rem">
                 Back
               </Text>
               <Button size="xs" variant="outline" onClick={() => choose(null)}>
@@ -124,6 +124,8 @@ export const StartFromControl: React.FC<{
             >
               <Input
                 type="datetime-local"
+                // One-second steps make the browser show and accept seconds.
+                step={1}
                 size="sm"
                 value={draft}
                 aria-label="Start from execution time"
@@ -146,7 +148,7 @@ const PresetRow: React.FC<{
   onPick: (date: Date) => void;
 }> = ({ label, presets, onPick }) => (
   <HStack spacing={2} align="center" flexWrap="wrap">
-    <Text fontSize="xs" color={colors.primary['400']} width="3rem">
+    <Text fontSize="xs" color={colors.primary['400']} width="3.75rem">
       {label}
     </Text>
     {presets.map(([text, at]) => (
