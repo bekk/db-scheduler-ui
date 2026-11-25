@@ -15,7 +15,6 @@ import { ChevronDownIcon, TimeIcon } from '@chakra-ui/icons';
 import {
   Button,
   HStack,
-  Input,
   Popover,
   PopoverBody,
   PopoverContent,
@@ -29,33 +28,19 @@ import {
   addHours,
   addWeeks,
   format,
-  isValid,
-  parse,
   subDays,
   subHours,
 } from 'date-fns';
 import { useState } from 'react';
+import { DateTimeField } from 'src/components/task/DateTimeField';
 import colors from 'src/styles/colors';
+import { EMPTY_PARTS, dateOf, partsOf } from 'src/utils/dateTimeParts';
 
-// Typed and shown in local time; the URL keeps an ISO instant.
+// Shown in local time; the URL keeps an ISO instant.
 const DISPLAY_FORMAT = 'yyyy.MM.dd HH:mm:ss';
-// Shorter forms are accepted too, read as the start of that minute or day.
-const INPUT_FORMATS = [DISPLAY_FORMAT, 'yyyy.MM.dd HH:mm', 'yyyy.MM.dd'];
 
-const toInputValue = (iso: string | null) =>
-  iso ? format(new Date(iso), DISPLAY_FORMAT) : '';
-
-/** The instant typed, or null when it matches none of the accepted formats. */
-function parseInput(text: string): Date | null {
-  const trimmed = text.trim();
-  for (const pattern of INPUT_FORMATS) {
-    const date = parse(trimmed, pattern, new Date());
-    if (isValid(date) && format(date, pattern) === trimmed) {
-      return date;
-    }
-  }
-  return null;
-}
+const partsFor = (iso: string | null) =>
+  iso ? partsOf(new Date(iso)) : EMPTY_PARTS;
 
 /** Where in execution time the list starts. Cleared means the earliest execution. */
 export const StartFromControl: React.FC<{
@@ -63,9 +48,10 @@ export const StartFromControl: React.FC<{
   onChange: (from: string | null) => void;
 }> = ({ from, onChange }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [draft, setDraft] = useState(toInputValue(from));
-  const typed = draft.trim() === '' ? null : parseInput(draft);
-  const invalid = draft.trim() !== '' && typed === null;
+  const [parts, setParts] = useState(partsFor(from));
+  const typed = dateOf(parts);
+  const empty = Object.values(parts).every((v) => v === '');
+  const invalid = !empty && typed === null;
 
   const choose = (value: string | null) => {
     onChange(value);
@@ -76,7 +62,7 @@ export const StartFromControl: React.FC<{
     <Popover
       isOpen={isOpen}
       onOpen={() => {
-        setDraft(toInputValue(from));
+        setParts(partsFor(from));
         onOpen();
       }}
       onClose={onClose}
@@ -143,14 +129,10 @@ export const StartFromControl: React.FC<{
                 }
               }}
             >
-              <Input
-                size="sm"
-                fontFamily="mono"
-                value={draft}
-                placeholder="yyyy.mm.dd hh:mm:ss"
-                aria-label="Start from execution time"
-                isInvalid={invalid}
-                onChange={(e) => setDraft(e.target.value)}
+              <DateTimeField
+                parts={parts}
+                onChange={setParts}
+                invalid={invalid}
               />
               <Button size="sm" type="submit" isDisabled={invalid}>
                 Go
@@ -161,8 +143,9 @@ export const StartFromControl: React.FC<{
               color={invalid ? colors.failed['200'] : colors.primary['400']}
               mt={-1}
             >
-              yyyy.mm.dd, optionally with hh:mm or hh:mm:ss (24-hour, local
-              time)
+              {invalid
+                ? 'Not a valid date and time'
+                : 'yyyy.mm.dd hh:mm:ss, 24-hour local time · ↑↓ change a field'}
             </Text>
           </Stack>
         </PopoverBody>
