@@ -15,6 +15,7 @@ import { ChevronDownIcon, TimeIcon } from '@chakra-ui/icons';
 import {
   Button,
   HStack,
+  Input,
   Popover,
   PopoverBody,
   PopoverContent,
@@ -32,15 +33,12 @@ import {
   subHours,
 } from 'date-fns';
 import { useState } from 'react';
-import { DateTimeField } from 'src/components/task/DateTimeField';
 import colors from 'src/styles/colors';
-import { EMPTY_PARTS, dateOf, partsOf } from 'src/utils/dateTimeParts';
 
-// Shown in local time; the URL keeps an ISO instant.
-const DISPLAY_FORMAT = 'yyyy.MM.dd HH:mm:ss';
-
-const partsFor = (iso: string | null) =>
-  iso ? partsOf(new Date(iso)) : EMPTY_PARTS;
+// datetime-local works in local time without a zone; the URL keeps an ISO instant. Its field
+// order follows the browser's locale, which a page cannot change.
+const toInputValue = (iso: string | null) =>
+  iso ? format(new Date(iso), "yyyy-MM-dd'T'HH:mm:ss") : '';
 
 /** Where in execution time the list starts. Cleared means the earliest execution. */
 export const StartFromControl: React.FC<{
@@ -48,10 +46,7 @@ export const StartFromControl: React.FC<{
   onChange: (from: string | null) => void;
 }> = ({ from, onChange }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [parts, setParts] = useState(partsFor(from));
-  const typed = dateOf(parts);
-  const empty = Object.values(parts).every((v) => v === '');
-  const invalid = !empty && typed === null;
+  const [draft, setDraft] = useState(toInputValue(from));
 
   const choose = (value: string | null) => {
     onChange(value);
@@ -62,7 +57,7 @@ export const StartFromControl: React.FC<{
     <Popover
       isOpen={isOpen}
       onOpen={() => {
-        setParts(partsFor(from));
+        setDraft(toInputValue(from));
         onOpen();
       }}
       onClose={onClose}
@@ -77,7 +72,8 @@ export const StartFromControl: React.FC<{
           leftIcon={<TimeIcon color={colors.primary['400']} />}
           rightIcon={<ChevronDownIcon />}
         >
-          From: {from ? format(new Date(from), DISPLAY_FORMAT) : 'earliest'}
+          From:{' '}
+          {from ? format(new Date(from), 'yyyy.MM.dd HH:mm:ss') : 'earliest'}
         </Button>
       </PopoverTrigger>
       <PopoverContent width="30rem">
@@ -124,29 +120,22 @@ export const StartFromControl: React.FC<{
               spacing={2}
               onSubmit={(e: React.FormEvent) => {
                 e.preventDefault();
-                if (!invalid) {
-                  choose(typed ? typed.toISOString() : null);
-                }
+                choose(draft ? new Date(draft).toISOString() : null);
               }}
             >
-              <DateTimeField
-                parts={parts}
-                onChange={setParts}
-                invalid={invalid}
+              <Input
+                type="datetime-local"
+                // One-second steps make the browser show and accept seconds.
+                step={1}
+                size="sm"
+                value={draft}
+                aria-label="Start from execution time"
+                onChange={(e) => setDraft(e.target.value)}
               />
-              <Button size="sm" type="submit" isDisabled={invalid}>
+              <Button size="sm" type="submit">
                 Go
               </Button>
             </HStack>
-            <Text
-              fontSize="xs"
-              color={invalid ? colors.failed['200'] : colors.primary['400']}
-              mt={-1}
-            >
-              {invalid
-                ? 'Not a valid date and time'
-                : 'yyyy.mm.dd hh:mm:ss, 24-hour local time · ↑↓ change a field'}
-            </Text>
           </Stack>
         </PopoverBody>
       </PopoverContent>
