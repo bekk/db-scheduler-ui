@@ -137,24 +137,19 @@ Found reviewing the task-detail branch; none blocks it.
 - **Task names with `/` or `%` in `/tasks/:taskName`.** Reloads and shared links to a name with
   `/` get a 400 (Tomcat rejects `%2F`, as does Spring Security's firewall), and react-router 6.15
   decodes the path twice, so a task named `a%20b` opens as `a b`. The legacy
-  `/scheduled/:taskName` has the same flaw. Fix by moving the name to the query string or by
-  upgrading react-router (≥ 6.22 decodes per segment); either way, settle it together with the
-  Overview's panel-versus-page behaviour.
-- **The default tab can switch by itself.** Without `?status`, the tab is recomputed on every
-  summary refresh, so the first failure moves a reader from All to Failing, and a rerun moves
-  them back. Fix the default once per task.
-- **A malformed `?from=` blanks the page** (`format(new Date('x'))` throws). Drop unparsable
-  values the way `status` already is.
+  `/scheduled/:taskName` has the same flaw. Shipped as a known issue, since the Overview keeps
+  the side panel and in-app navigation works. Fix by upgrading react-router (≥ 6.22 decodes per
+  segment) or by moving the name to the query string.
 - **Rerun of very large failing sets is one long request.** At 100k+ rows a proxy timeout shows
   an error while the server carries on. Cap per call and report "more remain", or document it.
 - **Auto-refresh refetches every loaded page.** Refetch only the first page (`refetchPage`).
-- **Rows aren't keyboard-reachable**, and closing the drawer doesn't return focus to the row.
 - **The drawer's "Open task page" link drops the Overview's filters** from the breadcrumb.
 - **Go-to-instance trims spaces**, so ids with leading or trailing spaces can't be opened.
 - **`FailedRerunner`'s `alreadyRerun` check is likely dead**: a rerun resets the failure count, so
   the row already leaves the failing filter. Confirm, then remove it or fix its comment.
-- **Smoke tests for the new endpoints exist only in `example-app`**, not in the Boot 4 and WebFlux
-  example apps.
+- **The drawer's › stops at the last loaded row.** It could load the next page and carry on.
+- **Failing rows don't show their error.** A one-line last-exception message per row would save
+  opening each one; needs the message in `ExecutionRow`.
 
 ## Reschedule has no backend
 

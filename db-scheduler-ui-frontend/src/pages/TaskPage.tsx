@@ -53,6 +53,7 @@ import {
   OVERVIEW_TASKS_QUERY_KEY,
 } from 'src/services/getOverviewTasks';
 import colors from 'src/styles/colors';
+import { useEffect, useState } from 'react';
 import {
   absoluteTitle,
   dotColor,
@@ -86,9 +87,26 @@ export const TaskPage: React.FC = () => {
   });
   const task = summary.data?.find((t) => t.taskName === taskName);
 
-  // Failing first when there is something failing; the choice is not written to the URL.
+  // Failing first when there is something failing; the choice is not written to the URL. It is
+  // settled once per task, so a refresh that changes the failing count doesn't switch tabs.
+  const [settledDefault, setSettledDefault] = useState<{
+    taskName: string;
+    status: ExecutionStatusFilter;
+  } | null>(null);
+  const computedDefault: ExecutionStatusFilter | null = task
+    ? task.counts.failing > 0
+      ? 'failing'
+      : 'all'
+    : null;
+  const defaultStatus =
+    settledDefault?.taskName === taskName ? settledDefault.status : null;
+  useEffect(() => {
+    if (!defaultStatus && computedDefault) {
+      setSettledDefault({ taskName, status: computedDefault });
+    }
+  }, [defaultStatus, computedDefault, taskName]);
   const status: ExecutionStatusFilter =
-    params.status ?? (task && task.counts.failing > 0 ? 'failing' : 'all');
+    params.status ?? defaultStatus ?? computedDefault ?? 'all';
 
   const executions = useTaskExecutions(taskName, status, params.from, {
     // Waits for the summary so the default tab is settled before the first fetch.

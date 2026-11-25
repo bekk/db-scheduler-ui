@@ -63,7 +63,7 @@ export const useTaskPageParams = (): TaskPageParams => {
     status,
     // Tabs and the start time change the view; replace so they do not fill the back button.
     setStatus: (next) => write(STATUS_PARAM, next),
-    from: searchParams.get(FROM_PARAM),
+    from: parseFrom(searchParams.get(FROM_PARAM)),
     setFrom: (next) => write(FROM_PARAM, next),
     instance: panel.value,
     openInstance: panel.open,
@@ -71,3 +71,12 @@ export const useTaskPageParams = (): TaskPageParams => {
     closeInstance: panel.close,
   };
 };
+
+// Normalised to an ISO instant, which is what the server accepts; unparsable values are dropped.
+function parseFrom(raw: string | null): string | null {
+  if (!raw) {
+    return null;
+  }
+  const date = new Date(raw);
+  return isNaN(date.getTime()) ? null : date.toISOString();
+}
