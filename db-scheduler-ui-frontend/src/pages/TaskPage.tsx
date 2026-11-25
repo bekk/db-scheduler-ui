@@ -35,6 +35,7 @@ import {
   useParams,
 } from 'react-router-dom';
 import { InstanceDrawer } from 'src/components/overview/InstanceDrawer';
+import { timeSections } from 'src/utils/timeSections';
 import { GoToInstance } from 'src/components/task/GoToInstance';
 import { RerunFailedButton } from 'src/components/task/RerunFailedButton';
 import { TASK_EXECUTIONS_QUERY_KEY } from 'src/services/getTaskExecutions';
@@ -95,6 +96,15 @@ export const TaskPage: React.FC = () => {
     refetchInterval,
   });
   const rows = executions.data?.pages.flatMap((page) => page.items) ?? [];
+  // The order the table shows them in, which groups running and overdue rows first.
+  const order = timeSections(rows, new Date()).flatMap((section) =>
+    section.rows.map((row) => row.taskInstance),
+  );
+  const position = params.instance ? order.indexOf(params.instance) : -1;
+  const neighbour = (offset: number) => {
+    const id = order[position + offset];
+    return id === undefined ? null : () => params.stepInstance(id);
+  };
 
   const refresh = () => {
     void summary.refetch();
@@ -181,7 +191,8 @@ export const TaskPage: React.FC = () => {
               {params.from && (
                 <>
                   {' '}
-                  from {format(new Date(params.from), 'yyyy.MM.dd HH:mm:ss')} on ·{' '}
+                  from {format(new Date(params.from), 'yyyy.MM.dd HH:mm:ss')} on
+                  ·{' '}
                   <Button
                     variant="link"
                     size="sm"
@@ -241,6 +252,18 @@ export const TaskPage: React.FC = () => {
       <InstanceDrawer
         taskName={params.instance ? taskName : null}
         instanceId={params.instance}
+        stepper={
+          // Opened by id for an instance outside the loaded rows, there is nothing to step through.
+          position < 0
+            ? undefined
+            : {
+                position,
+                loaded: order.length,
+                hasMore: !!executions.hasNextPage,
+                onPrevious: neighbour(-1),
+                onNext: neighbour(1),
+              }
+        }
         onClose={params.closeInstance}
         onChanged={refresh}
       />

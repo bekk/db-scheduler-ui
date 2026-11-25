@@ -83,8 +83,8 @@ Adding one is an upstream change for later.
   the instance id beneath it; on the task page it is the other way round. The drawer is about
   40rem wide (at most 92% of the viewport).
 - **Drawer → page:** the drawer opened from a single-instance Overview row gets an
-  **`Open task page →`** link, so single-schedule recurring tasks can reach the page without it
-  being the default.
+  **`Open task page →`** button in its header, so single-schedule recurring tasks can reach the
+  page without it being the default.
 - **Breadcrumb:** `Overview › <taskName>`. It returns to the Overview with its own query string
   (filters, auto-refresh) intact: link with the previous location when there is one, otherwise
   plain `/overview`.
@@ -162,9 +162,16 @@ The tabs are the Overview's stat cards (same look as the summary strip), single-
   tab.
 - **Go to instance:** an exact-id box. On submit it opens the drawer with `?instance=<id>`;
   an unknown id shows the drawer's existing not-found state. No prefix or contains search.
-- **Selection:** clicking a row opens `InstanceDrawer` for that id; the row stays highlighted;
-  closing the drawer returns focus to it. Back closes the drawer (push, like today's
-  `useSelectedInstance`).
+- **Selection:** clicking a row, or its **Details** button (the Overview's), opens
+  `InstanceDrawer` for that id; the row stays highlighted; closing the drawer returns focus to it.
+- **Stepping:** the drawer header shows "N of M" with ‹ › buttons, and ← → keys, that move to
+  the previous/next row in table order among the loaded rows. Stepping replaces the history
+  entry. At the last loaded row with more to load, › is inert and says to load more. An
+  instance opened by id that is not among the loaded rows has no stepper.
+- **Closing and Back** (both pages): opening the drawer pushes a history entry, so Back closes
+  it. Closing with ×, Esc or the overlay pops that entry rather than pushing a new one, so Back
+  afterwards leaves the page instead of reopening the drawer. A drawer that was already open on
+  arrival (reload, shared link) closes by replacing the entry.
 - **Empty states:** an empty tab gets one muted line ("No failing instances"); with a start time set it says so and offers a way back ("No instances from 25 Nov, 21:19 on · show from the earliest"). If the task no
   longer has executions and is not registered, show "No scheduled instances for this task" with
   a link back to the Overview.

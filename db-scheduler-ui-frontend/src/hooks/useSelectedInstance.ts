@@ -11,7 +11,7 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useSearchParams } from 'react-router-dom';
+import { usePanelParam } from 'src/hooks/usePanelParam';
 
 // Named for the task, not the instance: Overview rows identify a task, and the endpoint
 // resolves the single execution behind it.
@@ -26,22 +26,6 @@ interface SelectedInstanceState {
 
 /** Keeps the open instance in the query string, so reloads and shared links reopen it. */
 export const useSelectedInstance = (): SelectedInstanceState => {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const write = (taskName: string | null) => {
-    const params = new URLSearchParams(searchParams);
-    if (taskName) {
-      params.set(TASK_PARAM, taskName);
-    } else {
-      params.delete(TASK_PARAM);
-    }
-    // Push, not replace, so the back button closes the drawer.
-    setSearchParams(params);
-  };
-
-  return {
-    selected: searchParams.get(TASK_PARAM),
-    select: write,
-    clear: () => write(null),
-  };
+  const panel = usePanelParam(TASK_PARAM);
+  return { selected: panel.value, select: panel.open, clear: panel.close };
 };

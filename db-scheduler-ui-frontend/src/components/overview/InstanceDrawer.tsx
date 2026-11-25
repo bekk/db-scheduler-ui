@@ -27,11 +27,13 @@ import {
   DrawerHeader,
   DrawerOverlay,
   HStack,
+  IconButton,
   Link,
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import JsonViewer from 'src/components/common/JsonViewer';
 import { useInstanceDetail } from 'src/hooks/useInstanceDetail';
@@ -55,9 +57,21 @@ interface InstanceDrawerProps {
   instanceId?: string | null;
   /** Link to the task page, for drawers opened from somewhere other than that page. */
   showTaskPageLink?: boolean;
+  /** Steps through the list the drawer was opened from; absent when there is no such list. */
+  stepper?: Stepper;
   onClose: () => void;
   /** Refresh the overview behind the drawer after an action changes the execution. */
   onChanged: () => void;
+}
+
+export interface Stepper {
+  /** Zero-based position of the open instance among the loaded rows. */
+  position: number;
+  loaded: number;
+  /** More rows exist than are loaded. */
+  hasMore: boolean;
+  onPrevious: (() => void) | null;
+  onNext: (() => void) | null;
 }
 
 const statusLabel: Record<InstanceStatus, string> = {
@@ -77,6 +91,7 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
   taskName,
   instanceId,
   showTaskPageLink = false,
+  stepper,
   onClose,
   onChanged,
 }) => {
@@ -88,7 +103,11 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
   // Opened from the Overview the reader picked a task, so the task leads; opened from the task
   // page they picked an instance, so the instance id does.
   const title = showTaskPageLink || !showInstance ? taskName : instance.id;
-  const subtitle = showInstance ? (showTaskPageLink ? instance.id : taskName) : null;
+  const subtitle = showInstance
+    ? showTaskPageLink
+      ? instance.id
+      : taskName
+    : null;
 
   return (
     <Drawer isOpen={!!taskName} placement="right" onClose={onClose} size="md">
@@ -97,19 +116,37 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
       <DrawerContent maxW="min(40rem, 92vw)">
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth="1px" pb={3}>
-          <HStack spacing={3} align="center">
-            <Text fontSize="lg" color={colors.primary['600']}>
+          {/* Right padding keeps the controls clear of the close button. */}
+          <HStack spacing={3} align="center" pr={8}>
+            <Text flex="1" minW={0} fontSize="lg" color={colors.primary['600']}>
               {title}
+              {showInstance && (
+                <Text
+                  as="span"
+                  ml={3}
+                  fontSize="sm"
+                  fontWeight="bold"
+                  whiteSpace="nowrap"
+                  color={statusColor[instance.status]}
+                >
+                  {statusLabel[instance.status]}
+                </Text>
+              )}
             </Text>
-            {showInstance && (
-              <Text
-                fontSize="sm"
-                fontWeight="bold"
-                color={statusColor[instance.status]}
+            {showTaskPageLink && taskName && (
+              <Button
+                as={RouterLink}
+                to={`/tasks/${encodeURIComponent(taskName)}`}
+                size="xs"
+                variant="outline"
+                fontWeight="semibold"
+                color={colors.running['300']}
+                flexShrink={0}
               >
-                {statusLabel[instance.status]}
-              </Text>
+                Open task page →
+              </Button>
             )}
+            {stepper && <StepperControls stepper={stepper} />}
           </HStack>
           {subtitle && (
             <Text
@@ -120,17 +157,6 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
             >
               {subtitle}
             </Text>
-          )}
-          {showTaskPageLink && taskName && (
-            <Link
-              as={RouterLink}
-              to={`/tasks/${encodeURIComponent(taskName)}`}
-              fontSize="xs"
-              fontWeight="normal"
-              color={colors.running['300']}
-            >
-              Open task page →
-            </Link>
           )}
         </DrawerHeader>
 
@@ -188,6 +214,75 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
         </DrawerBody>
       </DrawerContent>
     </Drawer>
+  );
+};
+
+// Looks disabled but keeps focus: a truly disabled button drops focus out of the drawer, and the
+// drawer then no longer hears Esc.
+const endOfList = (atEnd: boolean) =>
+  atEnd
+    ? {
+        'aria-disabled': true,
+        opacity: 0.35,
+        cursor: 'not-allowed',
+        _hover: { bgColor: 'transparent' },
+      }
+    : {};
+
+const StepperControls: React.FC<{ stepper: Stepper }> = ({ stepper }) => {
+  const { position, loaded, hasMore, onPrevious, onNext } = stepper;
+
+  // Arrow keys step too, unless the reader is typing or a button has its own use for them.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('input, textarea, select, [role="alertdialog"]')) {
+        return;
+      }
+      if (event.key === 'ArrowLeft' && onPrevious) {
+        onPrevious();
+      } else if (event.key === 'ArrowRight' && onNext) {
+        onNext();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onPrevious, onNext]);
+
+  return (
+    <HStack spacing={1} flexShrink={0}>
+      <Text
+        fontSize="xs"
+        fontWeight="normal"
+        color={colors.primary['400']}
+        whiteSpace="nowrap"
+      >
+        {(position + 1).toLocaleString()} of {loaded.toLocaleString()}
+        {hasMore ? ' loaded' : ''}
+      </Text>
+      <IconButton
+        size="xs"
+        variant="ghost"
+        icon={<ChevronLeftIcon boxSize={5} />}
+        aria-label="Previous instance"
+        title="Previous instance (←)"
+        {...endOfList(!onPrevious)}
+        onClick={() => onPrevious?.()}
+      />
+      <IconButton
+        size="xs"
+        variant="ghost"
+        icon={<ChevronRightIcon boxSize={5} />}
+        aria-label="Next instance"
+        title={
+          !onNext && hasMore
+            ? 'Load more rows on the page to go further'
+            : 'Next instance (→)'
+        }
+        {...endOfList(!onNext)}
+        onClick={() => onNext?.()}
+      />
+    </HStack>
   );
 };
 
@@ -493,11 +588,14 @@ const Actions: React.FC<{
               Delete instance
             </AlertDialogHeader>
             <AlertDialogBody>
-              Delete {instance.taskName} · {instance.id}? The scheduled execution
-              is removed and will not run.
+              Delete {instance.taskName} · {instance.id}? The scheduled
+              execution is removed and will not run.
             </AlertDialogBody>
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={() => setConfirmingDelete(false)}>
+              <Button
+                ref={cancelRef}
+                onClick={() => setConfirmingDelete(false)}
+              >
                 Cancel
               </Button>
               <Button
