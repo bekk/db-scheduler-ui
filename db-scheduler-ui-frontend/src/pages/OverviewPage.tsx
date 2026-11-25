@@ -27,9 +27,9 @@ import {
   Text,
   Tr,
 } from '@chakra-ui/react';
-import { ChevronRightIcon } from '@chakra-ui/icons';
+import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
-import { RepeatIcon } from 'src/assets/icons';
+import { PanelIcon, RepeatIcon } from 'src/assets/icons';
 import { InstanceDrawer } from 'src/components/overview/InstanceDrawer';
 import { SummaryStrip } from 'src/components/overview/SummaryStrip';
 import { OverviewTask } from 'src/models/OverviewTask';
@@ -193,11 +193,19 @@ const OverviewRow: React.FC<{
     }
   };
 
+  // The row and its button say where a click leads, since that depends on the instance count.
+  const hint = opensInstance
+    ? 'Opens the instance in the side panel'
+    : task.instanceCount > 1
+    ? `Opens the task page · ${task.instanceCount.toLocaleString()} instances`
+    : undefined;
+
   return (
     <Tr
       sx={rowSx(task, task.instanceCount > 0)}
       onClick={open}
       cursor={task.instanceCount > 0 ? 'pointer' : 'default'}
+      title={hint}
     >
       <Td>
         <HStack align="center" spacing={2}>
@@ -236,14 +244,15 @@ const OverviewRow: React.FC<{
       </Td>
       <Td>{lastRunText(task)}</Td>
       <Td textAlign="right" width="1%" whiteSpace="nowrap">
-        {task.instanceCount > 0 && (
+        {opensInstance && (
           <Button
             size="xs"
-            variant="ghost"
+            variant="solid"
+            bgColor="#eef1ff"
             color={colors.running['300']}
-            rightIcon={<ChevronRightIcon />}
-            iconSpacing={0}
-            aria-label={`Show details for ${task.taskName}`}
+            _hover={{ bgColor: colors.running['100'] }}
+            leftIcon={<PanelIcon />}
+            aria-label={`Show details for ${task.taskName} in the side panel`}
             onClick={(event) => {
               // The row handles the same click; without this it would fire twice.
               event.stopPropagation();
@@ -251,6 +260,22 @@ const OverviewRow: React.FC<{
             }}
           >
             Details
+          </Button>
+        )}
+        {task.instanceCount > 1 && (
+          <Button
+            size="xs"
+            variant="outline"
+            bgColor="white"
+            color={colors.primary['600']}
+            rightIcon={<ArrowForwardIcon />}
+            aria-label={`Open the task page for ${task.taskName}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              open();
+            }}
+          >
+            {task.instanceCount.toLocaleString()} instances
           </Button>
         )}
       </Td>

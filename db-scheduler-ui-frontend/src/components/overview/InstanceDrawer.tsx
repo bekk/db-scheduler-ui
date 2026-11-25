@@ -85,16 +85,21 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
   // `status` rather than `instance` — otherwise the header keeps a stale badge after the body
   // has already moved on to a gone/ambiguous/error message.
   const showInstance = status === 'ready' && !!instance;
+  // Opened from the Overview the reader picked a task, so the task leads; opened from the task
+  // page they picked an instance, so the instance id does.
+  const title = showTaskPageLink || !showInstance ? taskName : instance.id;
+  const subtitle = showInstance ? (showTaskPageLink ? instance.id : taskName) : null;
 
   return (
     <Drawer isOpen={!!taskName} placement="right" onClose={onClose} size="md">
       <DrawerOverlay />
-      <DrawerContent>
+      {/* Wider than Chakra's md so stack traces and instance ids fit without wrapping. */}
+      <DrawerContent maxW="min(40rem, 92vw)">
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth="1px" pb={3}>
           <HStack spacing={3} align="center">
             <Text fontSize="lg" color={colors.primary['600']}>
-              {showInstance ? instance.id : taskName}
+              {title}
             </Text>
             {showInstance && (
               <Text
@@ -106,14 +111,14 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
               </Text>
             )}
           </HStack>
-          {/* Only once loaded: before that the title above already shows the task name. */}
-          {showInstance && (
+          {subtitle && (
             <Text
               fontSize="xs"
               fontWeight="normal"
+              fontFamily={showTaskPageLink ? 'mono' : undefined}
               color={colors.primary['400']}
             >
-              {taskName}
+              {subtitle}
             </Text>
           )}
           {showTaskPageLink && taskName && (

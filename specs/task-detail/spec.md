@@ -77,6 +77,11 @@ Adding one is an upstream change for later.
 - **From the Overview:** rows with **more than one instance** navigate to `/tasks/:taskName`,
   replacing today's `/scheduled/:taskName` target. Rows with exactly one instance keep opening
   the drawer in place. Dormant rows (0 instances) stay non-clickable.
+  The row's button says which will happen: **Details** with a side-panel icon (one instance,
+  opens the drawer) or **N instances →** (several, opens the task page); the row has the same
+  hint as a tooltip. Opened from the Overview, the drawer is titled with the task name and shows
+  the instance id beneath it; on the task page it is the other way round. The drawer is about
+  40rem wide (at most 92% of the viewport).
 - **Drawer → page:** the drawer opened from a single-instance Overview row gets an
   **`Open task page →`** link, so single-schedule recurring tasks can reach the page without it
   being the default.
