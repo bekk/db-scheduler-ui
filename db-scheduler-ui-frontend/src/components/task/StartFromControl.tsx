@@ -24,7 +24,14 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { format, subDays, subHours } from 'date-fns';
+import {
+  addDays,
+  addHours,
+  addWeeks,
+  format,
+  subDays,
+  subHours,
+} from 'date-fns';
 import { useState } from 'react';
 import colors from 'src/styles/colors';
 import { dateFormatText } from 'src/utils/dateFormatText';
@@ -68,10 +75,24 @@ export const StartFromControl: React.FC<{
           From: {from ? dateFormatText(new Date(from)) : 'earliest'}
         </Button>
       </PopoverTrigger>
-      <PopoverContent width="18rem">
+      <PopoverContent width="30rem">
         <PopoverBody>
           <Stack spacing={3}>
-            <HStack spacing={2}>
+            <PresetRow
+              label="Ahead"
+              presets={[
+                ['now', () => new Date()],
+                ['+1 hour', () => addHours(new Date(), 1)],
+                ['+6 hours', () => addHours(new Date(), 6)],
+                ['+1 day', () => addDays(new Date(), 1)],
+                ['+1 week', () => addWeeks(new Date(), 1)],
+              ]}
+              onPick={(date) => choose(date.toISOString())}
+            />
+            <HStack spacing={2} align="center">
+              <Text fontSize="xs" color={colors.primary['400']} width="3rem">
+                Back
+              </Text>
               <Button size="xs" variant="outline" onClick={() => choose(null)}>
                 earliest
               </Button>
@@ -88,13 +109,6 @@ export const StartFromControl: React.FC<{
                 onClick={() => choose(subHours(new Date(), 1).toISOString())}
               >
                 −1 hour
-              </Button>
-              <Button
-                size="xs"
-                variant="outline"
-                onClick={() => choose(new Date().toISOString())}
-              >
-                now
               </Button>
             </HStack>
             <Text fontSize="xs" color={colors.primary['400']}>
@@ -125,3 +139,25 @@ export const StartFromControl: React.FC<{
     </Popover>
   );
 };
+
+const PresetRow: React.FC<{
+  label: string;
+  presets: [string, () => Date][];
+  onPick: (date: Date) => void;
+}> = ({ label, presets, onPick }) => (
+  <HStack spacing={2} align="center" flexWrap="wrap">
+    <Text fontSize="xs" color={colors.primary['400']} width="3rem">
+      {label}
+    </Text>
+    {presets.map(([text, at]) => (
+      <Button
+        key={text}
+        size="xs"
+        variant="outline"
+        onClick={() => onPick(at())}
+      >
+        {text}
+      </Button>
+    ))}
+  </HStack>
+);

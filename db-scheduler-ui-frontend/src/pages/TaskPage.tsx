@@ -51,6 +51,7 @@ import {
   OVERVIEW_TASKS_QUERY_KEY,
 } from 'src/services/getOverviewTasks';
 import colors from 'src/styles/colors';
+import { dateFormatText } from 'src/utils/dateFormatText';
 import {
   absoluteTitle,
   dotColor,
@@ -175,7 +176,23 @@ export const TaskPage: React.FC = () => {
             <Text color={colors.failed['200']}>Could not load instances</Text>
           )}
           {executions.isSuccess && rows.length === 0 && (
-            <Text color={colors.primary['400']}>{emptyText[status]}</Text>
+            <Text color={colors.primary['400']}>
+              {emptyText[status]}
+              {params.from && (
+                <>
+                  {' '}
+                  from {dateFormatText(new Date(params.from))} on ·{' '}
+                  <Button
+                    variant="link"
+                    size="sm"
+                    color={colors.running['300']}
+                    onClick={() => params.setFrom(null)}
+                  >
+                    show from the earliest
+                  </Button>
+                </>
+              )}
+            </Text>
           )}
           {rows.length > 0 && (
             <ExecutionTable

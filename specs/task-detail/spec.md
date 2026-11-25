@@ -157,7 +157,7 @@ The tabs are the Overview's stat cards (same look as the summary strip), single-
 - **Order:** `execution_time` ascending, then `task_instance`, which is the database's keyset
   order. No sort controls.
 - **Paging:** keyset, **50 per page**, a **Load 50 more** button beside `Showing X of Y`; when `next` is null the button goes and the line reads `All N shown`.
-- **Start from:** a compact `From: earliest ▾` button opening presets `earliest`, `−1 day`, `−1 hour`, `now` and a date-time input (`earliest` clears
+- **Start from:** a compact `From: earliest ▾` button opening forward presets `now`, `+1 hour`, `+6 hours`, `+1 day`, `+1 week` (most rows are in the future), backward ones `earliest`, `−1 day`, `−1 hour`, and a date-time input (`earliest` clears
   `from`). It sets `from` and restarts the list at that execution time. It combines with every
   tab.
 - **Go to instance:** an exact-id box. On submit it opens the drawer with `?instance=<id>`;
@@ -165,7 +165,7 @@ The tabs are the Overview's stat cards (same look as the summary strip), single-
 - **Selection:** clicking a row opens `InstanceDrawer` for that id; the row stays highlighted;
   closing the drawer returns focus to it. Back closes the drawer (push, like today's
   `useSelectedInstance`).
-- **Empty states:** an empty tab gets one muted line ("No failing instances"). If the task no
+- **Empty states:** an empty tab gets one muted line ("No failing instances"); with a start time set it says so and offers a way back ("No instances from 25 Nov, 21:19 on · show from the earliest"). If the task no
   longer has executions and is not registered, show "No scheduled instances for this task" with
   a link back to the Overview.
 
