@@ -46,8 +46,11 @@ public class FailedRerunner {
    * @return how many executions were rescheduled; executions picked or removed in the meantime are
    *     skipped
    */
-  public int rerunFailed(String taskName, Instant cutoff) {
+  public int rerunFailed(String taskName, Instant requestedCutoff) {
     Instant rerunAt = clock.instant();
+    // The cutoff comes from the client's clock; never let it reach past this server's now, or a
+    // fast client clock would let one call rerun an execution that failed again meanwhile.
+    Instant cutoff = requestedCutoff.isAfter(rerunAt) ? rerunAt : requestedCutoff;
     ExecutionTimeAndId after = ExecutionPager.START;
     int rescheduled = 0;
 

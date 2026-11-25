@@ -28,21 +28,39 @@ export interface TimeSection {
 }
 
 /**
- * Splits rows already in execution-time order into consecutive sections a reader can scan:
- * running now, overdue, next hour, later today, tomorrow, then one per later day.
+ * Groups rows already in execution-time order into sections a reader can scan: one Running now
+ * and one Overdue section first, then next hour, later today, tomorrow and one per later day.
+ *
+ * Running rows usually have an execution time in the past, so in time order they sit among the
+ * overdue rows; collecting both as whole buckets keeps each heading, and each key, unique.
  */
 export function timeSections(rows: ExecutionRow[], now: Date): TimeSection[] {
-  const sections: TimeSection[] = [];
+  const running: TimeSection = {
+    key: 'running',
+    label: 'Running now',
+    rows: [],
+  };
+  const overdue: TimeSection = { key: 'overdue', label: 'Overdue', rows: [] };
+  const upcoming: TimeSection[] = [];
   for (const row of rows) {
     const { key, label } = sectionOf(row, now);
-    const last = sections[sections.length - 1];
-    if (last && last.key === key) {
-      last.rows.push(row);
+    if (key === 'running') {
+      running.rows.push(row);
+    } else if (key === 'overdue') {
+      overdue.rows.push(row);
     } else {
-      sections.push({ key, label, rows: [row] });
+      // Future rows arrive in time order, so their sections never repeat.
+      const last = upcoming[upcoming.length - 1];
+      if (last && last.key === key) {
+        last.rows.push(row);
+      } else {
+        upcoming.push({ key, label, rows: [row] });
+      }
     }
   }
-  return sections;
+  return [running, overdue, ...upcoming].filter(
+    (section) => section.rows.length > 0,
+  );
 }
 
 function sectionOf(

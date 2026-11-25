@@ -142,7 +142,7 @@ The tabs are the Overview's stat cards (same look as the summary strip), single-
 ### List
 
 - **Layout:** content capped at ~78rem so the columns stay together on wide screens. Rows are cards tinted by status with the Overview's row colours (failing red, running blue). One toolbar row holds go-to-instance, the Start-from control and, on the right, Rerun all failed.
-- **Time sections:** rows sit under headings computed from the loaded rows, which are already in time order: Running now, Overdue, Next hour, Later today, Tomorrow, then one per later day.
+- **Time sections:** rows sit under headings computed from the loaded rows: one Running now and one Overdue section first (running rows usually have a past execution time, so in time order they sit among the overdue ones), then Next hour, Later today, Tomorrow and one per later day.
 - **Columns:** instance id · status (All tab only; elsewhere it repeats the tab) · next run (labelled **Retry** on the Failing tab) · last run · consecutive failures.
   - *Instance id:* full, monospace, wraps rather than being cut. Below it is a **one-line muted
     task-data preview**, only when task data is shown (`db-scheduler-ui.task-data`) and non-null.
@@ -243,7 +243,7 @@ On `TaskAdminController`, so it is absent under `read-only=true`.
 
 Pages `withPicked(false).withFailing(true)` in ascending batches (e.g. 500), keeping rows whose
 `last_failure` is before the cutoff. Each goes through `tryReschedule(instance, rerunAt)`, with
-`rerunAt` taken once per call. That skips rows picked or gone meanwhile; it returns false rather
+`rerunAt` taken once per call. The client's cutoff is clamped to `rerunAt`, so a client clock running ahead of the server cannot let one call rerun an execution that failed again meanwhile. That skips rows picked or gone meanwhile; it returns false rather
 than throwing. Rows already at `rerunAt` were moved there by this call and are skipped when the walk
 reaches them again. The legacy `/tasks/rerunGroup` stays untouched for the Scheduled page.
 

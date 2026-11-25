@@ -62,6 +62,16 @@ class FailedRerunnerTest {
   }
 
   @Test
+  void rerun_clientClockAhead_cutoffIsClampedToServerNow() {
+    // The browser sends its own "now"; an hour fast, it would otherwise reach failures that
+    // happened after the server started this rerun.
+    failing("failed-after-server-now", NOW.minus(Duration.ofHours(1)));
+    setLastFailure("failed-after-server-now", NOW.plus(Duration.ofMinutes(10)));
+
+    assertThat(rerunner(client, 3).rerunFailed(TASK, NOW.plus(Duration.ofHours(1)))).isZero();
+  }
+
+  @Test
   void rerun_skipsFailuresAfterTheCutoff() {
     failing("failed-after-click", NOW.minus(Duration.ofHours(1)));
     setLastFailure("failed-after-click", CUTOFF.plusSeconds(5));
