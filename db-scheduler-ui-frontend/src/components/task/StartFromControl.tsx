@@ -29,16 +29,33 @@ import {
   addHours,
   addWeeks,
   format,
+  isValid,
+  parse,
   subDays,
   subHours,
 } from 'date-fns';
 import { useState } from 'react';
 import colors from 'src/styles/colors';
-import { dateFormatText } from 'src/utils/dateFormatText';
 
-// datetime-local works in local time without a zone; the URL keeps an ISO instant.
+// Typed and shown in local time; the URL keeps an ISO instant.
+const DISPLAY_FORMAT = 'yyyy.MM.dd HH:mm:ss';
+// Shorter forms are accepted too, read as the start of that minute or day.
+const INPUT_FORMATS = [DISPLAY_FORMAT, 'yyyy.MM.dd HH:mm', 'yyyy.MM.dd'];
+
 const toInputValue = (iso: string | null) =>
-  iso ? format(new Date(iso), "yyyy-MM-dd'T'HH:mm:ss") : '';
+  iso ? format(new Date(iso), DISPLAY_FORMAT) : '';
+
+/** The instant typed, or null when it matches none of the accepted formats. */
+function parseInput(text: string): Date | null {
+  const trimmed = text.trim();
+  for (const pattern of INPUT_FORMATS) {
+    const date = parse(trimmed, pattern, new Date());
+    if (isValid(date) && format(date, pattern) === trimmed) {
+      return date;
+    }
+  }
+  return null;
+}
 
 /** Where in execution time the list starts. Cleared means the earliest execution. */
 export const StartFromControl: React.FC<{
@@ -47,6 +64,8 @@ export const StartFromControl: React.FC<{
 }> = ({ from, onChange }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [draft, setDraft] = useState(toInputValue(from));
+  const typed = draft.trim() === '' ? null : parseInput(draft);
+  const invalid = draft.trim() !== '' && typed === null;
 
   const choose = (value: string | null) => {
     onChange(value);
@@ -72,7 +91,7 @@ export const StartFromControl: React.FC<{
           leftIcon={<TimeIcon color={colors.primary['400']} />}
           rightIcon={<ChevronDownIcon />}
         >
-          From: {from ? dateFormatText(new Date(from)) : 'earliest'}
+          From: {from ? format(new Date(from), DISPLAY_FORMAT) : 'earliest'}
         </Button>
       </PopoverTrigger>
       <PopoverContent width="30rem">
@@ -119,22 +138,32 @@ export const StartFromControl: React.FC<{
               spacing={2}
               onSubmit={(e: React.FormEvent) => {
                 e.preventDefault();
-                choose(draft ? new Date(draft).toISOString() : null);
+                if (!invalid) {
+                  choose(typed ? typed.toISOString() : null);
+                }
               }}
             >
               <Input
-                type="datetime-local"
-                // One-second steps make the browser show and accept seconds.
-                step={1}
                 size="sm"
+                fontFamily="mono"
                 value={draft}
+                placeholder="yyyy.mm.dd hh:mm:ss"
                 aria-label="Start from execution time"
+                isInvalid={invalid}
                 onChange={(e) => setDraft(e.target.value)}
               />
-              <Button size="sm" type="submit">
+              <Button size="sm" type="submit" isDisabled={invalid}>
                 Go
               </Button>
             </HStack>
+            <Text
+              fontSize="xs"
+              color={invalid ? colors.failed['200'] : colors.primary['400']}
+              mt={-1}
+            >
+              yyyy.mm.dd, optionally with hh:mm or hh:mm:ss (24-hour, local
+              time)
+            </Text>
           </Stack>
         </PopoverBody>
       </PopoverContent>

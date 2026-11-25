@@ -27,6 +27,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import {
   Link as RouterLink,
   useLocation,
@@ -51,7 +52,6 @@ import {
   OVERVIEW_TASKS_QUERY_KEY,
 } from 'src/services/getOverviewTasks';
 import colors from 'src/styles/colors';
-import { dateFormatText } from 'src/utils/dateFormatText';
 import {
   absoluteTitle,
   dotColor,
@@ -181,7 +181,7 @@ export const TaskPage: React.FC = () => {
               {params.from && (
                 <>
                   {' '}
-                  from {dateFormatText(new Date(params.from))} on ·{' '}
+                  from {format(new Date(params.from), 'yyyy.MM.dd HH:mm:ss')} on ·{' '}
                   <Button
                     variant="link"
                     size="sm"
