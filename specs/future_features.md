@@ -130,6 +130,32 @@ leave the Overview off. The task-detail page adds a second such API
 minimum version is better than one check per class. Maven's enforcer plugin cannot help here: it
 runs only in this project's build, not in the applications that use it.
 
+## Task page: follow-ups from the first review
+
+Found reviewing the task-detail branch; none blocks it.
+
+- **Task names with `/` or `%` in `/tasks/:taskName`.** Reloads and shared links to a name with
+  `/` get a 400 (Tomcat rejects `%2F`, as does Spring Security's firewall), and react-router 6.15
+  decodes the path twice, so a task named `a%20b` opens as `a b`. The legacy
+  `/scheduled/:taskName` has the same flaw. Fix by moving the name to the query string or by
+  upgrading react-router (≥ 6.22 decodes per segment); either way, settle it together with the
+  Overview's panel-versus-page behaviour.
+- **The default tab can switch by itself.** Without `?status`, the tab is recomputed on every
+  summary refresh, so the first failure moves a reader from All to Failing, and a rerun moves
+  them back. Fix the default once per task.
+- **A malformed `?from=` blanks the page** (`format(new Date('x'))` throws). Drop unparsable
+  values the way `status` already is.
+- **Rerun of very large failing sets is one long request.** At 100k+ rows a proxy timeout shows
+  an error while the server carries on. Cap per call and report "more remain", or document it.
+- **Auto-refresh refetches every loaded page.** Refetch only the first page (`refetchPage`).
+- **Rows aren't keyboard-reachable**, and closing the drawer doesn't return focus to the row.
+- **The drawer's "Open task page" link drops the Overview's filters** from the breadcrumb.
+- **Go-to-instance trims spaces**, so ids with leading or trailing spaces can't be opened.
+- **`FailedRerunner`'s `alreadyRerun` check is likely dead**: a rerun resets the failure count, so
+  the row already leaves the failing filter. Confirm, then remove it or fix its comment.
+- **Smoke tests for the new endpoints exist only in `example-app`**, not in the Boot 4 and WebFlux
+  example apps.
+
 ## Reschedule has no backend
 
 `TaskAdminController` has rerun / rerunGroup / delete and nothing else, so the instance panel
