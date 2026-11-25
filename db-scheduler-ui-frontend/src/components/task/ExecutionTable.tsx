@@ -11,9 +11,9 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ChevronRightIcon } from '@chakra-ui/icons';
 import { Box, Grid, HStack, Text } from '@chakra-ui/react';
 import { formatDistanceToNowStrict, isBefore } from 'date-fns';
+import { DetailsButton } from 'src/components/common/DetailsButton';
 import { ExecutionRow } from 'src/models/ExecutionPage';
 import { InstanceStatus } from 'src/models/InstanceDetail';
 import colors from 'src/styles/colors';
@@ -65,8 +65,8 @@ export const ExecutionTable: React.FC<ExecutionTableProps> = ({
   nextRunLabel,
 }) => {
   const columns = hideStatus
-    ? 'minmax(16rem, 2.4fr) 1.2fr 1.3fr 4.5rem 1rem'
-    : 'minmax(16rem, 2.4fr) 0.8fr 1.2fr 1.3fr 4.5rem 1rem';
+    ? 'minmax(16rem, 2.4fr) 1.2fr 1.3fr 4.5rem 5rem'
+    : 'minmax(16rem, 2.4fr) 0.8fr 1.2fr 1.3fr 4.5rem 5rem';
   const sections = timeSections(rows, new Date());
 
   return (
@@ -131,6 +131,7 @@ export const ExecutionTable: React.FC<ExecutionTableProps> = ({
                   bgColor: isSelected ? colors.running['100'] : tint.hover,
                 }}
                 onClick={() => onSelect(row.taskInstance)}
+                title="Opens the instance in the side panel"
               >
                 <Box minW={0}>
                   <Text
@@ -169,7 +170,12 @@ export const ExecutionTable: React.FC<ExecutionTableProps> = ({
                     ? `${row.consecutiveFailures}×`
                     : '—'}
                 </Text>
-                <ChevronRightIcon color={colors.primary['400']} />
+                <Box textAlign="right">
+                  <DetailsButton
+                    label={`Show details for ${row.taskInstance} in the side panel`}
+                    onOpen={() => onSelect(row.taskInstance)}
+                  />
+                </Box>
               </Grid>
             );
           })}

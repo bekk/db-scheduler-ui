@@ -29,7 +29,8 @@ import {
 } from '@chakra-ui/react';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
-import { PanelIcon, RepeatIcon } from 'src/assets/icons';
+import { RepeatIcon } from 'src/assets/icons';
+import { DetailsButton } from 'src/components/common/DetailsButton';
 import { InstanceDrawer } from 'src/components/overview/InstanceDrawer';
 import { SummaryStrip } from 'src/components/overview/SummaryStrip';
 import { OverviewTask } from 'src/models/OverviewTask';
@@ -245,22 +246,10 @@ const OverviewRow: React.FC<{
       <Td>{lastRunText(task)}</Td>
       <Td textAlign="right" width="1%" whiteSpace="nowrap">
         {opensInstance && (
-          <Button
-            size="xs"
-            variant="solid"
-            bgColor="#eef1ff"
-            color={colors.running['300']}
-            _hover={{ bgColor: colors.running['100'] }}
-            leftIcon={<PanelIcon />}
-            aria-label={`Show details for ${task.taskName} in the side panel`}
-            onClick={(event) => {
-              // The row handles the same click; without this it would fire twice.
-              event.stopPropagation();
-              open();
-            }}
-          >
-            Details
-          </Button>
+          <DetailsButton
+            label={`Show details for ${task.taskName} in the side panel`}
+            onOpen={open}
+          />
         )}
         {task.instanceCount > 1 && (
           <Button
