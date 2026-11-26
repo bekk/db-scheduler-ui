@@ -94,8 +94,9 @@ class SmokeTest {
     ResponseEntity<ExecutionPage> result =
         this.restTemplate.getForEntity(
             baseUrl
-                + "/db-scheduler-api/tasks/executions?taskName=%s&status=all"
-                    .formatted(SEND_WELCOME_EMAIL.getTaskName()),
+                // Most of the example invoice emails are scheduled days ahead, so some are
+                // always there; the welcome emails can complete before the request.
+                + "/db-scheduler-api/tasks/executions?taskName=send-invoice-email&status=all",
             ExecutionPage.class);
 
     assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);

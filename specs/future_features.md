@@ -147,6 +147,15 @@ Found reviewing the task-detail branch; none blocks it.
 - **Go-to-instance trims spaces**, so ids with leading or trailing spaces can't be opened.
 - **`FailedRerunner`'s `alreadyRerun` check is likely dead**: a rerun resets the failure count, so
   the row already leaves the failing filter. Confirm, then remove it or fix its comment.
+- **Rerun all failed overwrites a reschedule made in the meantime.** `tryReschedule` skips only
+  missing or picked rows; it has no expected execution time or version. An instance someone
+  rescheduled between the batch read and the rerun is moved to now. Closing this needs a
+  conditional reschedule in db-scheduler's `SchedulerClient`.
+- **401 redirects ignore `CONTEXT_PATH`.** Every frontend service sends an expired session to
+  `/db-scheduler`, so behind a UI prefix it lands on a 404. Fix all services together.
+- **Log readers and the log writer can use different datasources.** With a `DbSchedulerOverrides`
+  (or customizer) datasource, history is read from it but `JdbcLogRepository` writes to the
+  primary one. Predates the task page; pick one policy for writer and readers in both starters.
 - **The drawer's › stops at the last loaded row.** It could load the next page and carry on.
 - **Failing rows don't show their error.** A one-line last-exception message per row would save
   opening each one; needs the message in `ExecutionRow`.

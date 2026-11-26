@@ -113,6 +113,7 @@ export const TaskPage: React.FC = () => {
     enabled: !!task,
     refetchInterval,
   });
+  const refreshing = executions.isFetching && !executions.isFetchingNextPage;
   const rows = executions.data?.pages.flatMap((page) => page.items) ?? [];
   // The order the table shows them in, which groups running and overdue rows first.
   const order = timeSections(rows, new Date()).flatMap((section) =>
@@ -239,7 +240,13 @@ export const TaskPage: React.FC = () => {
                   size="sm"
                   variant="outline"
                   bgColor="white"
-                  onClick={() => void executions.fetchNextPage()}
+                  // Loading more during a refresh would cancel it and append to the stale pages.
+                  isDisabled={refreshing}
+                  onClick={() => {
+                    if (!refreshing) {
+                      void executions.fetchNextPage();
+                    }
+                  }}
                   isLoading={executions.isFetchingNextPage}
                 >
                   Load 50 more

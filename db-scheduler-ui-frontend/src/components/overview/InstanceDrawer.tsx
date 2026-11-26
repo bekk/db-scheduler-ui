@@ -34,7 +34,7 @@ import {
 } from '@chakra-ui/react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import JsonViewer from 'src/components/common/JsonViewer';
 import { useInstanceDetail } from 'src/hooks/useInstanceDetail';
 import {
@@ -96,6 +96,7 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
   onChanged,
 }) => {
   const { instance, status, refetch } = useInstanceDetail(taskName, instanceId);
+  const location = useLocation();
   // react-query keeps `data` from the last successful fetch around on a failed poll, so gate on
   // `status` rather than `instance` — otherwise the header keeps a stale badge after the body
   // has already moved on to a gone/ambiguous/error message.
@@ -137,6 +138,8 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
               <Button
                 as={RouterLink}
                 to={`/tasks/${encodeURIComponent(taskName)}`}
+                // The breadcrumb returns here, with the Overview's filters but not the panel.
+                state={{ from: withoutParam(location, 'task') }}
                 size="xs"
                 variant="outline"
                 fontWeight="semibold"
@@ -284,6 +287,16 @@ const StepperControls: React.FC<{ stepper: Stepper }> = ({ stepper }) => {
       />
     </HStack>
   );
+};
+
+const withoutParam = (
+  location: { pathname: string; search: string },
+  name: string,
+) => {
+  const params = new URLSearchParams(location.search);
+  params.delete(name);
+  const search = params.toString();
+  return location.pathname + (search ? `?${search}` : '');
 };
 
 const Muted: React.FC<{ children: React.ReactNode }> = ({ children }) => (

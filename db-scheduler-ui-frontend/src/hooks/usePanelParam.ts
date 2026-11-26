@@ -54,6 +54,11 @@ export const usePanelParam = (name: string): PanelParam => {
     open: (value) => write(value, true),
     replace: (value) => write(value, false),
     close: () => {
+      // Callers can hold an old close, e.g. a delete that completes after the drawer was closed;
+      // the live URL says whether the panel is still open.
+      if (!new URLSearchParams(window.location.search).has(name)) {
+        return;
+      }
       if (openedHere) {
         navigate(-1);
       } else {

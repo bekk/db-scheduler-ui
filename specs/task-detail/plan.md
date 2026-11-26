@@ -185,9 +185,11 @@ Chakra UI + React Query v4 + react-router v6.
     a `SchedulerClient` wrapper that marks it picked just before `reschedule`)
 - [ ] **Step 2:** Run it. Expected: FAIL.
 - [ ] **Step 3:** Implement. Page `withPicked(false).withFailing(true)` with
-  `after(last ?? EPOCH sentinel)` + `before(new ExecutionTimeAndId(cutoff, ""))` +
-  `limit(batchSize)`. For each row, `reschedule(taskInstanceId, clock.instant())`; count `true`
-  results. Stop on a short batch.
+  `after(last ?? EPOCH sentinel)` + `limit(batchSize)`, keeping rows whose `last_failure` is
+  before the cutoff. (Superseded during the build: filtering on `execution_time` missed failures
+  whose retry lies in the future, and the cutoff is clamped to server time; see the spec.) For
+  each row, `tryReschedule(taskInstanceId, clock.instant())`; count `true` results. Stop on a
+  short batch.
 - [ ] **Step 4:** Add the controller and beans. `SmokeTest`: `testRerunFailedReturnsCount` (200).
   `SmokeReadOnlyTest`: assert no `executionAdminController` bean. New
   `example-app/src/test/.../SmokeOverviewOffTest.java` (`@TestPropertySource(properties = "db-scheduler-ui.overview=false")`,

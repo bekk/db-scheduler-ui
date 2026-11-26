@@ -109,6 +109,7 @@ public class ExecutionPager {
         execution.getLastSuccess(),
         execution.getLastFailure(),
         execution.getConsecutiveFailures(),
-        TaskDataPreview.of(execution.getData(), showTaskData));
+        // getData() deserializes, so it is skipped when task data is hidden.
+        TaskDataPreview.of(showTaskData ? execution.getData() : null, showTaskData));
   }
 }

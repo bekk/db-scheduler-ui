@@ -64,7 +64,7 @@ export const StatusTabs: React.FC<{
   status: ExecutionStatusFilter;
   onChange: (status: ExecutionStatusFilter) => void;
 }> = ({ task, status, onChange }) => (
-  <Wrap spacing={3} role="tablist" aria-label="Instances by status">
+  <Wrap spacing={3} role="group" aria-label="Instances by status">
     {EXECUTION_STATUS_FILTERS.map((value) => {
       const n = count(task, value);
       const active = value === status;
@@ -74,8 +74,7 @@ export const StatusTabs: React.FC<{
           <Box
             as="button"
             type="button"
-            role="tab"
-            aria-selected={active}
+            aria-pressed={active}
             onClick={() => onChange(value)}
             minW="8.5rem"
             textAlign="left"
