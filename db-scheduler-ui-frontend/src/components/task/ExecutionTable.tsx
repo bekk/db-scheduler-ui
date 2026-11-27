@@ -11,9 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Box, Grid, HStack, Text } from '@chakra-ui/react';
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
+import { Box, Button, Grid, HStack, Text } from '@chakra-ui/react';
 import { formatDistanceToNowStrict, isBefore } from 'date-fns';
-import { DetailsButton } from 'src/components/common/DetailsButton';
+import { useEffect } from 'react';
 import { ExecutionRow } from 'src/models/ExecutionPage';
 import { InstanceStatus } from 'src/models/InstanceDetail';
 import colors from 'src/styles/colors';
@@ -55,7 +56,12 @@ interface ExecutionTableProps {
   hideStatus: boolean;
   /** Failing rows wait for a retry; label the time column for what it is. */
   nextRunLabel: string;
+  /** The expanded row's details. */
+  renderDetails: (id: string) => React.ReactNode;
 }
+
+/** DOM id of a row, for scrolling an expanded row into view. */
+const rowDomId = (id: string) => `execution-${id}`;
 
 export const ExecutionTable: React.FC<ExecutionTableProps> = ({
   rows,
@@ -63,11 +69,21 @@ export const ExecutionTable: React.FC<ExecutionTableProps> = ({
   onSelect,
   hideStatus,
   nextRunLabel,
+  renderDetails,
 }) => {
   const columns = hideStatus
-    ? 'minmax(16rem, 2.4fr) 1.2fr 1.3fr 4.5rem 5rem'
-    : 'minmax(16rem, 2.4fr) 0.8fr 1.2fr 1.3fr 4.5rem 5rem';
+    ? 'minmax(16rem, 2.4fr) 1.2fr 1.3fr 4.5rem 6rem'
+    : 'minmax(16rem, 2.4fr) 0.8fr 1.2fr 1.3fr 4.5rem 6rem';
   const sections = timeSections(rows, new Date());
+
+  // Bring a newly expanded row into view; its details push the rows below it down.
+  useEffect(() => {
+    if (selected) {
+      document
+        .getElementById(rowDomId(selected))
+        ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [selected]);
 
   return (
     <Box>
@@ -113,70 +129,101 @@ export const ExecutionTable: React.FC<ExecutionTableProps> = ({
             const tint = rowTint[row.status];
             const isSelected = row.taskInstance === selected;
             return (
-              <Grid
+              <Box
                 key={row.taskInstance}
-                templateColumns={columns}
-                gap={3}
-                alignItems="center"
-                px={4}
-                py={3}
+                id={rowDomId(row.taskInstance)}
                 mb={2}
-                bgColor={isSelected ? colors.running['100'] : tint.bg}
+                bgColor={isSelected ? 'white' : tint.bg}
                 border="1px solid"
                 borderColor={isSelected ? colors.running['300'] : tint.border}
+                boxShadow={isSelected ? 'md' : undefined}
                 borderRadius="8px"
-                cursor="pointer"
-                transition="background-color 0.12s ease"
-                _hover={{
-                  bgColor: isSelected ? colors.running['100'] : tint.hover,
-                }}
-                onClick={() => onSelect(row.taskInstance)}
-                title="Opens the instance in the side panel"
+                overflow="hidden"
               >
-                <Box minW={0}>
-                  <Text
-                    fontFamily="mono"
-                    fontSize="sm"
-                    fontWeight="semibold"
-                    wordBreak="break-all"
-                  >
-                    {row.taskInstance}
-                  </Text>
-                  {row.taskDataPreview && (
-                    <DataPreview preview={row.taskDataPreview} />
-                  )}
-                </Box>
-                {!hideStatus && (
-                  <Text
-                    color={statusColor[row.status]}
-                    fontWeight="semibold"
-                    fontSize="sm"
-                  >
-                    {statusLabel[row.status]}
-                  </Text>
-                )}
-                <NextRun row={row} />
-                <LastRun row={row} />
-                <Text
-                  textAlign="right"
-                  fontWeight="bold"
-                  color={
-                    row.consecutiveFailures > 0
-                      ? colors.failed['200']
-                      : colors.primary['300']
-                  }
+                <Grid
+                  templateColumns={columns}
+                  gap={3}
+                  alignItems="center"
+                  px={4}
+                  py={3}
+                  bgColor={isSelected ? colors.running['100'] : undefined}
+                  cursor="pointer"
+                  transition="background-color 0.12s ease"
+                  _hover={{
+                    bgColor: isSelected ? colors.running['100'] : tint.hover,
+                  }}
+                  onClick={() => onSelect(row.taskInstance)}
+                  title={isSelected ? 'Hide details' : 'Show details'}
                 >
-                  {row.consecutiveFailures > 0
-                    ? `${row.consecutiveFailures}×`
-                    : '—'}
-                </Text>
-                <Box textAlign="right">
-                  <DetailsButton
-                    label={`Show details for ${row.taskInstance} in the side panel`}
-                    onOpen={() => onSelect(row.taskInstance)}
-                  />
-                </Box>
-              </Grid>
+                  <Box minW={0}>
+                    <Text
+                      fontFamily="mono"
+                      fontSize="sm"
+                      fontWeight="semibold"
+                      wordBreak="break-all"
+                    >
+                      {row.taskInstance}
+                    </Text>
+                    {row.taskDataPreview && (
+                      <DataPreview preview={row.taskDataPreview} />
+                    )}
+                  </Box>
+                  {!hideStatus && (
+                    <Text
+                      color={statusColor[row.status]}
+                      fontWeight="semibold"
+                      fontSize="sm"
+                    >
+                      {statusLabel[row.status]}
+                    </Text>
+                  )}
+                  <NextRun row={row} />
+                  <LastRun row={row} />
+                  <Text
+                    textAlign="right"
+                    fontWeight="bold"
+                    color={
+                      row.consecutiveFailures > 0
+                        ? colors.failed['200']
+                        : colors.primary['300']
+                    }
+                  >
+                    {row.consecutiveFailures > 0
+                      ? `${row.consecutiveFailures}×`
+                      : '—'}
+                  </Text>
+                  <Box textAlign="right">
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      color={colors.running['300']}
+                      rightIcon={
+                        isSelected ? <ChevronUpIcon /> : <ChevronDownIcon />
+                      }
+                      aria-expanded={isSelected}
+                      aria-label={`${
+                        isSelected ? 'Hide' : 'Show'
+                      } details for ${row.taskInstance}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onSelect(row.taskInstance);
+                      }}
+                    >
+                      Details
+                    </Button>
+                  </Box>
+                </Grid>
+                {isSelected && (
+                  <Box
+                    px={6}
+                    pb={5}
+                    borderTop="1px solid"
+                    borderTopColor={colors.primary['200']}
+                  >
+                    {renderDetails(row.taskInstance)}
+                  </Box>
+                )}
+              </Box>
             );
           })}
         </Box>

@@ -34,8 +34,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { InstanceDrawer } from 'src/components/overview/InstanceDrawer';
-import { timeSections } from 'src/utils/timeSections';
+import { InstanceDetails } from 'src/components/overview/InstanceDrawer';
 import { GoToInstance } from 'src/components/task/GoToInstance';
 import { RerunFailedButton } from 'src/components/task/RerunFailedButton';
 import { TASK_EXECUTIONS_QUERY_KEY } from 'src/services/getTaskExecutions';
@@ -115,15 +114,37 @@ export const TaskPage: React.FC = () => {
   });
   const refreshing = executions.isFetching && !executions.isFetchingNextPage;
   const rows = executions.data?.pages.flatMap((page) => page.items) ?? [];
-  // The order the table shows them in, which groups running and overdue rows first.
-  const order = timeSections(rows, new Date()).flatMap((section) =>
-    section.rows.map((row) => row.taskInstance),
-  );
-  const position = params.instance ? order.indexOf(params.instance) : -1;
-  const neighbour = (offset: number) => {
-    const id = order[position + offset];
-    return id === undefined ? null : () => params.stepInstance(id);
+  // A task with a single instance opens with it expanded, until the reader collapses it.
+  const [soleCollapsed, setSoleCollapsed] = useState(false);
+  const sole =
+    task?.instanceCount === 1 && rows.length === 1 && !executions.hasNextPage
+      ? rows[0].taskInstance
+      : null;
+  const expanded = params.instance ?? (soleCollapsed ? null : sole);
+  const expandedLoaded = rows.some((row) => row.taskInstance === expanded);
+
+  const toggle = (id: string) => {
+    if (id === expanded) {
+      if (params.instance) {
+        params.closeInstance();
+      } else {
+        setSoleCollapsed(true);
+      }
+    } else if (params.instance) {
+      params.stepInstance(id);
+    } else {
+      params.openInstance(id);
+    }
   };
+
+  const details = (id: string) => (
+    <InstanceDetails
+      taskName={taskName}
+      instanceId={id}
+      onChanged={refresh}
+      onDeleted={params.closeInstance}
+    />
+  );
 
   const refresh = () => {
     void summary.refetch();
@@ -188,9 +209,16 @@ export const TaskPage: React.FC = () => {
             </FormControl>
           </HStack>
 
-          <StatusTabs task={task} status={status} onChange={params.setStatus} />
+          {/* One instance: tabs, search and paging have nothing to work on. */}
+          {!sole && (
+            <StatusTabs
+              task={task}
+              status={status}
+              onChange={params.setStatus}
+            />
+          )}
 
-          <Flex wrap="wrap" gap={3} align="center">
+          <Flex wrap="wrap" gap={3} align="center" hidden={!!sole}>
             <GoToInstance onOpen={params.openInstance} />
             <StartFromControl from={params.from} onChange={params.setFrom} />
             <Box flex={1} />
@@ -224,16 +252,42 @@ export const TaskPage: React.FC = () => {
               )}
             </Text>
           )}
+          {expanded && !expandedLoaded && executions.isSuccess && (
+            <Box
+              bgColor="white"
+              border="1px solid"
+              borderColor={colors.running['300']}
+              borderRadius="8px"
+              boxShadow="md"
+              px={6}
+              py={4}
+            >
+              <HStack justify="space-between" mb={2}>
+                <Text fontFamily="mono" fontWeight="semibold">
+                  {expanded}
+                </Text>
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={params.closeInstance}
+                >
+                  Close
+                </Button>
+              </HStack>
+              {details(expanded)}
+            </Box>
+          )}
           {rows.length > 0 && (
             <ExecutionTable
               rows={rows}
-              selected={params.instance}
-              onSelect={params.openInstance}
+              selected={expanded}
+              onSelect={toggle}
+              renderDetails={details}
               hideStatus={status !== 'all'}
               nextRunLabel={status === 'failing' ? 'Retry' : 'Next run'}
             />
           )}
-          {rows.length > 0 && (
+          {rows.length > 0 && !sole && (
             <Flex justify="center" align="center" gap={3}>
               {executions.hasNextPage && (
                 <Button
@@ -274,24 +328,6 @@ export const TaskPage: React.FC = () => {
           )}
         </Stack>
       )}
-      <InstanceDrawer
-        taskName={params.instance ? taskName : null}
-        instanceId={params.instance}
-        stepper={
-          // Opened by id for an instance outside the loaded rows, there is nothing to step through.
-          position < 0
-            ? undefined
-            : {
-                position,
-                loaded: order.length,
-                hasMore: !!executions.hasNextPage,
-                onPrevious: neighbour(-1),
-                onNext: neighbour(1),
-              }
-        }
-        onClose={params.closeInstance}
-        onChanged={refresh}
-      />
     </Box>
   );
 };

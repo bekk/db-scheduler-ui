@@ -30,8 +30,6 @@ import {
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { useQuery } from '@tanstack/react-query';
 import { RepeatIcon } from 'src/assets/icons';
-import { DetailsButton } from 'src/components/common/DetailsButton';
-import { InstanceDrawer } from 'src/components/overview/InstanceDrawer';
 import { SummaryStrip } from 'src/components/overview/SummaryStrip';
 import { OverviewTask } from 'src/models/OverviewTask';
 import {
@@ -41,7 +39,6 @@ import {
 import colors from 'src/styles/colors';
 import { useAutoRefresh } from 'src/hooks/useAutoRefresh';
 import { useOverviewFilters } from 'src/hooks/useOverviewFilters';
-import { useSelectedInstance } from 'src/hooks/useSelectedInstance';
 import { overdueColor } from 'src/utils/overdue';
 import { applyOverviewFilters } from 'src/utils/overviewFilters';
 import { summarizeOverview } from 'src/utils/overviewSummary';
@@ -64,12 +61,10 @@ export const OverviewPage: React.FC = () => {
     data = [],
     isLoading,
     isError,
-    refetch,
   } = useQuery([OVERVIEW_TASKS_QUERY_KEY], getOverviewTasks, {
     refetchInterval: autoRefresh ? AUTO_REFRESH_MS : false,
   });
   const { activeFilters, toggleFilter, clearFilters } = useOverviewFilters();
-  const { selected, select, clear } = useSelectedInstance();
 
   const tasks = sortedByName(data);
   const visibleTasks = applyOverviewFilters(tasks, activeFilters);
@@ -123,11 +118,7 @@ export const OverviewPage: React.FC = () => {
               <>
                 {visibleTasks.length > 0 && <ColumnLabels />}
                 {visibleTasks.map((task) => (
-                  <OverviewRow
-                    key={task.taskName}
-                    task={task}
-                    onOpenInstance={select}
-                  />
+                  <OverviewRow key={task.taskName} task={task} />
                 ))}
                 {tasks.length > 0 && visibleTasks.length === 0 && (
                   <MessageRow message="No tasks match the active filters" />
@@ -137,12 +128,6 @@ export const OverviewPage: React.FC = () => {
           </Tbody>
         </Table>
       </TableContainer>
-      <InstanceDrawer
-        taskName={selected}
-        showTaskPageLink
-        onClose={clear}
-        onChanged={() => void refetch()}
-      />
     </Box>
   );
 };
@@ -173,20 +158,12 @@ const ColumnLabels: React.FC = () => (
   </Tr>
 );
 
-const OverviewRow: React.FC<{
-  task: OverviewTask;
-  onOpenInstance: (taskName: string) => void;
-}> = ({ task, onOpenInstance }) => {
+const OverviewRow: React.FC<{ task: OverviewTask }> = ({ task }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const drillDownTarget = `/tasks/${encodeURIComponent(task.taskName)}`;
-  // Single-instance rows open the instance directly; the rest drill down to the list.
-  const opensInstance = task.instanceCount === 1;
-
   const open = () => {
-    if (opensInstance) {
-      onOpenInstance(task.taskName);
-    } else if (task.instanceCount > 0) {
+    if (task.instanceCount > 0) {
       // Hands the task page the Overview's URL, filters included, for its breadcrumb.
       navigate(drillDownTarget, {
         state: { from: location.pathname + location.search },
@@ -194,12 +171,7 @@ const OverviewRow: React.FC<{
     }
   };
 
-  // The row and its button say where a click leads, since that depends on the instance count.
-  const hint = opensInstance
-    ? 'Opens the instance in the side panel'
-    : task.instanceCount > 1
-    ? `Opens the task page · ${task.instanceCount.toLocaleString()} instances`
-    : undefined;
+  const hint = task.instanceCount > 0 ? 'Opens the task page' : undefined;
 
   return (
     <Tr
@@ -245,13 +217,7 @@ const OverviewRow: React.FC<{
       </Td>
       <Td>{lastRunText(task)}</Td>
       <Td textAlign="right" width="1%" whiteSpace="nowrap">
-        {opensInstance && (
-          <DetailsButton
-            label={`Show details for ${task.taskName} in the side panel`}
-            onOpen={open}
-          />
-        )}
-        {task.instanceCount > 1 && (
+        {task.instanceCount > 0 && (
           <Button
             size="xs"
             variant="outline"
@@ -264,7 +230,9 @@ const OverviewRow: React.FC<{
               open();
             }}
           >
-            {task.instanceCount.toLocaleString()} instances
+            {task.instanceCount === 1
+              ? '1 instance'
+              : `${task.instanceCount.toLocaleString()} instances`}
           </Button>
         )}
       </Td>

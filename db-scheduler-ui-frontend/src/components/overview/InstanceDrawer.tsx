@@ -164,59 +164,102 @@ export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
         </DrawerHeader>
 
         <DrawerBody>
-          {status === 'loading' && <Muted>Loading instance…</Muted>}
-          {status === 'error' && <Muted>Could not load this instance.</Muted>}
-          {status === 'gone' && (
-            <Muted>
-              This execution is no longer scheduled — it may have completed or
-              been deleted.
-            </Muted>
-          )}
-          {status === 'ambiguous' && (
-            <Muted>
-              This task has more than one execution now, so there is no single
-              one to show.
-            </Muted>
-          )}
-          {status === 'ready' && instance && (
-            <>
-              <Facts instance={instance} />
-              <Section label="Task data" />
-              {instance.taskData ? (
-                <Box
-                  bgColor={colors.primary['200']}
-                  borderRadius="6px"
-                  p={3}
-                  fontSize="sm"
-                  overflowX="auto"
-                >
-                  <JsonViewer data={instance.taskData} />
-                </Box>
-              ) : (
-                <Muted>no task data</Muted>
-              )}
-
-              <ExceptionSection instance={instance} />
-              <HistorySection instance={instance} />
-              <Actions
-                // Remounts on a different instance so confirm/busy state doesn't survive a
-                // switch (e.g. Back navigating from one instance's delete-confirm to another's).
-                key={`${instance.taskName}:${instance.id}`}
-                instance={instance}
-                onDone={() => {
-                  refetch();
-                  onChanged();
-                }}
-                onDeleted={() => {
-                  onChanged();
-                  onClose();
-                }}
-              />
-            </>
-          )}
+          <InstanceDetailsBody
+            status={status}
+            instance={instance}
+            onDone={() => {
+              refetch();
+              onChanged();
+            }}
+            onDeleted={() => {
+              onChanged();
+              onClose();
+            }}
+          />
         </DrawerBody>
       </DrawerContent>
     </Drawer>
+  );
+};
+
+type DetailStatus = ReturnType<typeof useInstanceDetail>['status'];
+
+const InstanceDetailsBody: React.FC<{
+  status: DetailStatus;
+  instance: InstanceDetail | undefined | null;
+  onDone: () => void;
+  onDeleted: () => void;
+}> = ({ status, instance, onDone, onDeleted }) => (
+  <>
+    {status === 'loading' && <Muted>Loading instance…</Muted>}
+    {status === 'error' && <Muted>Could not load this instance.</Muted>}
+    {status === 'gone' && (
+      <Muted>
+        This execution is no longer scheduled — it may have completed or been
+        deleted.
+      </Muted>
+    )}
+    {status === 'ambiguous' && (
+      <Muted>
+        This task has more than one execution now, so there is no single one to
+        show.
+      </Muted>
+    )}
+    {status === 'ready' && instance && (
+      <>
+        <Facts instance={instance} />
+        <Section label="Task data" />
+        {instance.taskData ? (
+          <Box
+            bgColor={colors.primary['200']}
+            borderRadius="6px"
+            p={3}
+            fontSize="sm"
+            overflowX="auto"
+          >
+            <JsonViewer data={instance.taskData} />
+          </Box>
+        ) : (
+          <Muted>no task data</Muted>
+        )}
+
+        <ExceptionSection instance={instance} />
+        <HistorySection instance={instance} />
+        <Actions
+          // Remounts on a different instance so confirm/busy state doesn't survive a
+          // switch (e.g. Back navigating from one instance's delete-confirm to another's).
+          key={`${instance.taskName}:${instance.id}`}
+          instance={instance}
+          onDone={onDone}
+          onDeleted={onDeleted}
+        />
+      </>
+    )}
+  </>
+);
+
+/** An execution's details in place, e.g. expanded under its row. */
+export const InstanceDetails: React.FC<{
+  taskName: string;
+  instanceId: string;
+  /** Refresh the list around it after an action changes the execution. */
+  onChanged: () => void;
+  onDeleted: () => void;
+}> = ({ taskName, instanceId, onChanged, onDeleted }) => {
+  const { instance, status, refetch } = useInstanceDetail(taskName, instanceId);
+  return (
+    <InstanceDetailsBody
+      status={status}
+      instance={instance}
+      onDone={() => {
+        refetch();
+        onChanged();
+      }}
+      onDeleted={() => {
+        onChanged();
+        onDeleted();
+      }}
+    />
   );
 };
 
