@@ -1,12 +1,17 @@
 # Task detail — per-task instance list (implementation spec)
 
 A page per task that lists its scheduled executions, filtered by status and paged through the
-database, with the instance drawer (`../instance-panel/spec.md`) opening for the selected row.
+database, with the selected row expanding in place to the instance's details (the contents of
+`../instance-panel/spec.md`, which first shipped as a side drawer).
 It is the parent view the instance panel was always meant to have, and it replaces the legacy
 `/scheduled/:taskName` drill-down for Overview users.
 
 Builds on `../overview-tasks-table/spec.md` (status model, row wording) and
-`../instance-panel/spec.md` (drawer, actions, history gating).
+`../instance-panel/spec.md` (details, actions, history gating).
+
+**Why inline, not a drawer:** user testing found the drawer far from the row on wide screens,
+and the Overview confusing when one-instance rows opened a drawer while others opened a page.
+Every Overview row now opens the task page, and details expand under their row.
 
 ## Who it is for
 
@@ -71,20 +76,17 @@ Adding one is an upstream change for later.
   |---------------|----------------------------------------------------------------------|
   | `status`      | `all` · `failing` · `running` · `overdue` · `scheduled`             |
   | `from`        | ISO instant; the list starts at this execution time                  |
-  | `instance`    | the instance open in the drawer (ids may contain `/ : space`, so never in the path) |
+  | `instance`    | the instance expanded in the list (ids may contain `/ : space`, so never in the path) |
   | `autoRefresh` | same param and default (off) as the Overview (`useAutoRefresh`)     |
 
-- **From the Overview:** rows with **more than one instance** navigate to `/tasks/:taskName`,
-  replacing today's `/scheduled/:taskName` target. Rows with exactly one instance keep opening
-  the drawer in place. Dormant rows (0 instances) stay non-clickable.
-  The row's button says which will happen: **Details** with a side-panel icon (one instance,
-  opens the drawer) or **N instances →** (several, opens the task page); the row has the same
-  hint as a tooltip. Opened from the Overview, the drawer is titled with the task name and shows
-  the instance id beneath it; on the task page it is the other way round. The drawer is about
-  40rem wide (at most 92% of the viewport).
-- **Drawer → page:** the drawer opened from a single-instance Overview row gets an
-  **`Open task page →`** button in its header, so single-schedule recurring tasks can reach the
-  page without it being the default.
+- **From the Overview:** every row with instances navigates to `/tasks/:taskName`, replacing
+  today's `/scheduled/:taskName` target; its button reads **1 instance** or **N instances →**,
+  and the row has "Opens the task page" as a tooltip. Dormant rows (0 instances) stay
+  non-clickable.
+- **One-instance tasks:** the page shows the header and the single row only (no tabs, toolbar
+  or paging). The row is shown closed, then opens after ~150 ms with its details already
+  fetched, so the reader sees the page they landed on become the details. Collapsing it keeps
+  it closed.
 - **Breadcrumb:** `Overview › <taskName>`. It returns to the Overview with its own query string
   (filters, auto-refresh) intact: link with the previous location when there is one, otherwise
   plain `/overview`.
@@ -122,7 +124,7 @@ summary is one `GROUP BY` and is already paid for by the Overview.)*
 
 ### Status tabs
 
-The tabs are the Overview's stat cards (same look as the summary strip), single-select. Each shows its count from the task summary; the header line above them carries timing only (one-time/recurring · next run · last run), so counts appear once.
+The tabs are the Overview's stat cards (same look as the summary strip), single-select. As on the Overview, a card with a count of 0 is inert unless it is the current one (Overdue has no count and stays selectable). Each shows its count from the task summary; the header line above them carries timing only (one-time/recurring · next run · last run), so counts appear once.
 
 | Tab       | Contents                                              | Filter                                        | Count           |
 |-----------|-------------------------------------------------------|-----------------------------------------------|-----------------|
@@ -146,7 +148,7 @@ The tabs are the Overview's stat cards (same look as the summary strip), single-
 - **Columns:** instance id · status (All tab only; elsewhere it repeats the tab) · next run (labelled **Retry** on the Failing tab) · last run · consecutive failures.
   - *Instance id:* full, monospace, wraps rather than being cut. Below it is a **one-line muted
     task-data preview**, only when task data is shown (`db-scheduler-ui.task-data`) and non-null.
-    The server truncates it (≈100 chars of compact JSON); the full payload lives in the drawer.
+    The server truncates it (≈100 chars of compact JSON); the full payload is in the expanded details.
     A preview that parses as a flat JSON object is shown as key/value chips (up to four);
     anything else, including a preview cut short, as one line of text.
   - *Status:* Failed / Running / Scheduled (per `../instance-panel/spec.md` §Status derivation).
@@ -160,18 +162,17 @@ The tabs are the Overview's stat cards (same look as the summary strip), single-
 - **Start from:** a compact `From: earliest ▾` button opening forward presets `now`, `+1 hour`, `+6 hours`, `+1 day`, `+1 week` (most rows are in the future), backward ones `earliest`, `−1 day`, `−1 hour`, and the browser's own date-time field, to the second (its field order follows the browser's locale; a page cannot change it). The button and the empty state show the start time as `yyyy.mm.dd hh:mm:ss` (`earliest` clears
   `from`). It sets `from` and restarts the list at that execution time. It combines with every
   tab.
-- **Go to instance:** an exact-id box. On submit it opens the drawer with `?instance=<id>`;
-  an unknown id shows the drawer's existing not-found state. No prefix or contains search.
-- **Selection:** clicking a row, or its **Details** button (the Overview's), opens
-  `InstanceDrawer` for that id; the row stays highlighted; closing the drawer returns focus to it.
-- **Stepping:** the drawer header shows "N of M" with ‹ › buttons, and ← → keys, that move to
-  the previous/next row in table order among the loaded rows. Stepping replaces the history
-  entry. At the last loaded row with more to load, › is inert and says to load more. An
-  instance opened by id that is not among the loaded rows has no stepper.
-- **Closing and Back** (both pages): opening the drawer pushes a history entry, so Back closes
-  it. Closing with ×, Esc or the overlay pops that entry rather than pushing a new one, so Back
-  afterwards leaves the page instead of reopening the drawer. A drawer that was already open on
-  arrival (reload, shared link) closes by replacing the entry.
+- **Go to instance:** an exact-id box, placeholder "Exact instance id" (db-scheduler can look
+  an instance up but not search them). On submit it sets `?instance=<id>`; an id outside the
+  loaded rows opens in a card above the list, and an unknown id says no scheduled instance has
+  it and that ids must match exactly. No prefix or contains search.
+- **Expanding:** clicking a row, or its **Details ⌄** button, expands the instance's details
+  under it in the same card (animated open and closed); clicking again collapses it. One row is
+  open at a time. The open row is scrolled into view.
+- **History** (`?instance=`): opening a row pushes a history entry, so Back collapses it;
+  switching to another row replaces that entry; collapsing pops it rather than pushing a new
+  one, so Back afterwards leaves the page. A row open on arrival (reload, shared link)
+  collapses by replacing the entry.
 - **Empty states:** an empty tab gets one muted line ("No failing instances"); with a start time set it says so and offers a way back ("No instances from 25 Nov, 21:19 on · show from the earliest"). If the task no
   longer has executions and is not registered, show "No scheduled instances for this task" with
   a link back to the Overview.
@@ -179,7 +180,7 @@ The tabs are the Overview's stat cards (same look as the summary strip), single-
 ### History link
 
 With `history=true`, a **`View history for this task →`** link opens the History page filtered
-by task name, the same way the drawer's `View full history →` does. A task-level history
+by task name, the same way the details' `View full history →` does. A task-level history
 section is **not** part of this spec; decide that once the page is in use.
 
 ## Actions
@@ -202,7 +203,7 @@ section is **not** part of this spec; decide that once the page is in use.
 
 ### Per instance
 
-Unchanged drawer actions (rerun / delete), now addressed by id. **Rerun** in the drawer gets the
+Unchanged instance actions (rerun / delete), now addressed by id. **Rerun** in the details gets the
 same reset-warning copy. This resolves `../future_features.md` *Rerun silently clears the
 failure history*; remove that entry.
 
@@ -273,8 +274,8 @@ the Overview.
 
 ## Degradation
 
-- **`read-only=true`:** no Rerun-all-failed button, no drawer actions (as today).
-- **`history=false`:** no history link; drawer behaves as today.
+- **`read-only=true`:** no Rerun-all-failed button, no instance actions (as today).
+- **`history=false`:** no history link; details behave as today.
 - **Task data hidden:** no preview line.
 - **No task definitions** (SchedulerClient-only): unaffected. The page needs only the
   executions and the summary.

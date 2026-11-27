@@ -34,7 +34,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { InstanceDetails } from 'src/components/overview/InstanceDrawer';
+import { InstanceDetails } from 'src/components/overview/InstanceDetails';
 import { GoToInstance } from 'src/components/task/GoToInstance';
 import { RerunFailedButton } from 'src/components/task/RerunFailedButton';
 import { TASK_EXECUTIONS_QUERY_KEY } from 'src/services/getTaskExecutions';
@@ -75,7 +75,7 @@ const emptyText: Record<ExecutionStatusFilter, string> = {
   scheduled: 'No scheduled instances',
 };
 
-const SOLE_OPEN_DELAY_MS = 350;
+const SOLE_OPEN_DELAY_MS = 150;
 
 /** One task's executions, by status. See `specs/task-detail/spec.md`. */
 export const TaskPage: React.FC = () => {
@@ -299,7 +299,13 @@ export const TaskPage: React.FC = () => {
                   Close
                 </Button>
               </HStack>
-              {details(expanded)}
+              <InstanceDetails
+                taskName={taskName}
+                instanceId={expanded}
+                onChanged={refresh}
+                onDeleted={params.closeInstance}
+                goneText={`No scheduled instance has the id "${expanded}". Ids must match exactly; the instance may also have completed or been deleted.`}
+              />
             </Box>
           )}
           {rows.length > 0 && (

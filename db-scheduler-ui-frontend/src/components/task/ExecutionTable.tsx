@@ -214,7 +214,15 @@ export const ExecutionTable: React.FC<ExecutionTableProps> = ({
                   </Box>
                 </Grid>
                 {/* Unmounted when closed, so only the open row fetches its details. */}
-                <Collapse in={isSelected} unmountOnExit animateOpacity>
+                <Collapse
+                  in={isSelected}
+                  unmountOnExit
+                  animateOpacity
+                  transition={{
+                    enter: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] },
+                    exit: { duration: 0.25 },
+                  }}
+                >
                   <Box
                     px={6}
                     pb={5}

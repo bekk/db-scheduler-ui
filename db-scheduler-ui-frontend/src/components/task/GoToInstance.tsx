@@ -11,7 +11,7 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SearchIcon } from '@chakra-ui/icons';
+import { ArrowForwardIcon } from '@chakra-ui/icons';
 import {
   Button,
   HStack,
@@ -22,7 +22,10 @@ import {
 import colors from 'src/styles/colors';
 import { useState } from 'react';
 
-/** Opens an instance by its exact id; the drawer reports an id that does not exist. */
+/**
+ * Opens an instance by its exact id. db-scheduler can look an instance up by id but not search
+ * them, so the box says so rather than looking like a search field.
+ */
 export const GoToInstance: React.FC<{ onOpen: (id: string) => void }> = ({
   onOpen,
 }) => {
@@ -42,13 +45,14 @@ export const GoToInstance: React.FC<{ onOpen: (id: string) => void }> = ({
     >
       <InputGroup size="sm" width="18rem">
         <InputLeftElement pointerEvents="none">
-          <SearchIcon color={colors.primary['400']} />
+          <ArrowForwardIcon color={colors.primary['400']} />
         </InputLeftElement>
         <Input
           bgColor="white"
           borderRadius="6px"
-          placeholder="Go to instance id"
-          aria-label="Instance id"
+          placeholder="Exact instance id"
+          aria-label="Open instance by exact id"
+          title="Opens one instance by its exact id. Partial ids are not searched."
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />

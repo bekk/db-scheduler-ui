@@ -75,6 +75,8 @@ export const StatusTabs: React.FC<{
             as="button"
             type="button"
             aria-pressed={active}
+            // As on the Overview, a tab with nothing in it is inert unless it is the current one.
+            disabled={n === 0 && !active}
             onClick={() => onChange(value)}
             minW="8.5rem"
             textAlign="left"
@@ -87,9 +89,9 @@ export const StatusTabs: React.FC<{
             borderRadius="8px"
             px={4}
             py={3}
-            cursor="pointer"
+            cursor={n === 0 && !active ? 'default' : 'pointer'}
             transition="border-color 0.12s ease"
-            _hover={{ borderColor: tone }}
+            _hover={n === 0 && !active ? undefined : { borderColor: tone }}
           >
             <Text
               fontSize="2xl"

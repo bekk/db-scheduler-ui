@@ -54,9 +54,11 @@ instance count as a sub; running/scheduled are instance totals.
 
 ## Filter chips
 
-Three **independent toggle** chips, **AND-combined**. They filter the already-loaded list
-**client-side** (the Overview has no pagination — all rows are present), so chips combine
-freely and need no server round-trip.
+**Single-select** chips: choosing one replaces the previous one, and choosing the active one
+clears it. (They were first AND-combined toggles; in user testing "Scheduled" plus "Failing"
+narrowing to tasks that are both read as a bug. A link with several keeps the first.) They
+filter the already-loaded list **client-side** (the Overview has no pagination — all rows are
+present), so they need no server round-trip.
 
 | Chip              | Keeps tasks where        | Source field            |
 |-------------------|--------------------------|-------------------------|

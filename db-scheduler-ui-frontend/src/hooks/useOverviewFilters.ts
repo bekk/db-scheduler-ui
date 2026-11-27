@@ -34,9 +34,11 @@ export const useOverviewFilters = (): OverviewFilterState => {
   const [searchParams, setSearchParams] = useSearchParams();
   // Unknown values are dropped: the query string is user-editable.
   const selected = searchParams.get(FILTER_PARAM)?.split(',') ?? [];
+  // One filter at a time: combined, they narrowed to tasks matching all of them, which read
+  // as a bug. An old multi-filter link keeps its first one.
   const activeFilters = OVERVIEW_FILTER_KEYS.filter((key) =>
     selected.includes(key),
-  );
+  ).slice(0, 1);
 
   const write = (next: OverviewFilterKey[]) => {
     const params = new URLSearchParams(searchParams);
@@ -53,12 +55,7 @@ export const useOverviewFilters = (): OverviewFilterState => {
 
   return {
     activeFilters,
-    toggleFilter: (key) =>
-      write(
-        activeFilters.includes(key)
-          ? activeFilters.filter((active) => active !== key)
-          : [...activeFilters, key],
-      ),
+    toggleFilter: (key) => write(activeFilters.includes(key) ? [] : [key]),
     clearFilters: () => write([]),
   };
 };

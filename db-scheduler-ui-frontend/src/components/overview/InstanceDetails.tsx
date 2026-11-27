@@ -20,28 +20,17 @@ import {
   AlertDialogOverlay,
   Box,
   Button,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   HStack,
-  IconButton,
   Link,
+  SimpleGrid,
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import JsonViewer from 'src/components/common/JsonViewer';
 import { useInstanceDetail } from 'src/hooks/useInstanceDetail';
-import {
-  InstanceDetail,
-  InstanceRun,
-  InstanceStatus,
-} from 'src/models/InstanceDetail';
+import { InstanceDetail, InstanceRun } from 'src/models/InstanceDetail';
 import { isOverdue, overdueColor } from 'src/utils/overdue';
 import deleteTask from 'src/services/deleteTask';
 import runTask from 'src/services/runTask';
@@ -50,138 +39,6 @@ import { dateFormatText } from 'src/utils/dateFormatText';
 import { getReadonly } from 'src/utils/config';
 import { formatDistanceToNowStrict } from 'date-fns';
 
-interface InstanceDrawerProps {
-  /** The task whose execution to show; null keeps the drawer closed. */
-  taskName: string | null;
-  /** The execution to show; when absent the task's sole execution is used. */
-  instanceId?: string | null;
-  /** Link to the task page, for drawers opened from somewhere other than that page. */
-  showTaskPageLink?: boolean;
-  /** Steps through the list the drawer was opened from; absent when there is no such list. */
-  stepper?: Stepper;
-  onClose: () => void;
-  /** Refresh the overview behind the drawer after an action changes the execution. */
-  onChanged: () => void;
-}
-
-export interface Stepper {
-  /** Zero-based position of the open instance among the loaded rows. */
-  position: number;
-  loaded: number;
-  /** More rows exist than are loaded. */
-  hasMore: boolean;
-  onPrevious: (() => void) | null;
-  onNext: (() => void) | null;
-}
-
-const statusLabel: Record<InstanceStatus, string> = {
-  FAILED: 'Failed',
-  RUNNING: 'Running',
-  SCHEDULED: 'Scheduled',
-};
-
-const statusColor: Record<InstanceStatus, string> = {
-  FAILED: colors.failed['200'],
-  RUNNING: colors.running['300'],
-  SCHEDULED: colors.primary['500'],
-};
-
-/** Slide-over detail for a single execution. See `specs/instance-panel/spec.md`. */
-export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
-  taskName,
-  instanceId,
-  showTaskPageLink = false,
-  stepper,
-  onClose,
-  onChanged,
-}) => {
-  const { instance, status, refetch } = useInstanceDetail(taskName, instanceId);
-  const location = useLocation();
-  // react-query keeps `data` from the last successful fetch around on a failed poll, so gate on
-  // `status` rather than `instance` — otherwise the header keeps a stale badge after the body
-  // has already moved on to a gone/ambiguous/error message.
-  const showInstance = status === 'ready' && !!instance;
-  // Opened from the Overview the reader picked a task, so the task leads; opened from the task
-  // page they picked an instance, so the instance id does.
-  const title = showTaskPageLink || !showInstance ? taskName : instance.id;
-  const subtitle = showInstance
-    ? showTaskPageLink
-      ? instance.id
-      : taskName
-    : null;
-
-  return (
-    <Drawer isOpen={!!taskName} placement="right" onClose={onClose} size="md">
-      <DrawerOverlay />
-      {/* Wider than Chakra's md so stack traces and instance ids fit without wrapping. */}
-      <DrawerContent maxW="min(40rem, 92vw)">
-        <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth="1px" pb={3}>
-          {/* Right padding keeps the controls clear of the close button. */}
-          <HStack spacing={3} align="center" pr={8}>
-            <Text flex="1" minW={0} fontSize="lg" color={colors.primary['600']}>
-              {title}
-              {showInstance && (
-                <Text
-                  as="span"
-                  ml={3}
-                  fontSize="sm"
-                  fontWeight="bold"
-                  whiteSpace="nowrap"
-                  color={statusColor[instance.status]}
-                >
-                  {statusLabel[instance.status]}
-                </Text>
-              )}
-            </Text>
-            {showTaskPageLink && taskName && (
-              <Button
-                as={RouterLink}
-                to={`/tasks/${encodeURIComponent(taskName)}`}
-                // The breadcrumb returns here, with the Overview's filters but not the panel.
-                state={{ from: withoutParam(location, 'task') }}
-                size="xs"
-                variant="outline"
-                fontWeight="semibold"
-                color={colors.running['300']}
-                flexShrink={0}
-              >
-                Open task page →
-              </Button>
-            )}
-            {stepper && <StepperControls stepper={stepper} />}
-          </HStack>
-          {subtitle && (
-            <Text
-              fontSize="xs"
-              fontWeight="normal"
-              fontFamily={showTaskPageLink ? 'mono' : undefined}
-              color={colors.primary['400']}
-            >
-              {subtitle}
-            </Text>
-          )}
-        </DrawerHeader>
-
-        <DrawerBody>
-          <InstanceDetailsBody
-            status={status}
-            instance={instance}
-            onDone={() => {
-              refetch();
-              onChanged();
-            }}
-            onDeleted={() => {
-              onChanged();
-              onClose();
-            }}
-          />
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
-  );
-};
-
 type DetailStatus = ReturnType<typeof useInstanceDetail>['status'];
 
 const InstanceDetailsBody: React.FC<{
@@ -189,14 +46,15 @@ const InstanceDetailsBody: React.FC<{
   instance: InstanceDetail | undefined | null;
   onDone: () => void;
   onDeleted: () => void;
-}> = ({ status, instance, onDone, onDeleted }) => (
+  goneText?: string;
+}> = ({ status, instance, onDone, onDeleted, goneText }) => (
   <>
     {status === 'loading' && <Muted>Loading instance…</Muted>}
     {status === 'error' && <Muted>Could not load this instance.</Muted>}
     {status === 'gone' && (
       <Muted>
-        This execution is no longer scheduled — it may have completed or been
-        deleted.
+        {goneText ??
+          'This execution is no longer scheduled — it may have completed or been deleted.'}
       </Muted>
     )}
     {status === 'ambiguous' && (
@@ -245,12 +103,15 @@ export const InstanceDetails: React.FC<{
   /** Refresh the list around it after an action changes the execution. */
   onChanged: () => void;
   onDeleted: () => void;
-}> = ({ taskName, instanceId, onChanged, onDeleted }) => {
+  /** Replaces the "no longer scheduled" text, e.g. for an id that was typed in. */
+  goneText?: string;
+}> = ({ taskName, instanceId, onChanged, onDeleted, goneText }) => {
   const { instance, status, refetch } = useInstanceDetail(taskName, instanceId);
   return (
     <InstanceDetailsBody
       status={status}
       instance={instance}
+      goneText={goneText}
       onDone={() => {
         refetch();
         onChanged();
@@ -261,85 +122,6 @@ export const InstanceDetails: React.FC<{
       }}
     />
   );
-};
-
-// Looks disabled but keeps focus: a truly disabled button drops focus out of the drawer, and the
-// drawer then no longer hears Esc.
-const endOfList = (atEnd: boolean) =>
-  atEnd
-    ? {
-        'aria-disabled': true,
-        opacity: 0.35,
-        cursor: 'not-allowed',
-        _hover: { bgColor: 'transparent' },
-      }
-    : {};
-
-const StepperControls: React.FC<{ stepper: Stepper }> = ({ stepper }) => {
-  const { position, loaded, hasMore, onPrevious, onNext } = stepper;
-
-  // Arrow keys step too, unless the reader is typing or a button has its own use for them.
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (target?.closest('input, textarea, select, [role="alertdialog"]')) {
-        return;
-      }
-      if (event.key === 'ArrowLeft' && onPrevious) {
-        onPrevious();
-      } else if (event.key === 'ArrowRight' && onNext) {
-        onNext();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onPrevious, onNext]);
-
-  return (
-    <HStack spacing={1} flexShrink={0}>
-      <Text
-        fontSize="xs"
-        fontWeight="normal"
-        color={colors.primary['400']}
-        whiteSpace="nowrap"
-      >
-        {(position + 1).toLocaleString()} of {loaded.toLocaleString()}
-        {hasMore ? ' loaded' : ''}
-      </Text>
-      <IconButton
-        size="xs"
-        variant="ghost"
-        icon={<ChevronLeftIcon boxSize={5} />}
-        aria-label="Previous instance"
-        title="Previous instance (←)"
-        {...endOfList(!onPrevious)}
-        onClick={() => onPrevious?.()}
-      />
-      <IconButton
-        size="xs"
-        variant="ghost"
-        icon={<ChevronRightIcon boxSize={5} />}
-        aria-label="Next instance"
-        title={
-          !onNext && hasMore
-            ? 'Load more rows on the page to go further'
-            : 'Next instance (→)'
-        }
-        {...endOfList(!onNext)}
-        onClick={() => onNext?.()}
-      />
-    </HStack>
-  );
-};
-
-const withoutParam = (
-  location: { pathname: string; search: string },
-  name: string,
-) => {
-  const params = new URLSearchParams(location.search);
-  params.delete(name);
-  const search = params.toString();
-  return location.pathname + (search ? `?${search}` : '');
 };
 
 const Muted: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -401,7 +183,8 @@ const Fact: React.FC<{
 );
 
 const Facts: React.FC<{ instance: InstanceDetail }> = ({ instance }) => (
-  <Box>
+  // Two columns once there is room, so labels and values do not drift apart on wide rows.
+  <SimpleGrid columns={{ base: 1, lg: 2 }} columnGap={10}>
     <Fact
       label="Consecutive failures"
       value={instance.consecutiveFailures}
@@ -434,7 +217,7 @@ const Facts: React.FC<{ instance: InstanceDetail }> = ({ instance }) => (
       label="Picked by"
       value={instance.picked ? instance.pickedBy : notRunning()}
     />
-  </Box>
+  </SimpleGrid>
 );
 
 // An absent history block means db-scheduler-ui.history is off.
