@@ -38,6 +38,10 @@ import { InstanceDetails } from 'src/components/overview/InstanceDrawer';
 import { GoToInstance } from 'src/components/task/GoToInstance';
 import { RerunFailedButton } from 'src/components/task/RerunFailedButton';
 import { TASK_EXECUTIONS_QUERY_KEY } from 'src/services/getTaskExecutions';
+import {
+  getInstanceDetail,
+  INSTANCE_QUERY_KEY,
+} from 'src/services/getInstanceDetail';
 import { getShowHistory } from 'src/utils/config';
 import { ExecutionTable } from 'src/components/task/ExecutionTable';
 import { StartFromControl } from 'src/components/task/StartFromControl';
@@ -70,6 +74,8 @@ const emptyText: Record<ExecutionStatusFilter, string> = {
   overdue: 'No overdue instances',
   scheduled: 'No scheduled instances',
 };
+
+const SOLE_OPEN_DELAY_MS = 350;
 
 /** One task's executions, by status. See `specs/task-detail/spec.md`. */
 export const TaskPage: React.FC = () => {
@@ -120,7 +126,26 @@ export const TaskPage: React.FC = () => {
     task?.instanceCount === 1 && rows.length === 1 && !executions.hasNextPage
       ? rows[0].taskInstance
       : null;
-  const expanded = params.instance ?? (soleCollapsed ? null : sole);
+  // The sole row is shown closed for a moment and then opens, so the reader sees the list they
+  // landed on become the instance's details. Its details are fetched meanwhile, so it opens full.
+  const [soleOpened, setSoleOpened] = useState<string | null>(null);
+  useEffect(() => {
+    if (!sole || soleOpened === sole) {
+      return;
+    }
+    let live = true;
+    void Promise.all([
+      queryClient.prefetchQuery([INSTANCE_QUERY_KEY, taskName, sole], () =>
+        getInstanceDetail(taskName, sole),
+      ),
+      new Promise((resolve) => setTimeout(resolve, SOLE_OPEN_DELAY_MS)),
+    ]).then(() => live && setSoleOpened(sole));
+    return () => {
+      live = false;
+    };
+  }, [sole, soleOpened, taskName, queryClient]);
+  const expanded =
+    params.instance ?? (soleCollapsed || soleOpened !== sole ? null : sole);
   const expandedLoaded = rows.some((row) => row.taskInstance === expanded);
 
   const toggle = (id: string) => {

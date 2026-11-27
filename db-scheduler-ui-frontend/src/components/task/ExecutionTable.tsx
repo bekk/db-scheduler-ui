@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
-import { Box, Button, Grid, HStack, Text } from '@chakra-ui/react';
+import { Box, Button, Collapse, Grid, HStack, Text } from '@chakra-ui/react';
 import { formatDistanceToNowStrict, isBefore } from 'date-fns';
 import { useEffect } from 'react';
 import { ExecutionRow } from 'src/models/ExecutionPage';
@@ -213,7 +213,8 @@ export const ExecutionTable: React.FC<ExecutionTableProps> = ({
                     </Button>
                   </Box>
                 </Grid>
-                {isSelected && (
+                {/* Unmounted when closed, so only the open row fetches its details. */}
+                <Collapse in={isSelected} unmountOnExit animateOpacity>
                   <Box
                     px={6}
                     pb={5}
@@ -222,7 +223,7 @@ export const ExecutionTable: React.FC<ExecutionTableProps> = ({
                   >
                     {renderDetails(row.taskInstance)}
                   </Box>
-                )}
+                </Collapse>
               </Box>
             );
           })}
