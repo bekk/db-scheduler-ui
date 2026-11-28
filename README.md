@@ -29,7 +29,7 @@ dashboard for monitoring and basic administration of tasks.
 ### Prerequisites
 
 * An existing Spring Boot application, with [db-scheduler](https://github.com/kagkarlsson/db-scheduler)
-* Minimum db-scheduler version 16.12.0
+* Minimum db-scheduler version 17.2.0
 * Minimum Java 17 and SpringBoot 3.4 (or SpringBoot 4.0 for the Spring Boot 4 starter)
 
 ## Getting started
@@ -108,6 +108,15 @@ for full attribution.
 
 > **Migrating from `io.rocketbase.extension:db-scheduler-log-spring-boot-starter`:**
 > remove that dependency and rename `db-scheduler-log.*` properties to `db-scheduler-ui.log.*`.
+
+## Recommended index
+
+Per-task views page through one task's executions in execution-time order. db-scheduler's default
+schema has no index for that, so on large tables add one:
+
+```sql
+CREATE INDEX st_task_time_idx ON scheduled_tasks (task_name, execution_time, task_instance);
+```
 
 ## How it works
 

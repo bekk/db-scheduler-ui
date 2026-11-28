@@ -16,9 +16,11 @@ package com.github.bekk.exampleapp.service;
 import static com.github.bekk.exampleapp.tasks.ChainTask.ORDER_CAPTURE_PAYMENT;
 import static com.github.bekk.exampleapp.tasks.FailingTask.CHARGE_CREDIT_CARD;
 import static com.github.bekk.exampleapp.tasks.FailingTask.DELIVER_OUTGOING_WEBHOOK;
+import static com.github.bekk.exampleapp.tasks.InvoiceEmailTask.SEND_INVOICE_EMAIL;
 import static com.github.bekk.exampleapp.tasks.LongRunningTask.GENERATE_MONTHLY_INVOICE_PDF;
 import static com.github.bekk.exampleapp.tasks.OneTimeTaskExample.SEND_WELCOME_EMAIL;
 
+import com.github.bekk.exampleapp.model.InvoiceEmail;
 import com.github.bekk.exampleapp.model.NewSignup;
 import com.github.bekk.exampleapp.model.Order;
 import com.github.kagkarlsson.scheduler.Scheduler;
@@ -78,5 +80,23 @@ public class TaskService {
             .data(new NewSignup(20232, "per.hansen@mail.com", "Per Hansen", Instant.now()))
             .build(),
         Instant.now());
+
+    scheduleInvoiceEmails();
+  }
+
+  // 300 instances: the first 30 due at once, so the ones ending in 7 fail and stay failing, the
+  // rest
+  // over the next six hours, two per slot so some share an execution time.
+  private void scheduleInvoiceEmails() {
+    Instant start = Instant.now();
+    String[] currencies = {"NOK", "SEK", "EUR"};
+    for (int i = 0; i < 300; i++) {
+      scheduler.schedule(
+          SEND_INVOICE_EMAIL
+              .instance("invoice-%s-%07d".formatted(YearMonth.now(), 88000 + i))
+              .data(new InvoiceEmail(4000 + i, 100 + (i * 37 % 4900), currencies[i % 3]))
+              .build(),
+          i < 30 ? start : start.plusSeconds(((i - 30) / 2) * 160L));
+    }
   }
 }

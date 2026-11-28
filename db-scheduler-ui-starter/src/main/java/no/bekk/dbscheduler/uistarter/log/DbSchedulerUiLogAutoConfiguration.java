@@ -16,6 +16,7 @@
 package no.bekk.dbscheduler.uistarter.log;
 
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
+import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerOverrides;
 import com.github.kagkarlsson.scheduler.exceptions.SerializationException;
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import java.io.ByteArrayInputStream;
@@ -29,8 +30,10 @@ import no.bekk.dbscheduler.ui.log.jdbc.IdProvider;
 import no.bekk.dbscheduler.ui.log.jdbc.JdbcLogRepository;
 import no.bekk.dbscheduler.ui.log.jdbc.Snowflake;
 import no.bekk.dbscheduler.ui.log.listener.LogSchedulerListener;
+import no.bekk.dbscheduler.uistarter.autoconfigure.SchedulerSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -39,7 +42,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ConfigurableObjectInputStream;
 
 @AutoConfiguration
@@ -70,11 +72,18 @@ public class DbSchedulerUiLogAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean(LogRepository.class)
-  LogRepository logRepository(IdProvider idProvider, @Lazy DbSchedulerCustomizer customizer) {
+  LogRepository logRepository(
+      IdProvider idProvider,
+      ObjectProvider<DbSchedulerOverrides> overrides,
+      ObjectProvider<DbSchedulerCustomizer> customizer) {
     log.debug("No LogRepository bean found, creating a JdbcLogRepository");
+    // Resolved on first use, not here: the overrides may depend on beans that depend on this one.
     return new JdbcLogRepository(
         existingDataSource,
-        () -> customizer.serializer().orElse(SPRING_JAVA_SERIALIZER),
+        () ->
+            SchedulerSettings.resolve(overrides.getIfAvailable(), customizer.getIfAvailable())
+                .serializer()
+                .orElse(SPRING_JAVA_SERIALIZER),
         config.tableName(),
         idProvider);
   }

@@ -17,6 +17,7 @@ import { TopBar } from 'src/components/common/TopBar';
 import { LogList } from 'src/components/history/LogList';
 import TaskList from 'src/components/scheduled/TaskList';
 import { OverviewPage } from 'src/pages/OverviewPage';
+import { TaskPage } from 'src/pages/TaskPage';
 import { getShowHistory, getShowOverview } from 'src/utils/config';
 
 export const FrontPage: React.FC = () => {
@@ -29,11 +30,14 @@ export const FrontPage: React.FC = () => {
         <Routes>
           <Route
             index
-            element={showOverview ? <Navigate to="/overview" replace /> : <TaskList />}
+            element={
+              showOverview ? <Navigate to="/overview" replace /> : <TaskList />
+            }
           ></Route>
           {showOverview && (
             <>
               <Route path="/overview" element={<OverviewPage />}></Route>
+              <Route path="/tasks/:taskName" element={<TaskPage />}></Route>
               <Route path="/scheduled" element={<TaskList />}></Route>
               <Route path="/scheduled/:taskName" element={<TaskList />}></Route>
               <Route

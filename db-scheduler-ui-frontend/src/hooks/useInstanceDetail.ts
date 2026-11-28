@@ -47,10 +47,11 @@ export interface InstanceDetailResult {
  */
 export const useInstanceDetail = (
   taskName: string | null,
+  instanceId?: string | null,
 ): InstanceDetailResult => {
   const query = useQuery(
-    [INSTANCE_QUERY_KEY, taskName],
-    () => getInstanceDetail(taskName as string),
+    [INSTANCE_QUERY_KEY, taskName, instanceId ?? null],
+    () => getInstanceDetail(taskName as string, instanceId ?? undefined),
     {
       enabled: !!taskName,
       // A missing or ambiguous instance will not change on retry.

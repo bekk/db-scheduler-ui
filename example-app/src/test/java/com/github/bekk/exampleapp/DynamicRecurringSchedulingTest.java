@@ -49,7 +49,7 @@ class DynamicRecurringSchedulingTest {
     ResponseEntity<GetTasksResponse> result =
         this.restTemplate.getForEntity(
             baseUrl
-                + "/db-scheduler-api/tasks/all?filter=ALL&pageNumber=0&size=10&sorting=DEFAULT&asc=true&searchTerm="
+                + "/db-scheduler-api/tasks/all?filter=ALL&pageNumber=0&size=10&sorting=DEFAULT&asc=true&searchTermTaskName="
                 + CUSTOMER_SCHEDULED_REPORT.getTaskName(),
             GetTasksResponse.class);
 

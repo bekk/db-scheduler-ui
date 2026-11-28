@@ -18,12 +18,15 @@ import static no.bekk.dbscheduler.uistarter.config.DbSchedulerUiUtil.normalizePa
 
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerCustomizer;
+import com.github.kagkarlsson.scheduler.boot.config.DbSchedulerOverrides;
 import com.github.kagkarlsson.scheduler.serializer.Serializer;
 import com.github.kagkarlsson.scheduler.task.Task;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import javax.sql.DataSource;
 import no.bekk.dbscheduler.ui.controller.ConfigController;
+import no.bekk.dbscheduler.ui.controller.ExecutionAdminController;
 import no.bekk.dbscheduler.ui.controller.IndexHtmlController;
 import no.bekk.dbscheduler.ui.controller.InstanceController;
 import no.bekk.dbscheduler.ui.controller.LogController;
@@ -31,6 +34,8 @@ import no.bekk.dbscheduler.ui.controller.OverviewController;
 import no.bekk.dbscheduler.ui.controller.SpaFallbackMvc;
 import no.bekk.dbscheduler.ui.controller.TaskAdminController;
 import no.bekk.dbscheduler.ui.controller.TaskController;
+import no.bekk.dbscheduler.ui.service.ExecutionPager;
+import no.bekk.dbscheduler.ui.service.FailedRerunner;
 import no.bekk.dbscheduler.ui.service.InstanceLogRepository;
 import no.bekk.dbscheduler.ui.service.InstanceService;
 import no.bekk.dbscheduler.ui.service.LogLogic;
@@ -45,6 +50,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -111,9 +117,12 @@ public class UiApiAutoConfiguration {
       matchIfMissing = false)
   InstanceLogRepository instanceLogRepository(
       DataSource dataSource,
-      DbSchedulerCustomizer customizer,
+      ObjectProvider<DbSchedulerOverrides> overrides,
+      ObjectProvider<DbSchedulerCustomizer> customizer,
       @Value("${db-scheduler-ui.log.table-name:scheduled_execution_logs}") String logTableName) {
-    return new InstanceLogRepository(customizer.dataSource().orElse(dataSource), logTableName);
+    SchedulerSettings settings =
+        SchedulerSettings.resolve(overrides.getIfAvailable(), customizer.getIfAvailable());
+    return new InstanceLogRepository(settings.dataSource().orElse(dataSource), logTableName);
   }
 
   @Bean
@@ -137,8 +146,37 @@ public class UiApiAutoConfiguration {
       name = "overview",
       havingValue = "true",
       matchIfMissing = false)
-  InstanceController instanceController(InstanceService instanceService) {
-    return new InstanceController(instanceService);
+  InstanceController instanceController(
+      InstanceService instanceService, ExecutionPager executionPager) {
+    return new InstanceController(instanceService, executionPager);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnProperty(
+      prefix = "db-scheduler-ui",
+      name = "overview",
+      havingValue = "true",
+      matchIfMissing = false)
+  ExecutionPager executionPager(Scheduler scheduler, DbSchedulerUiProperties properties) {
+    return new ExecutionPager(scheduler, properties.taskData(), Clock.systemUTC());
+  }
+
+  private static final String OVERVIEW_AND_WRITABLE =
+      "${db-scheduler-ui.overview:false} and !${db-scheduler-ui.read-only:false}";
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnExpression(OVERVIEW_AND_WRITABLE)
+  FailedRerunner failedRerunner(Scheduler scheduler) {
+    return new FailedRerunner(scheduler, Clock.systemUTC(), FailedRerunner.DEFAULT_BATCH_SIZE);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  @ConditionalOnExpression(OVERVIEW_AND_WRITABLE)
+  ExecutionAdminController executionAdminController(FailedRerunner failedRerunner) {
+    return new ExecutionAdminController(failedRerunner);
   }
 
   @Bean
@@ -151,13 +189,16 @@ public class UiApiAutoConfiguration {
   LogLogic logLogic(
       DataSource dataSource,
       Caching caching,
-      DbSchedulerCustomizer customizer,
+      ObjectProvider<DbSchedulerOverrides> overrides,
+      ObjectProvider<DbSchedulerCustomizer> customizer,
       DbSchedulerUiProperties properties,
       @Value("${db-scheduler-ui.log.table-name:scheduled_execution_logs}") String logTableName,
       @Value("${db-scheduler-ui.log-limit:0}") int logLimit) {
+    SchedulerSettings settings =
+        SchedulerSettings.resolve(overrides.getIfAvailable(), customizer.getIfAvailable());
     return new LogLogic(
-        customizer.dataSource().orElse(dataSource),
-        customizer.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
+        settings.dataSource().orElse(dataSource),
+        settings.serializer().orElse(Serializer.DEFAULT_JAVA_SERIALIZER),
         caching,
         properties.taskData(),
         logTableName,

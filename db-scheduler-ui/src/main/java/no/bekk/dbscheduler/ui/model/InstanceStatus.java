@@ -13,6 +13,8 @@
  */
 package no.bekk.dbscheduler.ui.model;
 
+import com.github.kagkarlsson.scheduler.ScheduledExecution;
+
 /**
  * State of a single execution. No {@code DORMANT}: that is a task-level state, describing a task
  * with no executions at all.
@@ -20,5 +22,13 @@ package no.bekk.dbscheduler.ui.model;
 public enum InstanceStatus {
   FAILED,
   RUNNING,
-  SCHEDULED
+  SCHEDULED;
+
+  // Picked beats failing: a failing execution that is running now reports as RUNNING.
+  public static InstanceStatus of(ScheduledExecution<?> execution) {
+    if (execution.isPicked()) {
+      return RUNNING;
+    }
+    return execution.getConsecutiveFailures() > 0 ? FAILED : SCHEDULED;
+  }
 }

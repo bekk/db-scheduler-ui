@@ -96,6 +96,17 @@ public final class StubSchedulerClient implements SchedulerClient {
   }
 
   @Override
+  public boolean tryReschedule(TaskInstanceId taskInstanceId, Instant newExecutionTime) {
+    throw unsupported();
+  }
+
+  @Override
+  public <T> boolean tryReschedule(
+      TaskInstanceId taskInstanceId, Instant newExecutionTime, T newData) {
+    throw unsupported();
+  }
+
+  @Override
   public <T> boolean reschedule(
       TaskInstanceId taskInstanceId, Instant newExecutionTime, T newData) {
     throw unsupported();

@@ -42,6 +42,8 @@ class SmokeReadOnlyTest {
   @Test
   void testContextLoads() {
     assertThat(context.containsBean("taskAdminController")).isFalse();
+    assertThat(context.containsBean("executionAdminController")).isFalse();
+    assertThat(context.containsBean("executionPager")).isTrue();
     assertThat(context.containsBean("taskController")).isTrue();
   }
 

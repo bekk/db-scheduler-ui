@@ -85,7 +85,7 @@ public class InstanceService {
     return new InstanceDetail(
         taskName,
         instanceId,
-        status(execution),
+        InstanceStatus.of(execution),
         execution.getExecutionTime(),
         execution.isPicked(),
         execution.getPickedBy(),
@@ -105,15 +105,5 @@ public class InstanceService {
     return new InstanceHistory(
         hasEverFailed ? logRepository.findLastFailure(taskName, instanceId).orElse(null) : null,
         logRepository.findRecentRuns(taskName, instanceId, RECENT_RUNS));
-  }
-
-  // Picked beats failing: a failing execution that is running now reports as RUNNING.
-  private InstanceStatus status(ScheduledExecution<Object> execution) {
-    if (execution.isPicked()) {
-      return InstanceStatus.RUNNING;
-    }
-    return execution.getConsecutiveFailures() > 0
-        ? InstanceStatus.FAILED
-        : InstanceStatus.SCHEDULED;
   }
 }

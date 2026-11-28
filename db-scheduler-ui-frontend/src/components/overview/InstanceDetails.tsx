@@ -20,14 +20,9 @@ import {
   AlertDialogOverlay,
   Box,
   Button,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   HStack,
   Link,
+  SimpleGrid,
   Text,
   useToast,
 } from '@chakra-ui/react';
@@ -35,11 +30,7 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JsonViewer from 'src/components/common/JsonViewer';
 import { useInstanceDetail } from 'src/hooks/useInstanceDetail';
-import {
-  InstanceDetail,
-  InstanceRun,
-  InstanceStatus,
-} from 'src/models/InstanceDetail';
+import { InstanceDetail, InstanceRun } from 'src/models/InstanceDetail';
 import { isOverdue, overdueColor } from 'src/utils/overdue';
 import deleteTask from 'src/services/deleteTask';
 import runTask from 'src/services/runTask';
@@ -48,124 +39,88 @@ import { dateFormatText } from 'src/utils/dateFormatText';
 import { getReadonly } from 'src/utils/config';
 import { formatDistanceToNowStrict } from 'date-fns';
 
-interface InstanceDrawerProps {
-  /** The task whose sole execution to show; null keeps the drawer closed. */
-  taskName: string | null;
-  onClose: () => void;
-  /** Refresh the overview behind the drawer after an action changes the execution. */
+type DetailStatus = ReturnType<typeof useInstanceDetail>['status'];
+
+const InstanceDetailsBody: React.FC<{
+  status: DetailStatus;
+  instance: InstanceDetail | undefined | null;
+  onDone: () => void;
+  onDeleted: () => void;
+  goneText?: string;
+}> = ({ status, instance, onDone, onDeleted, goneText }) => (
+  <>
+    {status === 'loading' && <Muted>Loading instance…</Muted>}
+    {status === 'error' && <Muted>Could not load this instance.</Muted>}
+    {status === 'gone' && (
+      <Muted>
+        {goneText ??
+          'This execution is no longer scheduled — it may have completed or been deleted.'}
+      </Muted>
+    )}
+    {status === 'ambiguous' && (
+      <Muted>
+        This task has more than one execution now, so there is no single one to
+        show.
+      </Muted>
+    )}
+    {status === 'ready' && instance && (
+      <>
+        <Facts instance={instance} />
+        <Section label="Task data" />
+        {instance.taskData ? (
+          <Box
+            bgColor={colors.primary['200']}
+            borderRadius="6px"
+            p={3}
+            fontSize="sm"
+            overflowX="auto"
+          >
+            <JsonViewer data={instance.taskData} />
+          </Box>
+        ) : (
+          <Muted>no task data</Muted>
+        )}
+
+        <ExceptionSection instance={instance} />
+        <HistorySection instance={instance} />
+        <Actions
+          // Remounts on a different instance so confirm/busy state doesn't survive a
+          // switch (e.g. Back navigating from one instance's delete-confirm to another's).
+          key={`${instance.taskName}:${instance.id}`}
+          instance={instance}
+          onDone={onDone}
+          onDeleted={onDeleted}
+        />
+      </>
+    )}
+  </>
+);
+
+/** An execution's details in place, e.g. expanded under its row. */
+export const InstanceDetails: React.FC<{
+  taskName: string;
+  instanceId: string;
+  /** Refresh the list around it after an action changes the execution. */
   onChanged: () => void;
-}
-
-const statusLabel: Record<InstanceStatus, string> = {
-  FAILED: 'Failed',
-  RUNNING: 'Running',
-  SCHEDULED: 'Scheduled',
-};
-
-const statusColor: Record<InstanceStatus, string> = {
-  FAILED: colors.failed['200'],
-  RUNNING: colors.running['300'],
-  SCHEDULED: colors.primary['500'],
-};
-
-/** Slide-over detail for a single execution. See `specs/instance-panel/spec.md`. */
-export const InstanceDrawer: React.FC<InstanceDrawerProps> = ({
-  taskName,
-  onClose,
-  onChanged,
-}) => {
-  const { instance, status, refetch } = useInstanceDetail(taskName);
-  // react-query keeps `data` from the last successful fetch around on a failed poll, so gate on
-  // `status` rather than `instance` — otherwise the header keeps a stale badge after the body
-  // has already moved on to a gone/ambiguous/error message.
-  const showInstance = status === 'ready' && !!instance;
-
+  onDeleted: () => void;
+  /** Replaces the "no longer scheduled" text, e.g. for an id that was typed in. */
+  goneText?: string;
+}> = ({ taskName, instanceId, onChanged, onDeleted, goneText }) => {
+  const { instance, status, refetch } = useInstanceDetail(taskName, instanceId);
   return (
-    <Drawer isOpen={!!taskName} placement="right" onClose={onClose} size="md">
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth="1px" pb={3}>
-          <HStack spacing={3} align="center">
-            <Text fontSize="lg" color={colors.primary['600']}>
-              {showInstance ? instance.id : taskName}
-            </Text>
-            {showInstance && (
-              <Text
-                fontSize="sm"
-                fontWeight="bold"
-                color={statusColor[instance.status]}
-              >
-                {statusLabel[instance.status]}
-              </Text>
-            )}
-          </HStack>
-          {/* Only once loaded: before that the title above already shows the task name. */}
-          {showInstance && (
-            <Text
-              fontSize="xs"
-              fontWeight="normal"
-              color={colors.primary['400']}
-            >
-              {taskName}
-            </Text>
-          )}
-        </DrawerHeader>
-
-        <DrawerBody>
-          {status === 'loading' && <Muted>Loading instance…</Muted>}
-          {status === 'error' && <Muted>Could not load this instance.</Muted>}
-          {status === 'gone' && (
-            <Muted>
-              This execution is no longer scheduled — it may have completed or
-              been deleted.
-            </Muted>
-          )}
-          {status === 'ambiguous' && (
-            <Muted>
-              This task has more than one execution now, so there is no single
-              one to show.
-            </Muted>
-          )}
-          {status === 'ready' && instance && (
-            <>
-              <Facts instance={instance} />
-              <Section label="Task data" />
-              {instance.taskData ? (
-                <Box
-                  bgColor={colors.primary['200']}
-                  borderRadius="6px"
-                  p={3}
-                  fontSize="sm"
-                  overflowX="auto"
-                >
-                  <JsonViewer data={instance.taskData} />
-                </Box>
-              ) : (
-                <Muted>no task data</Muted>
-              )}
-
-              <ExceptionSection instance={instance} />
-              <HistorySection instance={instance} />
-              <Actions
-                // Remounts on a different instance so confirm/busy state doesn't survive a
-                // switch (e.g. Back navigating from one instance's delete-confirm to another's).
-                key={`${instance.taskName}:${instance.id}`}
-                instance={instance}
-                onDone={() => {
-                  refetch();
-                  onChanged();
-                }}
-                onDeleted={() => {
-                  onChanged();
-                  onClose();
-                }}
-              />
-            </>
-          )}
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+    <InstanceDetailsBody
+      status={status}
+      instance={instance}
+      goneText={goneText}
+      onDone={() => {
+        refetch();
+        onChanged();
+      }}
+      onDeleted={() => {
+        onChanged();
+        onDeleted();
+      }}
+    />
   );
 };
 
@@ -228,7 +183,8 @@ const Fact: React.FC<{
 );
 
 const Facts: React.FC<{ instance: InstanceDetail }> = ({ instance }) => (
-  <Box>
+  // Two columns once there is room, so labels and values do not drift apart on wide rows.
+  <SimpleGrid columns={{ base: 1, lg: 2 }} columnGap={10}>
     <Fact
       label="Consecutive failures"
       value={instance.consecutiveFailures}
@@ -261,7 +217,7 @@ const Facts: React.FC<{ instance: InstanceDetail }> = ({ instance }) => (
       label="Picked by"
       value={instance.picked ? instance.pickedBy : notRunning()}
     />
-  </Box>
+  </SimpleGrid>
 );
 
 // An absent history block means db-scheduler-ui.history is off.
@@ -448,10 +404,16 @@ const Actions: React.FC<{
       >
         Delete
       </Button>
-      {instance.picked && (
+      {instance.picked ? (
         <Text fontSize="xs" color={colors.primary['400']}>
           Disabled while running
         </Text>
+      ) : (
+        instance.lastFailure && (
+          <Text fontSize="xs" color={colors.primary['400']}>
+            Rerunning resets the failure count and last-failure time.
+          </Text>
+        )
       )}
       {/* Deletion cannot be undone; spec.md marks it destructive and requires confirmation. */}
       <AlertDialog
@@ -465,11 +427,14 @@ const Actions: React.FC<{
               Delete instance
             </AlertDialogHeader>
             <AlertDialogBody>
-              Delete {instance.taskName} · {instance.id}? The scheduled execution
-              is removed and will not run.
+              Delete {instance.taskName} · {instance.id}? The scheduled
+              execution is removed and will not run.
             </AlertDialogBody>
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={() => setConfirmingDelete(false)}>
+              <Button
+                ref={cancelRef}
+                onClick={() => setConfirmingDelete(false)}
+              >
                 Cancel
               </Button>
               <Button

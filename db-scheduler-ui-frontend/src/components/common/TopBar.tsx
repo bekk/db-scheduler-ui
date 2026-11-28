@@ -29,7 +29,11 @@ export const TopBar: React.FC<TopBarProps> = ({ title }) => {
   const showOverview = getShowOverview();
   const showNavigation = showOverview || showHistory;
   const isHistory = location.pathname.startsWith('/history');
-  const isOverview = showOverview && location.pathname === '/overview';
+  // The task page is a drill-down from the Overview, so it keeps that tab selected.
+  const isOverview =
+    showOverview &&
+    (location.pathname === '/overview' ||
+      location.pathname.startsWith('/tasks/'));
   const isScheduled = !isHistory && !isOverview;
   const scheduledPath = showOverview ? '/scheduled' : '/';
 

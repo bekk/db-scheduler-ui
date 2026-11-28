@@ -13,7 +13,12 @@
  */
 package no.bekk.dbscheduler.ui.controller;
 
+import java.time.Instant;
+import java.util.Locale;
+import no.bekk.dbscheduler.ui.model.ExecutionPage;
+import no.bekk.dbscheduler.ui.model.ExecutionStatusFilter;
 import no.bekk.dbscheduler.ui.model.InstanceDetail;
+import no.bekk.dbscheduler.ui.service.ExecutionPager;
 import no.bekk.dbscheduler.ui.service.InstanceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -29,9 +34,39 @@ import org.springframework.web.server.ResponseStatusException;
 public class InstanceController {
 
   private final InstanceService instanceService;
+  private final ExecutionPager executionPager;
 
-  public InstanceController(InstanceService instanceService) {
+  public InstanceController(InstanceService instanceService, ExecutionPager executionPager) {
     this.instanceService = instanceService;
+    this.executionPager = executionPager;
+  }
+
+  /**
+   * One page of a task's executions, oldest execution time first.
+   *
+   * @param status {@code all}, {@code failing}, {@code running}, {@code overdue} or {@code
+   *     scheduled}, in any case
+   * @param after the previous page's {@code next}
+   * @param from execution time to start at when there is no cursor
+   */
+  @GetMapping("/executions")
+  public ExecutionPage getExecutions(
+      @RequestParam String taskName,
+      @RequestParam(defaultValue = "all") String status,
+      @RequestParam(required = false) String after,
+      @RequestParam(required = false) Instant from,
+      @RequestParam(required = false) Integer limit) {
+    ExecutionStatusFilter filter;
+    try {
+      filter = ExecutionStatusFilter.valueOf(status.toUpperCase(Locale.ROOT));
+    } catch (IllegalArgumentException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown status " + status);
+    }
+    try {
+      return executionPager.page(taskName, filter, after, from, limit);
+    } catch (IllegalArgumentException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
   }
 
   /**
